@@ -10,7 +10,6 @@ execute when any changes occur.
   Usage: kicker [options] -e [command] [path]
       -e, --execute [COMMAND]          The command to execute.
           --[no-]growl                 Whether or not to use Growl. Default is to use growl.
-          --growl-message [MESSAGE]    The message to Growl when the command succeeded.
           --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
 
 == Examples
@@ -21,12 +20,16 @@ Show all files whenever a change occurs in the current work directory:
 
 Run a Rake task whenever a given file is changed:
 
-  $ kicker -e "ONLY=nested_model_forms rake guides" guides/source/nested_model_forms.textile
+  $ kicker -e "rake guides" guides/source/nested_model_forms.textile
 
 Run a Run task whenever a given file is changed and specify a command to be
 executed if the user clicks a `succeeded' Growl message:
 
-  $ kicker -e "ONLY=nested_model_forms rake guides" --growl-command "open -a Safari guides/output/nested_model_forms.html" guides/source/nested_model_forms.textile
+  $ kicker -e "rake guides" --growl-command "open -a Safari guides/output/nested_model_forms.html" guides/source/nested_model_forms.textile
+
+And for fun, ghetto-autotest:
+
+  $ kicker -e "ruby test/test_case.rb" test/test_case.rb
 
 == Installation
 
