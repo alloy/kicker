@@ -14,19 +14,30 @@ else
   end
 end
 
+def log(msg)
+  puts "[#{Time.now}] #{msg}"
+end
+
 path = File.expand_path(path)
 file, path = path, File.dirname(path) unless File.directory?(path)
 
-puts "Watching for changes on `#{file || path}'"
+command = %{sh -c #{command.inspect}}
 
-stream = Rucola::FSEvents.start_watching(path) do |events|
+log "Watching for changes on `#{file || path}' with command: #{command}"
+
+watch_dog = Rucola::FSEvents.start_watching(path) do |events|
   unless file && !events.find { |e| e.last_modified_file == file }
-    system command
+    log "Change occured. Executing command:"
+    `#{command}`.strip.split("\n").each { |line| log "  #{line}" }
+    log "Command #{$?.success? ? 'succeeded' : "failed (#{$?})"}"
   end
 end
 
 trap("INT") do
-  stream.stop
+  log "Cleaning up…"
+  watch_dog.stop
+  OSX.FSEventStreamInvalidate(watch_dog.stream)
+  OSX.FSEventStreamRelease(watch_dog.stream)
   exit
 end
 
