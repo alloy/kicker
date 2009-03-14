@@ -36,6 +36,10 @@ class Kicker
   
   private
   
+  def log(message)
+    puts "[#{Time.now}] #{message}"
+  end
+  
   def validate_options!
     validate_path_and_command!
     validate_path_exists!

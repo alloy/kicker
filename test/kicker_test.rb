@@ -87,3 +87,17 @@ describe "Kicker, when running" do
     kicker.process([event])
   end
 end
+
+describe "Kicker, in general" do
+  before do
+    @kicker = Kicker.new(:path => '/some/dir', :command => 'ls -l')
+  end
+  
+  it "should print a log entry with timestamp" do
+    now = Time.now
+    Time.stubs(:now).returns(now)
+    
+    @kicker.expects(:puts).with("[#{now}] the message")
+    @kicker.send(:log, 'the message')
+  end
+end
