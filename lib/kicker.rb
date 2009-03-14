@@ -1,5 +1,6 @@
 class Kicker
-  attr_accessor :path, :command
+  attr_accessor :path
+  attr_writer :command
   attr_reader :file
   
   def initialize(options)
@@ -14,6 +15,10 @@ class Kicker
   
   def start
     validate_options!
+  end
+  
+  def command
+    "sh -c #{@command.inspect}"
   end
   
   private

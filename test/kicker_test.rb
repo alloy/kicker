@@ -11,7 +11,7 @@ describe "Kicker, when initializing" do
   end
   
   it "should return the command to execute once a change occurs" do
-    Kicker.new(:command => 'ls -l').command.should == 'ls -l'
+    Kicker.new(:command => 'ls -l').command.should == 'sh -c "ls -l"'
   end
   
   it "should return the dirname of the path if the given path is a file" do
