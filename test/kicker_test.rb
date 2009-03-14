@@ -116,7 +116,7 @@ describe "Kicker, in general" do
     Time.stubs(:now).returns(now)
     
     @kicker.expects(:puts).with("[#{now}] the message")
-    @kicker.send(:log, 'the message')
+    @kicker.log('the message')
   end
   
   it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
@@ -126,7 +126,7 @@ describe "Kicker, in general" do
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command succeeded')
-    @kicker.send(:execute!)
+    @kicker.execute!
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
@@ -134,6 +134,6 @@ describe "Kicker, in general" do
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command failed (123)')
-    @kicker.send(:execute!)
+    @kicker.execute!
   end
 end

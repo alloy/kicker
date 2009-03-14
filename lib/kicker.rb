@@ -36,8 +36,6 @@ class Kicker
     execute! unless file && !events.find { |e| e.last_modified_file == file }
   end
   
-  private
-  
   def log(message)
     puts "[#{Time.now}] #{message}"
   end
