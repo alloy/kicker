@@ -2,8 +2,18 @@
 
 A simple OS X CLI tool which uses FSEvents to run a given shell command.
 
-Give it a path to a file or directory and a shell command to execute when any
-changes occur:
+== Usage
+
+At the least give it a path to a file or directory and a shell command to
+execute when any changes occur.
+
+  Usage: kicker [options] -e [command] [path]
+      -e, --execute [COMMAND]          The command to execute.
+          --[no-]growl                 Whether or not to use Growl. Default is to use growl.
+          --growl-message [MESSAGE]    The message to Growl when the command succeeded.
+          --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
+
+== Examples
 
 Show all files whenever a change occurs in the current work directory:
 
