@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../vendor/rucola/fsevents', __FILE__)
+
+path, command = ARGV
+
+unless path && command
+  puts "Usage: #{$0} [PATH] [COMMAND]"
+  exit
+else
+  unless File.exist?(path)
+    puts "The given path `#{path}' does not exist."
+    exit 1
+  end
+end
+
+path = File.expand_path(path)
+file, path = path, File.dirname(path) unless File.directory?(path)
+
+puts "Watching for changes on `#{file || path}'"
+
+Rucola::FSEvents.start_watching(path) do |events|
+  unless file && !events.find { |e| e.last_modified_file == file }
+    system command
+  end
+end
+
+OSX::NSApplication.sharedApplication.run
