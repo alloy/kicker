@@ -58,6 +58,19 @@ describe "Kicker, when starting" do
     
     @kicker.start
   end
+  
+  it "should setup a signal handler for `INT' which stops the FSEvents stream and exits" do
+    @kicker.stubs(:validate_options!)
+    
+    watch_dog = stub('Rucola::FSEvents')
+    Rucola::FSEvents.stubs(:start_watching).returns(watch_dog)
+    
+    @kicker.expects(:trap).with('INT').yields
+    watch_dog.expects(:stop)
+    @kicker.expects(:exit)
+    
+    @kicker.start
+  end
 end
 
 describe "Kicker, when a change occurs" do
