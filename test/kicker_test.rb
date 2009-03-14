@@ -9,6 +9,19 @@ describe "Kicker.parse_options" do
     Kicker.parse_options(%w{ -e ls })[:command].should == 'ls'
     Kicker.parse_options(%w{ --execute ls })[:command].should == 'ls'
   end
+  
+  it "should parse if growl shouldn't be used" do
+    Kicker.parse_options([])[:growl].should == true
+    Kicker.parse_options(%w{ --no-growl })[:growl].should == false
+  end
+  
+  it "should parse the Growl message to use when the command succeeded" do
+    Kicker.parse_options(%w{ --growl-message Done! })[:growl_message].should == 'Done!'
+  end
+  
+  it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
+    Kicker.parse_options(%w{ --growl-command ls })[:growl_command].should == 'ls'
+  end
 end
 
 describe "Kicker, when initializing" do

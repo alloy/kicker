@@ -5,11 +5,23 @@ require 'optparse'
 class Kicker
   def self.parse_options(argv)
     argv = argv.dup
-    options = {}
+    options = { :growl => true }
     
     OptionParser.new do |opts|
-      opts.on('-e', '--execute [COMMAND]', 'The command to execute') do |command|
+      opts.on('-e', '--execute [COMMAND]', 'The command to execute.') do |command|
         options[:command] = command
+      end
+      
+      opts.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
+        options[:growl] = growl
+      end
+      
+      opts.on('--growl-message [MESSAGE]', 'The message to Growl when the command succeeded.') do |message|
+        options[:growl_message] = message
+      end
+      
+      opts.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
+        options[:growl_command] = command
       end
     end.parse!(argv)
     
