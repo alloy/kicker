@@ -1,5 +1,6 @@
 $:.unshift File.expand_path('../../vendor', __FILE__)
 require 'rucola/fsevents'
+require 'growlnotifier/growl_helpers'
 require 'optparse'
 
 class Kicker
@@ -37,12 +38,20 @@ class Kicker
     new(parse_options(argv)).start
   end
   
+  GROWL_NOTIFICATIONS = {
+    :change => 'Change occured',
+    :succeeded => 'Command succeeded',
+    :failed => 'Command failed'
+  }
+  
   attr_writer :command
   attr_reader :path, :file
+  attr_accessor :use_growl
   
   def initialize(options)
     self.path = options[:path] if options[:path]
     @command = options[:command]
+    @use_growl = options[:use_growl]
   end
   
   def path=(path)
@@ -64,6 +73,8 @@ class Kicker
       watch_dog.stop
       exit
     end
+    
+    Growl::Notifier.sharedInstance.register('Kicker', Kicker::GROWL_NOTIFICATIONS.values) if @use_growl
     
     OSX.CFRunLoopRun
   end

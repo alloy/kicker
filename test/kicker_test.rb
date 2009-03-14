@@ -104,6 +104,22 @@ describe "Kicker, when starting" do
     OSX.expects(:CFRunLoopRun)
     @kicker.start
   end
+  
+  it "should register with growl if growl should be used" do
+    @kicker.stubs(:validate_options!)
+    @kicker.use_growl = true
+    
+    Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
+    @kicker.start
+  end
+  
+  it "should _not_ register with growl if growl should not be used" do
+    @kicker.stubs(:validate_options!)
+    @kicker.use_growl = false
+    
+    Growl::Notifier.sharedInstance.expects(:register).never
+    @kicker.start
+  end
 end
 
 describe "Kicker, when a change occurs" do
