@@ -1,3 +1,6 @@
+$:.unshift File.expand_path('../../vendor', __FILE__)
+require 'rucola/fsevents'
+
 class Kicker
   attr_accessor :path
   attr_writer :command
@@ -15,6 +18,14 @@ class Kicker
   
   def start
     validate_options!
+    
+    watch_dog = Rucola::FSEvents.start_watching(path) do |events|
+      # unless file && !events.find { |e| e.last_modified_file == file }
+      #   log "Change occured. Executing command:"
+      #   `#{command}`.strip.split("\n").each { |line| log "  #{line}" }
+      #   log "Command #{$?.success? ? 'succeeded' : "failed (#{$?})"}"
+      # end
+    end
   end
   
   def command

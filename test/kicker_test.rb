@@ -28,6 +28,7 @@ end
 describe "Kicker, when starting" do
   before do
     @kicker = Kicker.new(:path => '/some/file.rb', :command => 'ls -l')
+    Rucola::FSEvents.stubs(:start_watching)
   end
   
   it "should show the usage banner when path and command are nil and exit" do
@@ -45,6 +46,12 @@ describe "Kicker, when starting" do
     @kicker.expects(:puts).with("The given path `#{@kicker.path}' does not exist.")
     @kicker.expects(:exit).with(1)
     
+    @kicker.start
+  end
+  
+  it "should start a FSEvents stream" do
+    @kicker.stubs(:validate_options!)
+    Rucola::FSEvents.expects(:start_watching).with(@kicker.path)
     @kicker.start
   end
 end
