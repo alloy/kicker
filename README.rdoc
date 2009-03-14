@@ -1,4 +1,4 @@
-= kicker
+= Kicker
 
 A simple OS X CLI tool which uses FSEvents to run a given shell command.
 
@@ -20,5 +20,5 @@ Run a Rake task whenever a given file is changed:
 == Tests??
 
 For now it's just a very simple bin script which uses the FSEvents abstraction
-from Rucola, which is tested there. Once/if this will every be developed
-further test cases will be added where appropriate.
+from Rucola, which is tested there. Once/if this will ever be developed further
+test cases will be added where appropriate.
