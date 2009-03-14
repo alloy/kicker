@@ -1,9 +1,15 @@
 class Kicker
   attr_accessor :path, :command
+  attr_reader :file
   
   def initialize(options)
-    @path = options[:path]
+    self.path = options[:path] if options[:path]
     @command = options[:command]
+  end
+  
+  def path=(path)
+    @path = File.expand_path(path)
+    @file, @path = @path, File.dirname(@path) unless File.directory?(@path)
   end
   
   def start
