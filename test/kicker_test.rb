@@ -49,9 +49,12 @@ describe "Kicker, when starting" do
     @kicker.start
   end
   
-  it "should start a FSEvents stream" do
+  it "should start a FSEvents stream with a block which calls #process with the events" do
     @kicker.stubs(:validate_options!)
-    Rucola::FSEvents.expects(:start_watching).with(@kicker.path)
+    
+    Rucola::FSEvents.expects(:start_watching).with(@kicker.path).yields(['event'])
+    @kicker.expects(:process).with(['event'])
+    
     @kicker.start
   end
 end
