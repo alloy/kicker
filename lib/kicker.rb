@@ -16,10 +16,6 @@ class Kicker
         options[:growl] = growl
       end
       
-      opts.on('--growl-message [MESSAGE]', 'The message to Growl when the command succeeded.') do |message|
-        options[:growl_message] = message
-      end
-      
       opts.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
         options[:growl_command] = command
       end
