@@ -19,18 +19,19 @@ class Kicker
   def start
     validate_options!
     
-    watch_dog = Rucola::FSEvents.start_watching(path) do |events|
-      process events
-      # unless file && !events.find { |e| e.last_modified_file == file }
-      #   log "Change occured. Executing command:"
-      #   `#{command}`.strip.split("\n").each { |line| log "  #{line}" }
-      #   log "Command #{$?.success? ? 'succeeded' : "failed (#{$?})"}"
-      # end
-    end
+    watch_dog = Rucola::FSEvents.start_watching(path) { |events| process(events) }
   end
   
   def command
     "sh -c #{@command.inspect}"
+  end
+  
+  def process(events)
+    unless file && !events.find { |e| e.last_modified_file == file }
+      #log "Change occured. Executing command:"
+      `#{command}` #.strip.split("\n").each { |line| log "  #{line}" }
+      #log "Command #{$?.success? ? 'succeeded' : "failed (#{$?})"}"
+    end
   end
   
   private

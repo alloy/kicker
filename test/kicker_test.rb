@@ -58,3 +58,32 @@ describe "Kicker, when starting" do
     @kicker.start
   end
 end
+
+describe "Kicker, when running" do
+  it "should execute the command if a change occured in the watched directory" do
+    File.stubs(:directory?).returns(true)
+    kicker = Kicker.new(:path => '/some/dir', :command => 'ls -l')
+    event = mock('Rucola::FSEvents::Event')
+    
+    kicker.expects(:`).with(kicker.command)
+    kicker.process([event])
+  end
+  
+  it "should execute the command if a change occured to the watched file" do
+    File.stubs(:directory?).returns(false)
+    kicker = Kicker.new(:path => '/some/file.rb', :command => 'ls -l')
+    event = mock('Rucola::FSEvents::Event', :last_modified_file => '/some/file.rb')
+    
+    kicker.expects(:`).with(kicker.command)
+    kicker.process([event])
+  end
+  
+  it "should _not_ execute the command if a change occured to another file than the one being watched" do
+    File.stubs(:directory?).returns(false)
+    kicker = Kicker.new(:path => '/some/file.rb', :command => 'ls -l')
+    event = mock('Rucola::FSEvents::Event', :last_modified_file => '/some/other_file.rb')
+    
+    kicker.expects(:`).never
+    kicker.process([event])
+  end
+end
