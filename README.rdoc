@@ -13,6 +13,10 @@ Run a Rake task whenever a given file is changed:
 
   $ kicker guides/source/nested_model_forms.textile "ONLY=nested_model_forms rake guides && open -a Safari guides/output/nested_model_forms.html"
 
+== Installation
+
+  $ sudo gem install alloy-kicker -s http://gems.github.com
+
 == Tests??
 
 For now it's just a very simple bin script which uses the FSEvents abstraction
