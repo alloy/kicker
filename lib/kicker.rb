@@ -1,7 +1,22 @@
 $:.unshift File.expand_path('../../vendor', __FILE__)
 require 'rucola/fsevents'
+require 'optparse'
 
 class Kicker
+  def self.parse_options(argv)
+    argv = argv.dup
+    options = {}
+    
+    OptionParser.new do |opts|
+      opts.on('-e', '--execute [COMMAND]', 'The command to execute') do |command|
+        options[:command] = command
+      end
+    end.parse!(argv)
+    
+    options[:path] = argv.first
+    options
+  end
+  
   attr_writer :command
   attr_reader :path, :file
   

@@ -1,5 +1,16 @@
 require File.expand_path('../test_helper', __FILE__)
 
+describe "Kicker.parse_options" do
+  it "should parse the path" do
+    Kicker.parse_options(['/some/file.rb'])[:path].should == '/some/file.rb'
+  end
+  
+  it "should parse the command" do
+    Kicker.parse_options(%w{ -e ls })[:command].should == 'ls'
+    Kicker.parse_options(%w{ --execute ls })[:command].should == 'ls'
+  end
+end
+
 describe "Kicker, when initializing" do
   before do
     @kicker = Kicker.new(:path => '/some/dir', :command => 'ls -l')
