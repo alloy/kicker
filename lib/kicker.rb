@@ -26,6 +26,8 @@ class Kicker
       watch_dog.stop
       exit
     end
+    
+    OSX.CFRunLoopRun
   end
   
   def command

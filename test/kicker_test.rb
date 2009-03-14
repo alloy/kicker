@@ -30,6 +30,7 @@ describe "Kicker, when starting" do
     @kicker = Kicker.new(:path => '/some/file.rb', :command => 'ls -l')
     @kicker.stubs(:log)
     Rucola::FSEvents.stubs(:start_watching)
+    OSX.stubs(:CFRunLoopRun)
   end
   
   it "should show the usage banner when path and command are nil and exit" do
@@ -69,6 +70,13 @@ describe "Kicker, when starting" do
     watch_dog.expects(:stop)
     @kicker.expects(:exit)
     
+    @kicker.start
+  end
+  
+  it "should start a CFRunLoop" do
+    @kicker.stubs(:validate_options!)
+    
+    OSX.expects(:CFRunLoopRun)
     @kicker.start
   end
 end
