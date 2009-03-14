@@ -1,44 +1,4 @@
 #!/usr/bin/env ruby
 
-require File.expand_path('../../vendor/rucola/fsevents', __FILE__)
-
-path, command = ARGV
-
-unless path && command
-  puts "Usage: #{$0} [PATH] [COMMAND]"
-  exit
-else
-  unless File.exist?(path)
-    puts "The given path `#{path}' does not exist."
-    exit 1
-  end
-end
-
-def log(msg)
-  puts "[#{Time.now}] #{msg}"
-end
-
-path = File.expand_path(path)
-file, path = path, File.dirname(path) unless File.directory?(path)
-
-command = %{sh -c #{command.inspect}}
-
-log "Watching for changes on `#{file || path}' with command: #{command}"
-
-watch_dog = Rucola::FSEvents.start_watching(path) do |events|
-  unless file && !events.find { |e| e.last_modified_file == file }
-    log "Change occured. Executing command:"
-    `#{command}`.strip.split("\n").each { |line| log "  #{line}" }
-    log "Command #{$?.success? ? 'succeeded' : "failed (#{$?})"}"
-  end
-end
-
-trap("INT") do
-  log "Cleaning up…"
-  watch_dog.stop
-  OSX.FSEventStreamInvalidate(watch_dog.stream)
-  OSX.FSEventStreamRelease(watch_dog.stream)
-  exit
-end
-
-OSX::NSApplication.sharedApplication.run
+require File.expand_path('../../lib/kicker', __FILE__)
+Kicker.run!

@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email = %q{eloy.de.enige@gmail.com}
   s.executables = ["kicker"]
   s.extra_rdoc_files = ["README.rdoc", "LICENSE"]
-  s.files = ["bin", "bin/kicker", "kicker.gemspec", "LICENSE", "pkg", "pkg/kicker-0.1.0.gem", "Rakefile", "README.rdoc", "vendor", "vendor/rucola", "vendor/rucola/fsevents.rb", "VERSION.yml"]
+  s.files = ["bin", "bin/kicker", "kicker.gemspec", "lib", "lib/kicker.rb", "LICENSE", "pkg", "pkg/kicker-0.1.0.gem", "pkg/kicker-0.1.1.gem", "Rakefile", "README.rdoc", "test", "test/kicker_test.rb", "test/test_helper.rb", "vendor", "vendor/growlnotifier", "vendor/growlnotifier/growl.rb", "vendor/growlnotifier/growl_helpers.rb", "vendor/rucola", "vendor/rucola/fsevents.rb", "VERSION.yml"]
   s.has_rdoc = true
   s.homepage = %q{http://github.com/alloy/kicker}
   s.rdoc_options = ["--inline-source", "--charset=UTF-8"]

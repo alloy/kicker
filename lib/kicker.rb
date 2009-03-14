@@ -33,6 +33,10 @@ class Kicker
     options
   end
   
+  def self.run!(argv = ARGV)
+    new(parse_options(argv)).start
+  end
+  
   attr_writer :command
   attr_reader :path, :file
   
@@ -50,7 +54,8 @@ class Kicker
     validate_options!
     
     log "Watching for changes on `#{file || path}'"
-    log "With command: #{command}\n"
+    log "With command: #{command}"
+    log ''
     
     watch_dog = Rucola::FSEvents.start_watching(path) { |events| process(events) }
     
