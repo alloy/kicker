@@ -185,4 +185,21 @@ describe "Kicker, in general" do
     @kicker.expects(:log).with('Command failed (123)')
     @kicker.execute!
   end
+  
+  it "should send the correct Growl messages" do
+    @kicker.stubs(:log)
+    
+    @kicker.stubs(:`).returns("line 1\nline 2")
+    @kicker.use_growl = true
+    
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Command succeeded', "line 1\nline 2")
+    @kicker.execute!
+    
+    @kicker.stubs(:last_command_succeeded?).returns(false)
+    @kicker.stubs(:last_command_status).returns(123)
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Command failed (123)', "line 1\nline 2")
+    @kicker.execute!
+  end
 end

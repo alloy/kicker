@@ -38,6 +38,7 @@ class Kicker
     new(parse_options(argv)).start
   end
   
+  include Growl
   GROWL_NOTIFICATIONS = {
     :change => 'Change occured',
     :succeeded => 'Command succeeded',
@@ -93,8 +94,20 @@ class Kicker
   
   def execute!
     log "Change occured. Executing command:"
-    `#{command}`.strip.split("\n").each { |line| log "  #{line}" }
+    growl(GROWL_NOTIFICATIONS[:change], 'Change occured', 'Executing command') if @use_growl
+    
+    output = `#{command}`
+    output.strip.split("\n").each { |line| log "  #{line}" }
+    
     log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
+    
+    if @use_growl
+      if last_command_succeeded?
+        growl(GROWL_NOTIFICATIONS[:succeeded], "Command succeeded", output)
+      else
+        growl(GROWL_NOTIFICATIONS[:failed], "Command failed (#{last_command_status})", output)
+      end
+    end
   end
   
   def last_command_succeeded?
