@@ -44,15 +44,19 @@ class Kicker
     :succeeded => 'Command succeeded',
     :failed => 'Command failed'
   }
+  GROWL_DEFAULT_CALLBACK = lambda do
+    OSX::NSWorkspace.sharedWorkspace.launchApplication('Terminal')
+  end
   
   attr_writer :command
   attr_reader :path, :file
-  attr_accessor :use_growl
+  attr_accessor :use_growl, :growl_command
   
   def initialize(options)
-    self.path = options[:path] if options[:path]
-    @command = options[:command]
-    @use_growl = options[:use_growl]
+    self.path      = options[:path] if options[:path]
+    @command       = options[:command]
+    @use_growl     = options[:growl]
+    @growl_command = options[:growl_command]
   end
   
   def path=(path)
@@ -94,7 +98,7 @@ class Kicker
   
   def execute!
     log "Change occured. Executing command:"
-    growl(GROWL_NOTIFICATIONS[:change], 'Change occured', 'Executing command') if @use_growl
+    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command') if @use_growl
     
     output = `#{command}`
     output.strip.split("\n").each { |line| log "  #{line}" }
@@ -103,9 +107,10 @@ class Kicker
     
     if @use_growl
       if last_command_succeeded?
-        growl(GROWL_NOTIFICATIONS[:succeeded], "Command succeeded", output)
+        callback = @growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(@growl_command) }
+        growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
       else
-        growl(GROWL_NOTIFICATIONS[:failed], "Command failed (#{last_command_status})", output)
+        growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
       end
     end
   end
