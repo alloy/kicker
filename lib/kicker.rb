@@ -22,7 +22,9 @@ class Kicker
     log "With command: #{command}\n"
     
     watch_dog = Rucola::FSEvents.start_watching(path) { |events| process(events) }
+    
     trap('INT') do
+      log "Cleaning up…"
       watch_dog.stop
       exit
     end
