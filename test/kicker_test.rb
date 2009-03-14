@@ -62,7 +62,8 @@ describe "Kicker, when starting" do
     @kicker.command = nil
     @kicker.stubs(:validate_path_exists!)
     
-    @kicker.expects(:puts).with("Usage: #{$0} [PATH] [COMMAND]")
+    Kicker::OPTION_PARSER.stubs(:call).returns(mock('OptionParser', :help => 'help'))
+    @kicker.expects(:puts).with("help")
     @kicker.expects(:exit)
     
     @kicker.start

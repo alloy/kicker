@@ -3,11 +3,10 @@ require 'rucola/fsevents'
 require 'optparse'
 
 class Kicker
-  def self.parse_options(argv)
-    argv = argv.dup
-    options = { :growl => true }
-    
+  OPTION_PARSER = lambda do |options|
     OptionParser.new do |opts|
+      opts.banner = "Usage: #{$0} [options] -e [command] [path]"
+      
       opts.on('-e', '--execute [COMMAND]', 'The command to execute.') do |command|
         options[:command] = command
       end
@@ -23,8 +22,13 @@ class Kicker
       opts.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
         options[:growl_command] = command
       end
-    end.parse!(argv)
-    
+    end
+  end
+  
+  def self.parse_options(argv)
+    argv = argv.dup
+    options = { :growl => true }
+    OPTION_PARSER.call(options).parse!(argv)
     options[:path] = argv.first
     options
   end
@@ -92,7 +96,7 @@ class Kicker
   
   def validate_path_and_command!
     unless @path && @command
-      puts "Usage: #{$0} [PATH] [COMMAND]"
+      puts OPTION_PARSER.call(nil).help
       exit
     end
   end
