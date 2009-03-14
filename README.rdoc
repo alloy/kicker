@@ -1,0 +1,7 @@
+= kicker
+
+Description goes here.
+
+== Copyright
+
+Copyright (c) 2009 Eloy Duran. See LICENSE for details.
