@@ -7,18 +7,17 @@ changes occur:
 
 Show all files whenever a change occurs in the current work directory:
 
-  $ kicker . "ls -l"
+  $ kicker -e "ls -l" .
 
 Run a Rake task whenever a given file is changed:
 
-  $ kicker guides/source/nested_model_forms.textile "ONLY=nested_model_forms rake guides && open -a Safari guides/output/nested_model_forms.html"
+  $ kicker -e "ONLY=nested_model_forms rake guides" guides/source/nested_model_forms.textile
+
+Run a Run task whenever a given file is changed and specify a command to be
+executed if the user clicks a `succeeded' Growl message:
+
+  $ kicker -e "ONLY=nested_model_forms rake guides" --growl-command "open -a Safari guides/output/nested_model_forms.html" guides/source/nested_model_forms.textile
 
 == Installation
 
   $ sudo gem install alloy-kicker -s http://gems.github.com
-
-== Tests??
-
-For now it's just a very simple bin script which uses the FSEvents abstraction
-from Rucola, which is tested there. Once/if this will ever be developed further
-test cases will be added where appropriate.
