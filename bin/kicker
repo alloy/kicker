@@ -19,10 +19,15 @@ file, path = path, File.dirname(path) unless File.directory?(path)
 
 puts "Watching for changes on `#{file || path}'"
 
-Rucola::FSEvents.start_watching(path) do |events|
+stream = Rucola::FSEvents.start_watching(path) do |events|
   unless file && !events.find { |e| e.last_modified_file == file }
     system command
   end
+end
+
+trap("INT") do
+  stream.stop
+  exit
 end
 
 OSX::NSApplication.sharedApplication.run
