@@ -2,6 +2,8 @@
 
 A simple OS X CLI tool which uses FSEvents to run a given shell command.
 
+http://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
+
 == Usage
 
 At the least give it a path to a file or directory and a shell command to
