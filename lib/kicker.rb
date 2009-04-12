@@ -62,16 +62,8 @@ class Kicker
     log "With command: #{command}"
     log ''
     
-    dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Rucola::FSEvents.start_watching(*dirs) { |events| process(events) }
-    
-    trap('INT') do
-      log "Cleaning up…"
-      watch_dog.stop
-      exit
-    end
-    
-    Growl::Notifier.sharedInstance.register('Kicker', Kicker::GROWL_NOTIFICATIONS.values) if @use_growl
+    run_watch_dog!
+    start_growl! if @use_growl
     
     OSX.CFRunLoopRun
   end
@@ -80,44 +72,7 @@ class Kicker
     "sh -c #{@command.inspect}"
   end
   
-  def process(events)
-    events.each do |event|
-      @paths.each do |path|
-        return execute! if event.last_modified_file =~ /^#{path}/
-      end
-    end
-  end
-  
-  def log(message)
-    puts "[#{Time.now}] #{message}"
-  end
-  
-  def execute!
-    log "Change occured. Executing command:"
-    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command') if @use_growl
-    
-    output = `#{command}`
-    output.strip.split("\n").each { |line| log "  #{line}" }
-    
-    log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
-    
-    if @use_growl
-      if last_command_succeeded?
-        callback = @growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(@growl_command) }
-        growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
-      else
-        growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
-      end
-    end
-  end
-  
-  def last_command_succeeded?
-    $?.success?
-  end
-  
-  def last_command_status
-    $?.to_i
-  end
+  private
   
   def validate_options!
     validate_paths_and_command!
@@ -136,6 +91,60 @@ class Kicker
       unless File.exist?(path)
         puts "The given path `#{path}' does not exist"
         exit 1
+      end
+    end
+  end
+  
+  def log(message)
+    puts "[#{Time.now}] #{message}"
+  end
+  
+  def last_command_succeeded?
+    $?.success?
+  end
+  
+  def last_command_status
+    $?.to_i
+  end
+  
+  def start_growl!
+    Growl::Notifier.sharedInstance.register('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
+  end
+  
+  def run_watch_dog!
+    dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
+    watch_dog = Rucola::FSEvents.start_watching(*dirs) { |events| process(events) }
+    
+    trap('INT') do
+      log "Cleaning up…"
+      watch_dog.stop
+      exit
+    end
+  end
+  
+  def process(events)
+    events.each do |event|
+      @paths.each do |path|
+        return execute! if event.last_modified_file =~ /^#{path}/
+      end
+    end
+  end
+  
+  def execute!
+    log "Change occured. Executing command:"
+    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command') if @use_growl
+    
+    output = `#{command}`
+    output.strip.split("\n").each { |line| log "  #{line}" }
+    
+    log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
+    
+    if @use_growl
+      if last_command_succeeded?
+        callback = @growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(@growl_command) }
+        growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
+      else
+        growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
       end
     end
   end
