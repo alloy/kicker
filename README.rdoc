@@ -6,10 +6,10 @@ http://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
 
 == Usage
 
-At the least give it a path to a file or directory and a shell command to
-execute when any changes occur.
+Give it paths to files or directories and a shell command to execute when any
+changes occur.
 
-  Usage: kicker [options] -e [command] [path]
+  Usage: kicker [options] -e [command] [paths to watch]
       -e, --execute [COMMAND]          The command to execute.
           --[no-]growl                 Whether or not to use Growl. Default is to use growl.
           --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
@@ -31,7 +31,7 @@ executed if the user clicks a `succeeded' Growl message:
 
 And for fun, ghetto-autotest:
 
-  $ kicker -e "ruby test/test_case.rb" test/test_case.rb
+  $ kicker -e "ruby test/test_case.rb" test/test_case.rb lib/file.rb
 
 == Installation
 
