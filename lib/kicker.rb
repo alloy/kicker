@@ -6,7 +6,7 @@ require 'optparse'
 class Kicker
   OPTION_PARSER = lambda do |options|
     OptionParser.new do |opts|
-      opts.banner = "Usage: #{$0} [options] -e [command] [path]"
+      opts.banner = "Usage: #{$0} [options] -e [command] [paths to watch]"
       
       opts.on('-e', '--execute [COMMAND]', 'The command to execute.') do |command|
         options[:command] = command
@@ -26,7 +26,7 @@ class Kicker
     argv = argv.dup
     options = { :growl => true }
     OPTION_PARSER.call(options).parse!(argv)
-    options[:path] = argv.first
+    options[:paths] = argv
     options
   end
   
@@ -45,29 +45,25 @@ class Kicker
   end
   
   attr_writer :command
-  attr_reader :path, :file
+  attr_reader :paths
   attr_accessor :use_growl, :growl_command
   
   def initialize(options)
-    self.path      = options[:path] if options[:path]
+    @paths         = options[:paths].map { |path| File.expand_path(path) }
     @command       = options[:command]
     @use_growl     = options[:growl]
     @growl_command = options[:growl_command]
   end
   
-  def path=(path)
-    @path = File.expand_path(path)
-    @file, @path = @path, File.dirname(@path) unless File.directory?(@path)
-  end
-  
   def start
     validate_options!
     
-    log "Watching for changes on `#{file || path}'"
+    log "Watching for changes on: #{@paths.join(', ')}"
     log "With command: #{command}"
     log ''
     
-    watch_dog = Rucola::FSEvents.start_watching(path) { |events| process(events) }
+    dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
+    watch_dog = Rucola::FSEvents.start_watching(*dirs) { |events| process(events) }
     
     trap('INT') do
       log "Cleaning up…"
@@ -85,7 +81,11 @@ class Kicker
   end
   
   def process(events)
-    execute! unless file && !events.find { |e| e.last_modified_file == file }
+    events.each do |event|
+      @paths.each do |path|
+        return execute! if event.last_modified_file =~ /^#{path}/
+      end
+    end
   end
   
   def log(message)
@@ -120,21 +120,23 @@ class Kicker
   end
   
   def validate_options!
-    validate_path_and_command!
-    validate_path_exists!
+    validate_paths_and_command!
+    validate_paths_exist!
   end
   
-  def validate_path_and_command!
-    unless @path && @command
+  def validate_paths_and_command!
+    if @paths.empty? && @command.nil?
       puts OPTION_PARSER.call(nil).help
       exit
     end
   end
   
-  def validate_path_exists!
-    unless File.exist?(@path)
-      puts "The given path `#{@path}' does not exist"
-      exit 1
+  def validate_paths_exist!
+    @paths.each do |path|
+      unless File.exist?(path)
+        puts "The given path `#{path}' does not exist"
+        exit 1
+      end
     end
   end
 end
