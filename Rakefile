@@ -12,7 +12,7 @@ begin
     gem.homepage = "http://github.com/alloy/kicker"
     gem.authors = ["Eloy Duran"]
     gem.executables << 'kicker'
-    gem.files = FileList['**/**']
+    gem.files.concat FileList['vendor/**/*']
     gem.require_paths = ['vendor']
     gem.has_rdoc = true
   end
