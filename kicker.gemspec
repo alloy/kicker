@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kicker}
-  s.version = "1.1.1"
+  s.version = "1.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2009-04-12}
+  s.date = %q{2009-06-08}
   s.email = %q{eloy.de.enige@gmail.com}
   s.executables = ["kicker", "kicker"]
   s.extra_rdoc_files = [
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.has_rdoc = true
   s.homepage = %q{http://github.com/alloy/kicker}
   s.rdoc_options = ["--charset=UTF-8"]
-  s.require_paths = ["vendor"]
+  s.require_paths = ["lib", "vendor"]
   s.rubygems_version = %q{1.3.1}
   s.summary = %q{A simple OS X CLI tool which uses FSEvents to run a given shell command.}
   s.test_files = [
