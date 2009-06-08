@@ -13,7 +13,7 @@ begin
     gem.authors = ["Eloy Duran"]
     gem.executables << 'kicker'
     gem.files.concat FileList['vendor/**/*']
-    gem.require_paths = ['vendor']
+    gem.require_paths = ["lib", "vendor"]
     gem.has_rdoc = true
   end
 rescue LoadError
