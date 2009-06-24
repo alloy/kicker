@@ -1,33 +1,61 @@
 require File.expand_path('../test_helper', __FILE__)
 
+describe "Kicker" do
+  it "should return the default paths to watch" do
+    Kicker.paths.should == %w{ . }
+  end
+  
+  it "should check if a .kick file exists and if so load it before running" do
+    Kicker.any_instance.stubs(:start)
+    
+    File.expects(:exist?).with('.kick').returns(true)
+    Kicker.expects(:load).with('.kick')
+    Kicker.run
+  end
+end
+
 describe "Kicker, when initializing" do
   before do
-    @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path }, :command => 'ls -l')
+    @now = Time.now
+    Time.stubs(:now).returns(@now)
+    
+    @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path })
   end
   
   it "should return the extended paths to watch" do
     @kicker.paths.should == ['/some/dir', File.expand_path('a/relative/path')]
   end
   
-  it "should return the command to execute once a change occurs" do
-    @kicker.command.should == 'sh -c "ls -l"'
+  it "should have assigned the current time to last_event_processed_at" do
+    @kicker.last_event_processed_at.should == @now
+  end
+  
+  it "should use the default paths if no paths were given" do
+    Kicker.new({}).paths.should == [File.expand_path('.')]
+  end
+  
+  it "should use the default FSEvents latency if none was given" do
+    @kicker.latency.should == 1.5
+  end
+  
+  it "should use the given FSEvents latency if one was given" do
+    Kicker.new(:latency => 3.5).latency.should == 3.5
   end
 end
 
 describe "Kicker, when starting" do
   before do
-    @kicker = Kicker.new(:paths => %w{ /some/file.rb }, :command => 'ls -l')
+    @kicker = Kicker.new(:paths => %w{ /some/file.rb })
     @kicker.stubs(:log)
     Rucola::FSEvents.stubs(:start_watching)
     OSX.stubs(:CFRunLoopRun)
   end
   
-  it "should show the usage banner and exit when there are no paths and a command" do
-    @kicker.instance_variable_set("@paths", [])
-    @kicker.command = nil
+  it "should show the usage banner and exit when there is no extra callback defined" do
     @kicker.stubs(:validate_paths_exist!)
+    Kicker.stubs(:callback_chain).returns([1])
     
-    Kicker::OPTION_PARSER.stubs(:call).returns(mock('OptionParser', :help => 'help'))
+    Kicker::OPTION_PARSER_CALLBACK.stubs(:call).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")
     @kicker.expects(:exit)
     
@@ -35,9 +63,18 @@ describe "Kicker, when starting" do
   end
   
   it "should warn the user and exit if any of the given paths doesn't exist" do
+    @kicker.stubs(:validate_paths_and_command!)
+    
     @kicker.expects(:puts).with("The given path `/some/file.rb' does not exist")
     @kicker.expects(:exit).with(1)
     
+    @kicker.start
+  end
+  
+  it "should start a FSEvents stream with the assigned latency" do
+    @kicker.stubs(:validate_options!)
+    
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
     @kicker.start
   end
   
@@ -45,7 +82,7 @@ describe "Kicker, when starting" do
     @kicker.stubs(:validate_options!)
     File.stubs(:directory?).with('/some/file.rb').returns(false)
     
-    Rucola::FSEvents.expects(:start_watching).with('/some')
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
     @kicker.start
   end
   

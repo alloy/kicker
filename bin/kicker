@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
 require File.expand_path('../../lib/kicker', __FILE__)
-Kicker.run!
+Kicker.run

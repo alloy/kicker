@@ -1,6 +1,6 @@
 require File.expand_path('../test_helper', __FILE__)
 
-describe "Kicker, in general" do
+describe "A Kicker instance, concerning its utility methods" do
   before do
     Kicker.any_instance.stubs(:last_command_succeeded?).returns(true)
     @kicker = Kicker.new(:paths => %w{ /some/dir }, :command => 'ls -l')
@@ -21,7 +21,7 @@ describe "Kicker, in general" do
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command succeeded')
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
@@ -29,7 +29,7 @@ describe "Kicker, in general" do
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command failed (123)')
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
   end
   
   it "should send the Growl messages with the default click callback" do
@@ -42,13 +42,13 @@ describe "Kicker, in general" do
     
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
   end
   
   it "should send the Growl messages with a click callback which executes the specified growl command when succeeded" do
@@ -63,12 +63,12 @@ describe "Kicker, in general" do
     
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    @kicker.send(:execute!)
+    @kicker.execute_command('')
   end
 end
