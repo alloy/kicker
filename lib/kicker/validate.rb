@@ -8,7 +8,7 @@ class Kicker
   
   def validate_paths_and_command!
     if @paths.empty? && @command.nil?
-      puts OPTION_PARSER.call(nil).help
+      puts OPTION_PARSER_CALLBACK.call(nil).help
       exit
     end
   end
