@@ -3,6 +3,8 @@ require 'rucola/fsevents'
 require 'kicker/callback_chain'
 require 'kicker/growl'
 require 'kicker/options'
+require 'kicker/utils'
+require 'kicker/validate'
 
 class Kicker
   def self.run!(argv = ARGV)
@@ -40,39 +42,6 @@ class Kicker
   end
   
   private
-  
-  def validate_options!
-    validate_paths_and_command!
-    validate_paths_exist!
-  end
-  
-  def validate_paths_and_command!
-    if @paths.empty? && @command.nil?
-      puts OPTION_PARSER.call(nil).help
-      exit
-    end
-  end
-  
-  def validate_paths_exist!
-    @paths.each do |path|
-      unless File.exist?(path)
-        puts "The given path `#{path}' does not exist"
-        exit 1
-      end
-    end
-  end
-  
-  def log(message)
-    puts "[#{Time.now}] #{message}"
-  end
-  
-  def last_command_succeeded?
-    $?.success?
-  end
-  
-  def last_command_status
-    $?.to_i
-  end
   
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
