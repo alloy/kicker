@@ -14,4 +14,8 @@ class Kicker
   def self.callback_chain
     @callback_chain ||= CallbackChain.new
   end
+  
+  def self.callback=(callback)
+    callback_chain.prepend_callback(callback)
+  end
 end

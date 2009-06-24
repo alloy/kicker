@@ -17,7 +17,7 @@ describe "Kicker, concerning the `execute a command-line' callback" do
     callback = Kicker.callback_chain.first
     callback.should.be.instance_of Proc
     
-    kicker = mock('Kicker instance')
+    kicker = Kicker.new({})
     kicker.expects(:execute_command).with('sh -c "ls"')
     
     callback.call(kicker, %w{ /file/1 /file/2 }).should.not.be.instance_of Array

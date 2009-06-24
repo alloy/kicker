@@ -6,6 +6,7 @@ require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
 
+require 'kicker/recipes/could_not_handle_file'
 require 'kicker/recipes/execute_cli_command'
 
 class Kicker

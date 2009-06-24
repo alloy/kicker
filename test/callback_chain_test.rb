@@ -5,6 +5,11 @@ describe "Kicker, concerning its callback chain" do
     Kicker.callback_chain.should.be.instance_of Kicker::CallbackChain
   end
   
+  it "should provide a shortcut method which prepends a callback" do
+    Kicker.callback = lambda { :from_callback }
+    Kicker.callback_chain.first.call.should == :from_callback
+  end
+  
   it "should be accessible by an instance" do
     kicker = Kicker.new({})
     kicker.callback_chain.should.be Kicker.callback_chain
