@@ -2,6 +2,9 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker, when initializing" do
   before do
+    @now = Time.now
+    Time.stubs(:now).returns(@now)
+    
     @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path }, :command => 'ls -l')
   end
   
@@ -11,6 +14,14 @@ describe "Kicker, when initializing" do
   
   it "should return the command to execute once a change occurs" do
     @kicker.command.should == 'sh -c "ls -l"'
+  end
+  
+  it "should have assigned the current time to last_event_processed_at" do
+    @kicker.last_event_processed_at.should == @now
+  end
+  
+  it "should have instantiated a Kicker::CallbackChain" do
+    @kicker.callback_chain.should.be.instance_of Kicker::CallbackChain
   end
 end
 

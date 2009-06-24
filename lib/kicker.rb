@@ -10,13 +10,16 @@ class Kicker
   end
   
   attr_writer :command
-  attr_reader :paths
+  attr_reader :paths, :last_event_processed_at, :callback_chain
   
   def initialize(options)
     @paths         = options[:paths].map { |path| File.expand_path(path) }
     @command       = options[:command]
     @use_growl     = options[:growl]
     @growl_command = options[:growl_command]
+    
+    @last_event_processed_at = Time.now
+    @callback_chain = CallbackChain.new
   end
   
   def start
@@ -82,11 +85,20 @@ class Kicker
     end
   end
   
+  def finished_processing!
+    @last_event_processed_at = Time.now
+  end
+  
+  def changed_files(events)
+    events.map do |event|
+      event.files.select { |file| File.mtime(file) > @last_event_processed_at }
+    end.flatten
+  end
+  
   def process(events)
-    events.each do |event|
-      @paths.each do |path|
-        return execute! if event.last_modified_file =~ /^#{path}/
-      end
+    unless (files = changed_files(events)).empty?
+      @callback_chain.run(files)
+      finished_processing!
     end
   end
   
