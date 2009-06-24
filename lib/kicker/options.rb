@@ -1,30 +1,32 @@
 require 'optparse'
 
 class Kicker
-  PARSER = OptionParser.new do |opt|
-    opt.banner = "Usage: #{$0} [options] -e [command] [paths to watch]"
+  def self.option_parser
+    @option_parser ||= OptionParser.new do |opt|
+      opt.banner = "Usage: #{$0} [options] [paths to watch]"
+    end
   end
   
-  OPTION_PARSER = lambda do |options|
-    PARSER.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
+  OPTION_PARSER_CALLBACK = lambda do |options|
+    option_parser.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
       options[:growl] = growl
     end
     
-    PARSER.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
+    option_parser.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
       options[:growl_command] = command
     end
     
-    PARSER.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency') do |latency|
+    option_parser.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency') do |latency|
       options[:latency] = Float(latency)
     end
     
-    PARSER
+    option_parser
   end
   
   def self.parse_options(argv)
     argv = argv.dup
     options = { :growl => true }
-    OPTION_PARSER.call(options).parse!(argv)
+    OPTION_PARSER_CALLBACK.call(options).parse!(argv)
     options[:paths] = argv
     options
   end
