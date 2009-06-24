@@ -3,9 +3,9 @@ class Kicker
     alias_method :append_callback,  :push
     alias_method :prepend_callback, :unshift
     
-    def run(files)
+    def run(kicker, files)
       each do |callback|
-        files = callback.call(files)
+        files = callback.call(kicker, files)
         break if !files.is_a?(Array) || files.empty?
       end
     end

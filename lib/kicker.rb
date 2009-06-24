@@ -9,38 +9,38 @@ require 'kicker/validate'
 require 'kicker/recipes/execute_cli_command'
 
 class Kicker
+  def self.paths
+    @paths ||= %w{ . }
+  end
+  
   def self.run(argv = ARGV)
     new(parse_options(argv)).start
   end
   
-  attr_writer :command
-  attr_reader :paths, :last_event_processed_at, :callback_chain
+  attr_reader :paths, :last_event_processed_at
   
   def initialize(options)
-    @paths         = options[:paths].map { |path| File.expand_path(path) }
-    @command       = options[:command]
+    @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
+    @last_event_processed_at = Time.now
+    
     @use_growl     = options[:growl]
     @growl_command = options[:growl_command]
-    
-    @last_event_processed_at = Time.now
-    @callback_chain = CallbackChain.new
+  end
+  
+  def callback_chain
+    self.class.callback_chain
   end
   
   def start
     validate_options!
     
     log "Watching for changes on: #{@paths.join(', ')}"
-    log "With command: #{command}"
     log ''
     
     run_watch_dog!
     start_growl! if @use_growl
     
     OSX.CFRunLoopRun
-  end
-  
-  def command
-    "sh -c #{@command.inspect}"
   end
   
   private
@@ -68,7 +68,7 @@ class Kicker
   
   def process(events)
     unless (files = changed_files(events)).empty?
-      @callback_chain.run(files)
+      callback_chain.run(self, files)
       finished_processing!
     end
   end

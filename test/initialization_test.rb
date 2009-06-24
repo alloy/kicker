@@ -1,27 +1,29 @@
 require File.expand_path('../test_helper', __FILE__)
 
+describe "Kicker" do
+  it "should return the default paths to watch" do
+    Kicker.paths.should == %w{ . }
+  end
+end
+
 describe "Kicker, when initializing" do
   before do
     @now = Time.now
     Time.stubs(:now).returns(@now)
     
-    @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path }, :command => 'ls -l')
+    @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path })
   end
   
   it "should return the extended paths to watch" do
     @kicker.paths.should == ['/some/dir', File.expand_path('a/relative/path')]
   end
   
-  it "should return the command to execute once a change occurs" do
-    @kicker.command.should == 'sh -c "ls -l"'
-  end
-  
   it "should have assigned the current time to last_event_processed_at" do
     @kicker.last_event_processed_at.should == @now
   end
   
-  it "should have instantiated a Kicker::CallbackChain" do
-    @kicker.callback_chain.should.be.instance_of Kicker::CallbackChain
+  it "should use the default paths if no paths were given" do
+    Kicker.new({}).paths.should == [File.expand_path('.')]
   end
 end
 
@@ -33,9 +35,8 @@ describe "Kicker, when starting" do
     OSX.stubs(:CFRunLoopRun)
   end
   
-  it "should show the usage banner and exit when there are no paths and a command" do
+  xit "should show the usage banner and exit when there are no paths and a command" do
     @kicker.instance_variable_set("@paths", [])
-    @kicker.command = nil
     @kicker.stubs(:validate_paths_exist!)
     
     Kicker::OPTION_PARSER.stubs(:call).returns(mock('OptionParser', :help => 'help'))
