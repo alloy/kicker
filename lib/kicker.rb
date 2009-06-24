@@ -1,52 +1,15 @@
 $:.unshift File.expand_path('../../vendor', __FILE__)
 require 'rucola/fsevents'
-require 'growlnotifier/growl_helpers'
-require 'optparse'
+require 'kicker/growl'
+require 'kicker/options'
 
 class Kicker
-  OPTION_PARSER = lambda do |options|
-    OptionParser.new do |opts|
-      opts.banner = "Usage: #{$0} [options] -e [command] [paths to watch]"
-      
-      opts.on('-e', '--execute [COMMAND]', 'The command to execute.') do |command|
-        options[:command] = command
-      end
-      
-      opts.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
-        options[:growl] = growl
-      end
-      
-      opts.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
-        options[:growl_command] = command
-      end
-    end
-  end
-  
-  def self.parse_options(argv)
-    argv = argv.dup
-    options = { :growl => true }
-    OPTION_PARSER.call(options).parse!(argv)
-    options[:paths] = argv
-    options
-  end
-  
   def self.run!(argv = ARGV)
     new(parse_options(argv)).start
   end
   
-  include Growl
-  GROWL_NOTIFICATIONS = {
-    :change => 'Change occured',
-    :succeeded => 'Command succeeded',
-    :failed => 'Command failed'
-  }
-  GROWL_DEFAULT_CALLBACK = lambda do
-    OSX::NSWorkspace.sharedWorkspace.launchApplication('Terminal')
-  end
-  
   attr_writer :command
   attr_reader :paths
-  attr_accessor :use_growl, :growl_command
   
   def initialize(options)
     @paths         = options[:paths].map { |path| File.expand_path(path) }
@@ -105,10 +68,6 @@ class Kicker
   
   def last_command_status
     $?.to_i
-  end
-  
-  def start_growl!
-    Growl::Notifier.sharedInstance.register('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
   end
   
   def run_watch_dog!
