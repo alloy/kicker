@@ -4,6 +4,14 @@ describe "Kicker" do
   it "should return the default paths to watch" do
     Kicker.paths.should == %w{ . }
   end
+  
+  it "should check if a .kick file exists and if so load it before running" do
+    Kicker.any_instance.stubs(:start)
+    
+    File.expects(:exist?).with('.kick').returns(true)
+    Kicker.expects(:load).with('.kick')
+    Kicker.run
+  end
 end
 
 describe "Kicker, when initializing" do

@@ -23,6 +23,7 @@ class Kicker
     end
     
     def run(argv = ARGV)
+      load '.kick' if File.exist?('.kick')
       new(parse_options(argv)).start
     end
   end
