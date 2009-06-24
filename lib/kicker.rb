@@ -70,23 +70,4 @@ class Kicker
       finished_processing!
     end
   end
-  
-  def execute!
-    log "Change occured. Executing command:"
-    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command') if @use_growl
-    
-    output = `#{command}`
-    output.strip.split("\n").each { |line| log "  #{line}" }
-    
-    log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
-    
-    if @use_growl
-      if last_command_succeeded?
-        callback = @growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(@growl_command) }
-        growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
-      else
-        growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
-      end
-    end
-  end
 end
