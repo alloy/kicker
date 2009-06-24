@@ -2,6 +2,8 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker.parse_options" do
   it "should parse the paths" do
+    Kicker.parse_options([])[:paths].should.be nil
+    
     Kicker.parse_options(%w{ /some/file.rb })[:paths].should == %w{ /some/file.rb }
     Kicker.parse_options(%w{ /some/file.rb /a/dir /and/some/other/file.rb })[:paths].should ==
       %w{ /some/file.rb /a/dir /and/some/other/file.rb }

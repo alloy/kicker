@@ -51,11 +51,11 @@ describe "Kicker, when starting" do
     OSX.stubs(:CFRunLoopRun)
   end
   
-  xit "should show the usage banner and exit when there are no paths and a command" do
-    @kicker.instance_variable_set("@paths", [])
+  it "should show the usage banner and exit when there is no extra callback defined" do
     @kicker.stubs(:validate_paths_exist!)
+    Kicker.stubs(:callback_chain).returns([1])
     
-    Kicker::OPTION_PARSER.stubs(:call).returns(mock('OptionParser', :help => 'help'))
+    Kicker::OPTION_PARSER_CALLBACK.stubs(:call).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")
     @kicker.expects(:exit)
     
@@ -63,6 +63,8 @@ describe "Kicker, when starting" do
   end
   
   it "should warn the user and exit if any of the given paths doesn't exist" do
+    @kicker.stubs(:validate_paths_and_command!)
+    
     @kicker.expects(:puts).with("The given path `/some/file.rb' does not exist")
     @kicker.expects(:exit).with(1)
     

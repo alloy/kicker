@@ -27,7 +27,7 @@ class Kicker
     argv = argv.dup
     options = { :growl => true }
     OPTION_PARSER_CALLBACK.call(options).parse!(argv)
-    options[:paths] = argv
+    options[:paths] = argv unless argv.empty?
     options
   end
 end
