@@ -1,5 +1,11 @@
 require File.expand_path('../test_helper', __FILE__)
 
+describe "Kicker, concerning its callback chain" do
+  it "should return the callback chain instance" do
+    Kicker.callback_chain.should.be.instance_of Kicker::CallbackChain
+  end
+end
+
 describe "Kicker::CallbackChain" do
   it "should be a subclass of Array" do
     Kicker::CallbackChain.superclass.should.be Array

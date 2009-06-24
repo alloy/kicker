@@ -7,11 +7,6 @@ describe "Kicker.parse_options" do
       %w{ /some/file.rb /a/dir /and/some/other/file.rb }
   end
   
-  it "should parse the command" do
-    Kicker.parse_options(%w{ -e ls })[:command].should == 'ls'
-    Kicker.parse_options(%w{ --execute ls })[:command].should == 'ls'
-  end
-  
   it "should parse if growl shouldn't be used" do
     Kicker.parse_options([])[:growl].should == true
     Kicker.parse_options(%w{ --no-growl })[:growl].should == false

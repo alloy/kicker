@@ -6,8 +6,10 @@ require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
 
+require 'kicker/recipes/execute_cli_command'
+
 class Kicker
-  def self.run!(argv = ARGV)
+  def self.run(argv = ARGV)
     new(parse_options(argv)).start
   end
   

@@ -10,4 +10,8 @@ class Kicker
       end
     end
   end
+  
+  def self.callback_chain
+    @callback_chain ||= CallbackChain.new
+  end
 end
