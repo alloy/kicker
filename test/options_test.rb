@@ -15,4 +15,9 @@ describe "Kicker.parse_options" do
   it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
     Kicker.parse_options(%w{ --growl-command ls })[:growl_command].should == 'ls'
   end
+  
+  it "should parse the latency to pass to FSEvents" do
+    Kicker.parse_options(%w{ -l 2.5 })[:latency].should == 2.5
+    Kicker.parse_options(%w{ --latency 3.5 })[:latency].should == 3.5
+  end
 end

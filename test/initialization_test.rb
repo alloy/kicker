@@ -25,11 +25,19 @@ describe "Kicker, when initializing" do
   it "should use the default paths if no paths were given" do
     Kicker.new({}).paths.should == [File.expand_path('.')]
   end
+  
+  it "should use the default FSEvents latency if none was given" do
+    @kicker.latency.should == 1.5
+  end
+  
+  it "should use the given FSEvents latency if one was given" do
+    Kicker.new(:latency => 3.5).latency.should == 3.5
+  end
 end
 
 describe "Kicker, when starting" do
   before do
-    @kicker = Kicker.new(:paths => %w{ /some/file.rb }, :command => 'ls -l')
+    @kicker = Kicker.new(:paths => %w{ /some/file.rb })
     @kicker.stubs(:log)
     Rucola::FSEvents.stubs(:start_watching)
     OSX.stubs(:CFRunLoopRun)
@@ -53,11 +61,18 @@ describe "Kicker, when starting" do
     @kicker.start
   end
   
+  it "should start a FSEvents stream with the assigned latency" do
+    @kicker.stubs(:validate_options!)
+    
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
+    @kicker.start
+  end
+  
   it "should start a FSEvents stream which watches all paths, but the dirnames of paths if they're files" do
     @kicker.stubs(:validate_options!)
     File.stubs(:directory?).with('/some/file.rb').returns(false)
     
-    Rucola::FSEvents.expects(:start_watching).with('/some')
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
     @kicker.start
   end
   

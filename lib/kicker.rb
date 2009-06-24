@@ -10,22 +10,32 @@ require 'kicker/recipes/could_not_handle_file'
 require 'kicker/recipes/execute_cli_command'
 
 class Kicker
-  def self.paths
-    @paths ||= %w{ . }
+  class << self
+    attr_accessor :latency
+    
+    def latency
+      @latency ||= 1.5
+    end
+    
+    def paths
+      @paths ||= %w{ . }
+    end
+    
+    def run(argv = ARGV)
+      new(parse_options(argv)).start
+    end
   end
   
-  def self.run(argv = ARGV)
-    new(parse_options(argv)).start
-  end
-  
-  attr_reader :paths, :last_event_processed_at
+  attr_reader :latency, :paths, :last_event_processed_at
   
   def initialize(options)
     @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
-    @last_event_processed_at = Time.now
     
+    @latency       = options[:latency] || self.class.latency
     @use_growl     = options[:growl]
     @growl_command = options[:growl_command]
+    
+    finished_processing!
   end
   
   def callback_chain
@@ -48,7 +58,7 @@ class Kicker
   
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Rucola::FSEvents.start_watching(*dirs) { |events| process(events) }
+    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => @latency) { |events| process(events) }
     
     trap('INT') do
       log "Cleaning up…"

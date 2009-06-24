@@ -14,6 +14,10 @@ class Kicker
       options[:growl_command] = command
     end
     
+    PARSER.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency') do |latency|
+      options[:latency] = Float(latency)
+    end
+    
     PARSER
   end
   
