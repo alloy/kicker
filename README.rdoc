@@ -36,18 +36,3 @@ And for fun, ghetto-autotest:
 == Installation
 
   $ sudo gem install alloy-kicker -s http://gems.github.com
-
-== TODO
-
-  15:12 sandbags: ideally i would like all events within a small window (e.g. 2s) to be batched into one
-  15:12 sandbags: depending upon whether what is being reported is "file X changed" or "some files in directory X" changed
-  15:12 sandbags: i forget the granularity FSEvents supports
-  15:13 alloy: Yeah the window can be changed, which is a good idea
-  15:13 alloy: FSEvents simply reports changes to files in dir X. nothing more
-  15:14 sandbags: btw.. what is your rationale for using "!" in method names?
-  15:14 alloy: So in this case we should simply keep the time at which an event occurs and then grep the dirs for files with an higher mtime
-  15:14 sandbags: works for me
-  15:16 alloy: Well the rationale in these cases was either it could raise something (validate) or it would run something external. But really it was just for kicks :)
-  15:16 alloy: It could be cleaned up, as I agree it doesn't help much
-  15:17 sandbags: i think it would be easy to grok without them
-  15:17 alloy: Yeah indeed
