@@ -17,19 +17,19 @@ describe "A Kicker instance, concerning its utility methods" do
   it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
     @kicker.stubs(:`).returns("line 1\nline 2")
     
-    @kicker.expects(:log).with('Change occured. Executing command:')
+    @kicker.expects(:log).with('Change occured, executing command: ls')
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command succeeded')
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
-    @kicker.expects(:log).with('Change occured. Executing command:')
+    @kicker.expects(:log).with('Change occured, executing command: ls')
     @kicker.expects(:log).with('  line 1')
     @kicker.expects(:log).with('  line 2')
     @kicker.expects(:log).with('Command failed (123)')
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
   end
   
   it "should send the Growl messages with the default click callback" do
@@ -40,15 +40,15 @@ describe "A Kicker instance, concerning its utility methods" do
     
     OSX::NSWorkspace.sharedWorkspace.expects(:launchApplication).with('Terminal').times(2)
     
-    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
-    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
   end
   
   it "should send the Growl messages with a click callback which executes the specified growl command when succeeded" do
@@ -61,14 +61,14 @@ describe "A Kicker instance, concerning its utility methods" do
     @kicker.expects(:system).with('ls -l').times(1)
     OSX::NSWorkspace.sharedWorkspace.expects(:launchApplication).with('Terminal').times(1)
     
-    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
     
     @kicker.stubs(:last_command_succeeded?).returns(false)
     @kicker.stubs(:last_command_status).returns(123)
-    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command')
+    @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
     @kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    @kicker.execute_command('')
+    @kicker.execute_command('ls')
   end
 end
