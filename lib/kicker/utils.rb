@@ -1,7 +1,7 @@
 class Kicker
   def execute_command(command)
-    log "Change occured. Executing command:"
-    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured', 'Executing command') if @use_growl
+    log "Change occured, executing command: #{command}"
+    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command) if @use_growl
     
     output = `#{command}`
     output.strip.split("\n").each { |line| log "  #{line}" }
