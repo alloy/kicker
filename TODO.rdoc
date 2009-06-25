@@ -11,8 +11,9 @@
   can add arbitrary attributes for if they spread handing over multiple callbacks.
   But this will make callbacks dependent on each-other...
 
-* Add example .kick files. For instance, one that rewrites the paths for a specific app dir layout
-  so that the JS tests are properly picked up.
+* Add example .kick files. E.g.:
+  * remove files in specific dirs from the files stack (log, tmp etc)
+  * rewrites the paths for a specific app dir layout so that the JS tests are properly picked up.
 
 * Add Rails and jstest recipes from our rails app:
 
