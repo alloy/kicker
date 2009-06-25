@@ -1,5 +1,10 @@
 == For v2
 
+* Create 3 callback chains
+  * pre-process: for instance Exclude
+  * process: normal callbacks
+  * post-process: for instance the default 'could not handle' callback
+
 * Add -r option to require recipe files that come bundled with Kicker
 
 * Probably easier to let the user mutate the files array instead of having to return an array.
