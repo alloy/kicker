@@ -40,10 +40,6 @@ class Kicker
     finished_processing!
   end
   
-  def callback_chain
-    self.class.process_chain
-  end
-  
   def start
     validate_options!
     
@@ -81,7 +77,7 @@ class Kicker
   
   def process(events)
     unless (files = changed_files(events)).empty?
-      callback_chain.run(self, files)
+      process_chain.run(self, files)
       finished_processing!
     end
   end

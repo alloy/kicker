@@ -45,7 +45,7 @@ describe "Kicker, when a change occurs" do
     events = [event('/file/1'), event('/file/2')]
     
     @kicker.expects(:changed_files).with(events).returns(files)
-    @kicker.callback_chain.expects(:run).with(@kicker, files)
+    @kicker.process_chain.expects(:run).with(@kicker, files)
     @kicker.expects(:finished_processing!)
     
     @kicker.send(:process, events)
@@ -53,7 +53,7 @@ describe "Kicker, when a change occurs" do
   
   it "should not run the callback chain if there were no changed files" do
     @kicker.stubs(:changed_files).returns([])
-    @kicker.callback_chain.expects(:run).never
+    @kicker.process_chain.expects(:run).never
     @kicker.expects(:finished_processing!).never
     
     @kicker.send(:process, [event()])

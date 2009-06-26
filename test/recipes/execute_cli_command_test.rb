@@ -14,7 +14,7 @@ describe "Kicker, concerning the `execute a command-line' callback" do
   it "should call execute_command with the given command" do
     Kicker.parse_options(%w{ -e ls })
     
-    callback = Kicker.process_chain.first
+    callback = Kicker.process_chain.last
     callback.should.be.instance_of Proc
     
     kicker = Kicker.new({})

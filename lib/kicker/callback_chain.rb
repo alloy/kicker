@@ -36,4 +36,16 @@ class Kicker
       post_process_chain.prepend_callback(callback)
     end
   end
+  
+  def pre_process_chain
+    self.class.pre_process_chain
+  end
+  
+  def process_chain
+    self.class.process_chain
+  end
+  
+  def post_process_chain
+    self.class.post_process_chain
+  end
 end
