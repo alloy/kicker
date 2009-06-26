@@ -40,20 +40,20 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:changed_files, events).should == [file1, file3]
   end
   
-  it "should run the callback chain with all changed files" do
+  it "should call the callback chain with all changed files" do
     files = %w{ /file/1 /file/2 }
     events = [event('/file/1'), event('/file/2')]
     
     @kicker.expects(:changed_files).with(events).returns(files)
-    @kicker.process_chain.expects(:run).with(@kicker, files)
+    @kicker.process_chain.expects(:call).with(@kicker, files)
     @kicker.expects(:finished_processing!)
     
     @kicker.send(:process, events)
   end
   
-  it "should not run the callback chain if there were no changed files" do
+  it "should not call the callback chain if there were no changed files" do
     @kicker.stubs(:changed_files).returns([])
-    @kicker.process_chain.expects(:run).never
+    @kicker.process_chain.expects(:call).never
     @kicker.expects(:finished_processing!).never
     
     @kicker.send(:process, [event()])

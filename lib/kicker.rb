@@ -77,7 +77,7 @@ class Kicker
   
   def process(events)
     unless (files = changed_files(events)).empty?
-      process_chain.run(self, files)
+      process_chain.call(self, files)
       finished_processing!
     end
   end
