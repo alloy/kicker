@@ -5,8 +5,8 @@ class Kicker
     
     def call(kicker, files)
       each do |callback|
-        files = callback.call(kicker, files)
-        break if !files.is_a?(Array) || files.empty?
+        callback.call(kicker, files)
+        break if files.empty?
       end
     end
   end

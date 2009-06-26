@@ -84,7 +84,7 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
   it "should call the callbacks from first to last" do
     @chain.append_callback lambda { @result << 1 }
     @chain.append_callback lambda { @result << 2 }
-    @chain.call(@kicker, [])
+    @chain.call(@kicker, %w{ file })
     @result.should == [1, 2]
   end
   
@@ -95,37 +95,29 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
     kicker.should.be @kicker
   end
   
-  it "should pass the files array given to #call to the first callback and pass the result array of that call to the next callback and so on" do
+  it "should pass the files array given to #call to each callback in the chain" do
+    array = %w{ /file/1 }
+    
     @chain.append_callback lambda { |_, files|
-      @result.concat(files)
-      %w{ /file/3 /file/4 }
+      files.should.be array
+      
+      files.concat(%w{ /file/2 })
     }
     
     @chain.append_callback lambda { |_, files|
+      files.should.be array
+      
       @result.concat(files)
-      []
     }
     
-    @chain.call(@kicker, %w{ /file/1 /file/2 })
-    @result.should == %w{ /file/1 /file/2 /file/3 /file/4 }
+    @chain.call(@kicker, array)
+    @result.should == %w{ /file/1 /file/2 }
   end
   
-  it "should halt the callback chain once an empty array is returned from a callback" do
-    @chain.append_callback lambda { @result << 1; [] }
-    @chain.append_callback lambda { @result << 2 }
+  it "should halt the callback chain once the given array is empty" do
+    @chain.append_callback lambda { |_, files| @result << 1; files.clear }
+    @chain.append_callback lambda { |_, files| @result << 2 }
     @chain.call(@kicker, %w{ /file/1 /file/2 })
     @result.should == [1]
-  end
-  
-  it "should halt the callback chain if not an Array instance is returned from a callback" do
-    [nil, false, ''].each do |object|
-      @chain.clear
-      @result.clear
-      
-      @chain.append_callback lambda { @result << 1; object }
-      @chain.append_callback lambda { @result << 2 }
-      @chain.call(@kicker, %w{ /file/1 /file/2 })
-      @result.should == [1]
-    end
   end
 end
