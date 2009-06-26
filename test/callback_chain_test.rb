@@ -91,7 +91,7 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
   it "should pass in the Kicker instance with each yield" do
     kicker = nil
     @chain.append_callback lambda { |x, _| kicker = x }
-    @chain.call(@kicker, [])
+    @chain.call(@kicker, %w{ file })
     kicker.should.be @kicker
   end
   
@@ -119,5 +119,11 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
     @chain.append_callback lambda { |_, files| @result << 2 }
     @chain.call(@kicker, %w{ /file/1 /file/2 })
     @result.should == [1]
+  end
+  
+  it "should not call any callback if the given array is empty" do
+    @chain.append_callback lambda { |_, files| @result << 1 }
+    @chain.call(@kicker, [])
+    @result.should == []
   end
 end
