@@ -24,6 +24,10 @@ class Kicker
       @post_process_chain ||= CallbackChain.new
     end
     
+    def full_chain
+      @full_chain ||= CallbackChain.new([pre_process_chain, process_chain, post_process_chain])
+    end
+    
     def pre_process_callback=(callback)
       pre_process_chain.append_callback(callback)
     end
@@ -47,5 +51,9 @@ class Kicker
   
   def post_process_chain
     self.class.post_process_chain
+  end
+  
+  def full_chain
+    self.class.full_chain
   end
 end

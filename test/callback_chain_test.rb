@@ -2,7 +2,7 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker, concerning its callback chains" do
   before do
-    @chains = [:pre_process_chain, :process_chain, :post_process_chain]
+    @chains = [:pre_process_chain, :process_chain, :post_process_chain, :full_chain]
   end
   
   it "should return the callback chain instances" do
@@ -41,6 +41,13 @@ describe "Kicker, concerning its callback chains" do
     end
     
     Kicker.post_process_callback = lambda { :from_callback }
+  end
+  
+  it "should have assigned the chains to the `full_chain'" do
+    Kicker.full_chain.length.should == 3
+    Kicker.full_chain.each_with_index do |chain, index|
+      chain.should.be Kicker.send(@chains[index])
+    end
   end
 end
 
@@ -100,13 +107,11 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
     
     @chain.append_callback lambda { |_, files|
       files.should.be array
-      
       files.concat(%w{ /file/2 })
     }
     
     @chain.append_callback lambda { |_, files|
       files.should.be array
-      
       @result.concat(files)
     }
     
@@ -125,5 +130,30 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
     @chain.append_callback lambda { |_, files| @result << 1 }
     @chain.call(@kicker, [])
     @result.should == []
+  end
+  
+  it "should work with a chain of chains as well" do
+    array = %w{ file }
+    
+    kicker_and_files = lambda do |kicker, files|
+      kicker.should.be @kicker
+      files.should.be array
+    end
+    
+    chain1 = Kicker::CallbackChain.new([
+      lambda { |*args| kicker_and_files.call(*args); @result << 1 },
+      lambda { |*args| kicker_and_files.call(*args); @result << 2 }
+    ])
+    
+    chain2 = Kicker::CallbackChain.new([
+      lambda { |*args| kicker_and_files.call(*args); @result << 3 },
+      lambda { |*args| kicker_and_files.call(*args); @result << 4 }
+    ])
+    
+    @chain.append_callback chain1
+    @chain.append_callback chain2
+    
+    @chain.call(@kicker, array)
+    @result.should == [1, 2, 3, 4]
   end
 end
