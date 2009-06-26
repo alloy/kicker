@@ -1,18 +1,46 @@
 require File.expand_path('../test_helper', __FILE__)
 
-describe "Kicker, concerning its callback chain" do
-  it "should return the callback chain instance" do
-    Kicker.callback_chain.should.be.instance_of Kicker::CallbackChain
+describe "Kicker, concerning its callback chains" do
+  before do
+    @chains = [:pre_process_chain, :process_chain, :post_process_chain]
   end
   
-  it "should provide a shortcut method which prepends a callback" do
-    Kicker.callback = lambda { :from_callback }
-    Kicker.callback_chain.first.call.should == :from_callback
+  it "should return the callback chain instances" do
+    @chains.each do |chain|
+      Kicker.send(chain).should.be.instance_of Kicker::CallbackChain
+    end
   end
   
   it "should be accessible by an instance" do
     kicker = Kicker.new({})
-    kicker.callback_chain.should.be Kicker.callback_chain
+    
+    @chains.each do |chain|
+      kicker.send(chain).should.be Kicker.send(chain)
+    end
+  end
+  
+  it "should provide a shortcut method which appends a callback to the pre-process chain" do
+    Kicker.pre_process_chain.expects(:append_callback).with do |callback|
+      callback.call == :from_callback
+    end
+    
+    Kicker.pre_process_callback = lambda { :from_callback }
+  end
+  
+  it "should provide a shortcut method which appends a callback to the process chain" do
+    Kicker.process_chain.expects(:append_callback).with do |callback|
+      callback.call == :from_callback
+    end
+    
+    Kicker.process_callback = lambda { :from_callback }
+  end
+  
+  it "should provide a shortcut method which prepends a callback to the post-process chain" do
+    Kicker.post_process_chain.expects(:prepend_callback).with do |callback|
+      callback.call == :from_callback
+    end
+    
+    Kicker.post_process_callback = lambda { :from_callback }
   end
 end
 

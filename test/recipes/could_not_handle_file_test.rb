@@ -8,6 +8,6 @@ describe "Kicker, concerning the default `could not handle file' callback" do
     kicker.expects(:log).with("Could not handle: /file/1, /file/2")
     kicker.expects(:log).with('')
     
-    Kicker.callback_chain.last.call(kicker, %w{ /file/1 /file/2 })
+    Kicker.process_chain.last.call(kicker, %w{ /file/1 /file/2 })
   end
 end

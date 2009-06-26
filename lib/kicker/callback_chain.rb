@@ -11,11 +11,29 @@ class Kicker
     end
   end
   
-  def self.callback_chain
-    @callback_chain ||= CallbackChain.new
-  end
-  
-  def self.callback=(callback)
-    callback_chain.prepend_callback(callback)
+  class << self
+    def pre_process_chain
+      @pre_process_chain ||= CallbackChain.new
+    end
+    
+    def process_chain
+      @process_chain ||= CallbackChain.new
+    end
+    
+    def post_process_chain
+      @post_process_chain ||= CallbackChain.new
+    end
+    
+    def pre_process_callback=(callback)
+      pre_process_chain.append_callback(callback)
+    end
+    
+    def process_callback=(callback)
+      process_chain.append_callback(callback)
+    end
+    
+    def post_process_callback=(callback)
+      post_process_chain.prepend_callback(callback)
+    end
   end
 end

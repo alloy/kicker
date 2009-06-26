@@ -41,7 +41,7 @@ class Kicker
   end
   
   def callback_chain
-    self.class.callback_chain
+    self.class.process_chain
   end
   
   def start

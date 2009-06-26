@@ -7,6 +7,7 @@ class Kicker
   end
   
   def validate_paths_and_command!
+    # TODO: should change to process_chain.empty?
     if callback_chain.length == 1
       puts OPTION_PARSER_CALLBACK.call(nil).help
       exit
