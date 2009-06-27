@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kicker}
-  s.version = "1.9.0"
+  s.version = "1.9.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2009-06-25}
+  s.date = %q{2009-06-27}
   s.email = %q{eloy.de.enige@gmail.com}
   s.executables = ["kicker", "kicker"]
   s.extra_rdoc_files = [
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
     "LICENSE",
     "README.rdoc",
     "Rakefile",
+    "TODO.rdoc",
     "VERSION.yml",
     "bin/kicker",
     "lib/kicker.rb",
