@@ -2,8 +2,6 @@
 
 * Add -r option to require recipe files that come bundled with Kicker
 
-* Probably easier to let the user mutate the files array instead of having to return an array.
-
 * Might be best to create an array of Pathname's instead of simply file path strings.
   Probably a subclass of Pathname with some Kicker specific helpers. (relative_path)
 
