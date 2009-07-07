@@ -17,15 +17,16 @@ describe "Kicker, concerning the `execute a command-line' callback" do
     callback = Kicker.process_chain.last
     callback.should.be.instance_of Proc
     
-    kicker = Kicker.new({})
-    kicker.expects(:execute_command).with('sh -c "ls"')
+    Kicker.expects(:execute_command).with('sh -c "ls"')
     
-    callback.call(kicker, %w{ /file/1 /file/2 }).should.not.be.instance_of Array
+    callback.call(%w{ /file/1 /file/2 }).should.not.be.instance_of Array
   end
   
   it "should clear the files array to halt the chain" do
+    Kicker.stubs(:execute_command)
+    
     files = %w{ /file/1 /file/2 }
-    Kicker.process_chain.last.call(stub(:execute_command), files)
+    Kicker.process_chain.last.call(files)
     files.should.be.empty
   end
 end

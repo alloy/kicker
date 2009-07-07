@@ -82,8 +82,6 @@ end
 
 describe "An instance of Kicker::CallbackChain, when calling the chain" do
   before do
-    @kicker = Kicker.new({})
-    
     @chain = Kicker::CallbackChain.new
     @result = []
   end
@@ -91,69 +89,57 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
   it "should call the callbacks from first to last" do
     @chain.append_callback lambda { @result << 1 }
     @chain.append_callback lambda { @result << 2 }
-    @chain.call(@kicker, %w{ file })
+    @chain.call(%w{ file })
     @result.should == [1, 2]
-  end
-  
-  it "should pass in the Kicker instance with each yield" do
-    kicker = nil
-    @chain.append_callback lambda { |x, _| kicker = x }
-    @chain.call(@kicker, %w{ file })
-    kicker.should.be @kicker
   end
   
   it "should pass the files array given to #call to each callback in the chain" do
     array = %w{ /file/1 }
     
-    @chain.append_callback lambda { |_, files|
+    @chain.append_callback lambda { |files|
       files.should.be array
       files.concat(%w{ /file/2 })
     }
     
-    @chain.append_callback lambda { |_, files|
+    @chain.append_callback lambda { |files|
       files.should.be array
       @result.concat(files)
     }
     
-    @chain.call(@kicker, array)
+    @chain.call(array)
     @result.should == %w{ /file/1 /file/2 }
   end
   
   it "should halt the callback chain once the given array is empty" do
-    @chain.append_callback lambda { |_, files| @result << 1; files.clear }
-    @chain.append_callback lambda { |_, files| @result << 2 }
-    @chain.call(@kicker, %w{ /file/1 /file/2 })
+    @chain.append_callback lambda { |files| @result << 1; files.clear }
+    @chain.append_callback lambda { |files| @result << 2 }
+    @chain.call(%w{ /file/1 /file/2 })
     @result.should == [1]
   end
   
   it "should not call any callback if the given array is empty" do
-    @chain.append_callback lambda { |_, files| @result << 1 }
-    @chain.call(@kicker, [])
+    @chain.append_callback lambda { |files| @result << 1 }
+    @chain.call([])
     @result.should == []
   end
   
   it "should work with a chain of chains as well" do
     array = %w{ file }
     
-    kicker_and_files = lambda do |kicker, files|
-      kicker.should.be @kicker
-      files.should.be array
-    end
-    
     chain1 = Kicker::CallbackChain.new([
-      lambda { |*args| kicker_and_files.call(*args); @result << 1 },
-      lambda { |*args| kicker_and_files.call(*args); @result << 2 }
+      lambda { |files| files.should.be(array); @result << 1 },
+      lambda { |files| files.should.be(array); @result << 2 }
     ])
     
     chain2 = Kicker::CallbackChain.new([
-      lambda { |*args| kicker_and_files.call(*args); @result << 3 },
-      lambda { |*args| kicker_and_files.call(*args); @result << 4 }
+      lambda { |files| files.should.be(array); @result << 3 },
+      lambda { |files| files.should.be(array); @result << 4 }
     ])
     
     @chain.append_callback chain1
     @chain.append_callback chain2
     
-    @chain.call(@kicker, array)
+    @chain.call(array)
     @result.should == [1, 2, 3, 4]
   end
 end

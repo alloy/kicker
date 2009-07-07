@@ -3,14 +3,14 @@ class Kicker
     class Base
       class NotImplementedError < StandardError; end
       
-      def self.call(kicker, files)
-        new(kicker, files).handle!
+      def self.call(files)
+        new(files).handle!
       end
       
-      attr_reader :kicker, :files
+      attr_reader :files
       
-      def initialize(kicker, files)
-        @kicker, @files = kicker, files
+      def initialize(files)
+        @files = files
         after_initialize if respond_to?(:after_initialize)
       end
       

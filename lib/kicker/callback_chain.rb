@@ -3,10 +3,10 @@ class Kicker
     alias_method :append_callback,  :push
     alias_method :prepend_callback, :unshift
     
-    def call(kicker, files)
+    def call(files)
       each do |callback|
         break if files.empty?
-        callback.call(kicker, files)
+        callback.call(files)
       end
     end
   end

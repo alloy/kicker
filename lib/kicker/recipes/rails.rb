@@ -1,3 +1,5 @@
+require 'kicker/recipes/base'
+
 class Kicker
   module Recipes
     class Rails < Base
@@ -21,7 +23,7 @@ class Kicker
       end
       
       def run_tests
-        @kicker.execute_command("ruby -r #{@test_files.join(' -r ')} -e ''")
+        Kicker.execute_command("ruby -r #{@test_files.join(' -r ')} -e ''")
       end
     end
   end

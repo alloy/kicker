@@ -41,6 +41,14 @@ describe "Kicker, when initializing" do
   it "should use the given FSEvents latency if one was given" do
     Kicker.new(:latency => 3.5).latency.should == 3.5
   end
+  
+  it "should assign whether or not to use growl, and the command, on the Kicker class" do
+    Kicker.use_growl = false
+    Kicker.growl_command = nil
+    Kicker.new(:growl => true, :growl_command => 'ls')
+    Kicker.use_growl.should.be true
+    Kicker.growl_command.should == 'ls'
+  end
 end
 
 describe "Kicker, when starting" do
@@ -117,7 +125,7 @@ describe "Kicker, when starting" do
   
   it "should register with growl if growl should be used" do
     @kicker.stubs(:validate_options!)
-    @kicker.use_growl = true
+    Kicker.use_growl = true
     
     Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
     @kicker.start
@@ -125,7 +133,7 @@ describe "Kicker, when starting" do
   
   it "should _not_ register with growl if growl should not be used" do
     @kicker.stubs(:validate_options!)
-    @kicker.use_growl = false
+    Kicker.use_growl = false
     
     Growl::Notifier.sharedInstance.expects(:register).never
     @kicker.start
