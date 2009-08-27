@@ -32,10 +32,10 @@ class Kicker
   
   def initialize(options)
     @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
-    @latency = options[:latency] || self.class.latency
     
-    self.class.use_growl     = options[:growl]
-    self.class.growl_command = options[:growl_command]
+    @latency       = options[:latency] || self.class.latency
+    @use_growl     = options[:growl]
+    @growl_command = options[:growl_command]
     
     finished_processing!
   end
@@ -47,7 +47,7 @@ class Kicker
     log ''
     
     run_watch_dog!
-    start_growl! if self.class.use_growl
+    start_growl! if @use_growl
     
     OSX.CFRunLoopRun
   end
@@ -77,7 +77,7 @@ class Kicker
   
   def process(events)
     unless (files = changed_files(events)).empty?
-      full_chain.call(files)
+      full_chain.call(self, files)
       finished_processing!
     end
   end

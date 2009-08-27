@@ -3,8 +3,10 @@ require 'kicker/recipes/rails'
 
 describe "The Kicker::Recipes::Rails handler" do
   before do
-    Kicker.stubs(:execute_command)
-    @handler = Kicker::Recipes::Rails.new([])
+    @kicker = Kicker.new({})
+    @kicker.stubs(:execute_command)
+    
+    @handler = Kicker::Recipes::Rails.new(@kicker, [])
   end
   
   it "should instantiate a new instance and call the #handle! method when called" do
@@ -12,8 +14,8 @@ describe "The Kicker::Recipes::Rails handler" do
     instance = mock('Kicker::Recipes::Rails')
     instance.expects(:handle!)
     
-    Kicker::Recipes::Rails.expects(:new).with(files).returns(instance)
-    Kicker::Recipes::Rails.call(files)
+    Kicker::Recipes::Rails.expects(:new).with(@kicker, files).returns(instance)
+    Kicker::Recipes::Rails.call(@kicker, files)
   end
   
   it "should match, extract, and run any test case files that have changed" do
@@ -22,7 +24,7 @@ describe "The Kicker::Recipes::Rails handler" do
     @handler.files << File.expand_path('test/1_test.rb')
     @handler.files << File.expand_path('test/namespace/2_test.rb')
     
-    Kicker.expects(:execute_command).with("ruby -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
+    @kicker.expects(:execute_command).with("ruby -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
     @handler.handle!
     
     @handler.test_files.should == %w{ test/1_test.rb test/namespace/2_test.rb }

@@ -1,10 +1,9 @@
 require 'growlnotifier/growl_helpers'
 
 class Kicker
-  class << self
-    include Growl
-    attr_accessor :use_growl, :growl_command
-  end
+  include Growl
+  
+  attr_accessor :use_growl, :growl_command
   
   GROWL_NOTIFICATIONS = {
     :change => 'Change occured',

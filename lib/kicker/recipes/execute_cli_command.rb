@@ -1,6 +1,6 @@
 Kicker.option_parser.on('-e', '--execute [COMMAND]', 'The command to execute.') do |command|
-  Kicker.process_callback = lambda do |files|
+  Kicker.process_callback = lambda do |kicker, files|
     files.clear
-    Kicker.execute_command "sh -c #{command.inspect}"
+    kicker.execute_command "sh -c #{command.inspect}"
   end
 end

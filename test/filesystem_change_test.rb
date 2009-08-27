@@ -45,7 +45,7 @@ describe "Kicker, when a change occurs" do
     events = [event('/file/1'), event('/file/2')]
     
     @kicker.expects(:changed_files).with(events).returns(files)
-    @kicker.full_chain.expects(:call).with(files)
+    @kicker.full_chain.expects(:call).with(@kicker, files)
     @kicker.expects(:finished_processing!)
     
     @kicker.send(:process, events)
