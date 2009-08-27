@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+$:.unshift File.expand_path('../../lib', __FILE__) if $0 == __FILE__
 
-require File.expand_path('../../lib/kicker', __FILE__)
+require 'kicker'
 Kicker.run
