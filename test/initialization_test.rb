@@ -51,9 +51,10 @@ describe "Kicker, when starting" do
     OSX.stubs(:CFRunLoopRun)
   end
   
-  it "should show the usage banner and exit when there is no process_callback defined at all" do
+  it "should show the usage banner and exit when there are no callbacks defined at all" do
     @kicker.stubs(:validate_paths_exist!)
     Kicker.stubs(:process_chain).returns([])
+    Kicker.stubs(:pre_process_chain).returns([])
     
     Kicker::OPTION_PARSER_CALLBACK.stubs(:call).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")
