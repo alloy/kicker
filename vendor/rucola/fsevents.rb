@@ -1,5 +1,4 @@
 require 'osx/cocoa'
-
 OSX.require_framework '/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework'
 
 module Rucola
@@ -15,7 +14,13 @@ module Rucola
       # Returns an array of the files/dirs in the path that the event occurred in.
       # The files are sorted by the modification time, the first entry is the last modified file.
       def files
-        Dir.glob("#{File.expand_path(path)}/*").sort_by {|f| File.mtime(f) }.reverse
+        Dir.glob("#{File.expand_path(path)}/*").map do |filename|
+          begin
+            [File.mtime(filename), filename] 
+          rescue Errno::ENOENT
+            nil
+          end
+        end.compact.sort.reverse.map { |mtime, filename| filename }
       end
       
       # Returns the last modified file in the path that the event occurred in.
