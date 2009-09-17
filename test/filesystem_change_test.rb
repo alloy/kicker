@@ -40,6 +40,17 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:changed_files, events).should == [file1, file3]
   end
   
+  it "should not break when determining changed files from events with missing files" do
+    file1 = touch('1')
+    file2 = touch('2')
+    @kicker.send(:finished_processing!)
+    sleep(1)
+    touch('2')
+    
+    events = [event(file1, file2), event('/does/not/exist')]
+    @kicker.send(:changed_files, events).should == [file2]
+  end
+  
   it "should call the full_chain with all changed files" do
     files = %w{ /file/1 /file/2 }
     events = [event('/file/1'), event('/file/2')]

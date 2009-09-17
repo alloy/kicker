@@ -71,7 +71,13 @@ class Kicker
   
   def changed_files(events)
     events.map do |event|
-      event.files.select { |file| File.mtime(file) > @last_event_processed_at }
+      event.files.select do |file|
+        begin
+          File.mtime(file) > @last_event_processed_at
+        rescue Errno::ENOENT
+          false
+        end
+      end
     end.flatten
   end
   
