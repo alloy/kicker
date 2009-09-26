@@ -13,5 +13,5 @@ Kicker.process_callback = lambda do |files|
     end
   end
   
-  Kicker.execute_command "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
+  execute "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
 end

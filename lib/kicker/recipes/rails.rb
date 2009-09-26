@@ -23,7 +23,7 @@ class Kicker
       end
       
       def run_tests
-        Kicker.execute_command("ruby -r #{@test_files.join(' -r ')} -e ''")
+        Kicker.execute("ruby -r #{@test_files.join(' -r ')} -e ''")
       end
     end
   end
