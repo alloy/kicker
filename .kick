@@ -1,0 +1,24 @@
+module Path
+  def self.relative(path)
+    path[Dir.pwd.length+1..-1]
+  end
+end
+
+Kicker.process_callback = lambda do |files|
+  test_files = []
+  
+  files.delete_if do |file|
+    file = Path.relative(file)
+    case file
+    when %r{^test/.+_test\.rb$}
+      test_files << file
+    when %r{^lib/kicker(\.rb|/validate\.rb|/growl\.rb)$}
+      test_files << "test/filesystem_change_test.rb" if $1 == '.rb'
+      test_files << "test/initialization_test.rb"
+    when %r{^lib/kicker/(.+)\.rb$}
+      test_files << "test/#{$1}_test.rb"
+    end
+  end
+  
+  Kicker.execute_command "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
+end
