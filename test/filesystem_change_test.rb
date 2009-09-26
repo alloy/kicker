@@ -53,6 +53,14 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:changed_files, events).should == [file2]
   end
   
+  it "should return relative file paths if the path is relative to the current work dir" do
+    sleep(1)
+    file = touch('1')
+    
+    Dir.stubs(:pwd).returns('/tmp')
+    @kicker.send(:changed_files, [event(file)]).should == [File.basename(file)]
+  end
+  
   it "should call the full_chain with all changed files" do
     files = %w{ /file/1 /file/2 }
     events = [event('/file/1'), event('/file/2')]

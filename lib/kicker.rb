@@ -59,7 +59,7 @@ class Kicker
     watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => @latency) { |events| process(events) }
     
     trap('INT') do
-      log "Cleaning up…"
+      log "Exiting…"
       watch_dog.stop
       exit
     end
@@ -70,15 +70,30 @@ class Kicker
   end
   
   def changed_files(events)
-    events.map do |event|
+    files = events.map do |event|
       Dir.glob("#{File.expand_path(event.path)}/*").select do |file|
-        begin
-          File.mtime(file) > @last_event_processed_at
-        rescue Errno::ENOENT
-          false
-        end
+        file_changed_since_last_event? file
       end
     end.flatten.uniq.sort
+    
+    unless files.empty?
+      wd = Dir.pwd
+      files.map! do |file|
+        if file[0..wd.length-1] == wd
+          file[wd.length+1..-1]
+        else
+          file
+        end
+      end
+    end
+    
+    files
+  end
+  
+  def file_changed_since_last_event?(file)
+    File.mtime(file) > @last_event_processed_at
+  rescue Errno::ENOENT
+    false
   end
   
   def process(events)

@@ -1,14 +1,7 @@
-module Path
-  def self.relative(path)
-    path[Dir.pwd.length+1..-1]
-  end
-end
-
 Kicker.process_callback = lambda do |files|
   test_files = []
   
   files.delete_if do |file|
-    file = Path.relative(file)
     case file
     when %r{^test/.+_test\.rb$}
       test_files << file
