@@ -47,6 +47,11 @@ describe "The Rails handler" do
     should_match %w{ config/routes.rb }, tests
   end
   
+  it "should map lib files to test/lib" do
+    should_match %w{ lib/money.rb           lib/views/date.rb },
+                 %w{ test/lib/money_test.rb test/lib/views/date_test.rb }
+  end
+  
   private
   
   def should_match(files, tests)

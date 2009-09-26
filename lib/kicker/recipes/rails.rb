@@ -12,9 +12,14 @@ process do |files|
     if file =~ /^test\/.+_test\.rb$/
       test_files << file
     
+    # Run all functional tests when routes.rb is saved
     elsif file == 'config/routes.rb'
       files.delete(file)
       test_files.concat Rails.all_functional_tests
+    
+    # Match lib/*
+    elsif file =~ /^(lib\/.+)\.rb$/
+      test_files << "test/#{$1}_test.rb"
     
     # Match any file in app/ and map it to a test file
     elsif match = file.match(%r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$})
