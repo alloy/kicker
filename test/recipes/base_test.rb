@@ -35,10 +35,4 @@ describe "An instance of Kicker::Recipes::Base" do
       Kicker::Recipes::Base.new(@files).handle!
     }.should.raise Kicker::Recipes::Base::NotImplementedError
   end
-  
-  it "should return a relative representation of a given path, relative to the working dir" do
-    path = 'lib/foo.rb'
-    instance = Kicker::Recipes::Base.new(@files)
-    instance.relative_path(File.expand_path(path)).should == path
-  end
 end

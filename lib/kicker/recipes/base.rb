@@ -17,10 +17,6 @@ class Kicker
       def handle!
         raise NotImplementedError, 'The subclass should implement this method to handle the changed files.'
       end
-      
-      def relative_path(path)
-        path[(Dir.pwd.length + 1)..-1]
-      end
     end
   end
 end
