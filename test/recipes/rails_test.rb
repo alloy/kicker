@@ -4,6 +4,13 @@ before = Kicker.process_chain.dup
 require 'kicker/recipes/rails'
 RAILS = (Kicker.process_chain - before).first
 
+describe "The Rails helper module" do
+  it "should return all functional tests" do
+    Dir.expects(:glob).with("test/functional/**/*_test.rb").returns(%w{ test.rb })
+    Rails.all_functional_tests.should == %w{ test.rb }
+  end
+end
+
 describe "The Rails handler" do
   before do
     @files = %w{ Rakefile }
@@ -32,6 +39,12 @@ describe "The Rails handler" do
   it "should map view templates to test/functional" do
     should_match %w{ app/views/members/index.html.erb           app/views/admin/articles/show.html.erb },
                  %w{ test/functional/members_controller_test.rb test/functional/admin/articles_controller_test.rb }
+  end
+  
+  it "should run all functional tests when config/routes.rb is saved" do
+    tests = %w{ test/functional/members_controller_test.rb test/functional/admin/articles_controller_test.rb }
+    Rails.expects(:all_functional_tests).returns(tests)
+    should_match %w{ config/routes.rb }, tests
   end
   
   private

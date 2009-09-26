@@ -1,3 +1,9 @@
+module Rails
+  def self.all_functional_tests
+    Dir.glob("test/functional/**/*_test.rb")
+  end
+end
+
 process do |files|
   test_files = []
   
@@ -5,6 +11,10 @@ process do |files|
     # Match any ruby test file and run it
     if file =~ /^test\/.+_test\.rb$/
       test_files << file
+    
+    elsif file == 'config/routes.rb'
+      files.delete(file)
+      test_files.concat Rails.all_functional_tests
     
     # Match any file in app/ and map it to a test file
     elsif match = file.match(%r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$})
