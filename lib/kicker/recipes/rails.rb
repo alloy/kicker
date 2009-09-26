@@ -13,6 +13,8 @@ process do |files|
       dir = case type
       when "models"
         "unit"
+      when "concerns"
+        "unit/concerns"
       end
       
       if dir

@@ -18,9 +18,19 @@ describe "The Rails handler" do
     @files.should == %w{ Rakefile }
   end
   
-  it "should map model files to unit tests" do
+  it "should map model files to test/unit" do
     @files += %w{ app/models/member.rb app/models/article.rb }
     test_files = %w{ test/unit/member_test.rb test/unit/article_test.rb }
+    File.stubs(:exist?).returns(true)
+    
+    Kicker::Utils.expects(:run_ruby_tests).with(test_files)
+    rails.call(@files)
+    @files.should == %w{ Rakefile }
+  end
+  
+  it "should map concern files to test/unit/concerns" do
+    @files += %w{ app/concerns/authenticate.rb app/concerns/nested_resource.rb }
+    test_files = %w{ test/unit/concerns/authenticate_test.rb test/unit/concerns/nested_resource_test.rb }
     File.stubs(:exist?).returns(true)
     
     Kicker::Utils.expects(:run_ruby_tests).with(test_files)
