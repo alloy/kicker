@@ -5,16 +5,26 @@ require 'kicker/recipes/rails'
 rails = (Kicker.process_chain - before).first
 
 describe "The Rails handler" do
-  # before do
-  #   Kicker::Utils.stubs(:execute)
-  # end
+  before do
+    @files = %w{ Rakefile }
+  end
   
   it "should match, extract, and run any test case files that have changed" do
     test_files = %w{ test/1_test.rb test/namespace/2_test.rb }
-    files = test_files + %w{ lib/foo.rb }
+    @files += test_files
     
     Kicker::Utils.expects(:run_ruby_tests).with(test_files)
-    rails.call(files)
-    files.should == %w{ lib/foo.rb }
+    rails.call(@files)
+    @files.should == %w{ Rakefile }
+  end
+  
+  it "should map model files to unit tests" do
+    @files += %w{ app/models/member.rb app/models/article.rb }
+    test_files = %w{ test/unit/member_test.rb test/unit/article_test.rb }
+    File.stubs(:exist?).returns(true)
+    
+    Kicker::Utils.expects(:run_ruby_tests).with(test_files)
+    rails.call(@files)
+    @files.should == %w{ Rakefile }
   end
 end

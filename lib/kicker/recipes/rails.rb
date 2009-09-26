@@ -5,6 +5,20 @@ process do |files|
     # Match any ruby test file and run it
     if file =~ /^test\/.+_test\.rb$/
       test_files << file
+    
+    # Match any file in app/ and map it to a test file
+    elsif match = file.match(%r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$})
+      type, namespace, file = match[1..3]
+      
+      dir = case type
+      when "models"
+        "unit"
+      end
+      
+      if dir
+        test_file = File.join("test", dir, namespace, "#{file}_test.rb")
+        test_files << test_file if File.exist?(test_file)
+      end
     end
   end
   
