@@ -31,6 +31,10 @@ class Kicker
       puts "[#{Time.now}] #{message}"
     end
     
+    def run_ruby_tests(tests)
+      execute "ruby -r #{tests.join(' -r ')} -e ''" unless tests.empty?
+    end
+    
     private
     
     def last_command_succeeded?
@@ -59,6 +63,6 @@ module Kernel
   end
   
   def run_ruby_tests(tests)
-    execute "ruby -r #{tests.join(' -r ')} -e ''" unless tests.empty?
+    Kicker::Utils.run_ruby_tests(tests)
   end
 end

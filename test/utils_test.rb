@@ -106,12 +106,12 @@ describe "Kernel utility methods" do
   end
   
   it "should call execute with the appropriate command to execute Ruby tests" do
-    expects(:execute).with("ruby -r test/1.rb -r test/2.rb -e ''")
+    utils.expects(:execute).with("ruby -r test/1.rb -r test/2.rb -e ''")
     run_ruby_tests %w{ test/1.rb test/2.rb }
   end
   
   it "should not execute anything if an empty array is given to run_ruby_tests" do
-    expects(:execute).never
+    utils.expects(:execute).never
     run_ruby_tests []
   end
   
