@@ -29,6 +29,11 @@ describe "The Rails handler" do
                  %w{ test/functional/application_controller_test.rb test/functional/members_controller_test.rb }
   end
   
+  it "should map view templates to test/functional" do
+    should_match %w{ app/views/members/index.html.erb           app/views/admin/articles/show.html.erb },
+                 %w{ test/functional/members_controller_test.rb test/functional/admin/articles_controller_test.rb }
+  end
+  
   private
   
   def should_match(files, tests)

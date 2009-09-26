@@ -15,11 +15,16 @@ process do |files|
         "unit"
       when "concerns"
         "unit/concerns"
-      when "controllers"
+      when "controllers", "views"
         "functional"
       end
       
       if dir
+        if type == "views"
+          namespace = namespace.split('/')[1..-1]
+          file = "#{namespace.pop}_controller"
+        end
+        
         test_file = File.join("test", dir, namespace, "#{file}_test.rb")
         test_files << test_file if File.exist?(test_file)
       end
