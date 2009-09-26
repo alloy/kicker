@@ -49,15 +49,15 @@ end
 module Kernel
   private
   
-  def pre_process_callback(callback = nil, &block)
+  def pre_process(callback = nil, &block)
     Kicker.pre_process_chain.append_callback(block ? block : callback)
   end
   
-  def process_callback(callback = nil, &block)
+  def process(callback = nil, &block)
     Kicker.process_chain.append_callback(block ? block : callback)
   end
   
-  def post_process_callback(callback = nil, &block)
+  def post_process(callback = nil, &block)
     Kicker.post_process_chain.prepend_callback(block ? block : callback)
   end
 end

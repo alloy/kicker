@@ -24,7 +24,7 @@ describe "Kicker, concerning its callback chains" do
       callback.call == :from_callback
     end
     
-    pre_process_callback { :from_callback }
+    pre_process { :from_callback }
   end
   
   it "should provide a shortcut method which appends a callback to the process chain" do
@@ -32,7 +32,7 @@ describe "Kicker, concerning its callback chains" do
       callback.call == :from_callback
     end
     
-    process_callback { :from_callback }
+    process { :from_callback }
   end
   
   it "should provide a shortcut method which prepends a callback to the post-process chain" do
@@ -40,7 +40,7 @@ describe "Kicker, concerning its callback chains" do
       callback.call == :from_callback
     end
     
-    post_process_callback { :from_callback }
+    post_process { :from_callback }
   end
   
   it "should have assigned the chains to the `full_chain'" do

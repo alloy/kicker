@@ -1,5 +1,10 @@
 require File.expand_path('../../test_helper', __FILE__)
+
+before = Kicker.process_chain.dup
+p before
 require 'kicker/recipes/rails'
+rails = Kicker.process_chain - before
+p rails
 
 # describe "The Kicker::Recipes::Rails handler" do
 #   before do

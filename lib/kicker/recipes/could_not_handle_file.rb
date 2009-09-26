@@ -1,4 +1,4 @@
-post_process_callback do |files|
+post_process do |files|
   log('')
   log("Could not handle: #{files.join(', ')}")
   log('')

@@ -1,4 +1,4 @@
-process_callback do |files|
+process do |files|
   test_files = []
   
   files.delete_if do |file|
