@@ -69,25 +69,21 @@ class Kicker
     @last_event_processed_at = Time.now
   end
   
-  def changed_files(events)
-    files = events.map do |event|
-      Dir.glob("#{File.expand_path(event.path)}/*").select do |file|
-        file_changed_since_last_event? file
-      end
-    end.flatten.uniq.sort
-    
-    unless files.empty?
-      wd = Dir.pwd
-      files.map! do |file|
-        if file[0..wd.length-1] == wd
-          file[wd.length+1..-1]
-        else
-          file
-        end
-      end
+  def process(events)
+    unless (files = changed_files(events)).empty?
+      full_chain.call(files)
+      finished_processing!
     end
-    
-    files
+  end
+  
+  def changed_files(events)
+    make_paths_relative(events.map do |event|
+      files_in_directory(event.path).select { |file| file_changed_since_last_event? file }
+    end.flatten.uniq.sort)
+  end
+  
+  def files_in_directory(dir)
+    Dir.glob("#{File.expand_path(dir)}/*")
   end
   
   def file_changed_since_last_event?(file)
@@ -96,10 +92,15 @@ class Kicker
     false
   end
   
-  def process(events)
-    unless (files = changed_files(events)).empty?
-      full_chain.call(files)
-      finished_processing!
+  def make_paths_relative(files)
+    return files if files.empty?
+    wd = Dir.pwd
+    files.map do |file|
+      if file[0..wd.length-1] == wd
+        file[wd.length+1..-1]
+      else
+        file
+      end
     end
   end
 end
