@@ -7,6 +7,8 @@ module Rails
       "unit/concerns"
     when "controllers", "views"
       "functional"
+    when "helpers"
+      "unit/helpers"
     end
   end
   
