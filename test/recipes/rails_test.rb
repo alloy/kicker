@@ -16,7 +16,7 @@ describe "The Kicker::Recipes::Rails handler" do
     Kicker::Recipes::Rails.call(files)
   end
   
-  it "should match, extract, and run any test case files that have changed" do
+  xit "should match, extract, and run any test case files that have changed" do
     lib_file = File.expand_path('lib/foo.rb')
     @handler.files << lib_file
     @handler.files << File.expand_path('test/1_test.rb')
