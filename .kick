@@ -1,4 +1,4 @@
-Kicker.process_callback = lambda do |files|
+process_callback do |files|
   test_files = []
   
   files.delete_if do |file|
@@ -13,5 +13,5 @@ Kicker.process_callback = lambda do |files|
     end
   end
   
-  execute "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
+  run_ruby_tests test_files
 end
