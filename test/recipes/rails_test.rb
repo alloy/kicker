@@ -24,6 +24,11 @@ describe "The Rails handler" do
                  %w{ test/unit/concerns/authenticate_test.rb test/unit/concerns/nested_resource_test.rb }
   end
   
+  it "should map controller files to test/functional" do
+    should_match %w{ app/controllers/application_controller.rb      app/controllers/members_controller.rb },
+                 %w{ test/functional/application_controller_test.rb test/functional/members_controller_test.rb }
+  end
+  
   private
   
   def should_match(files, tests)

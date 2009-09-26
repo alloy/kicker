@@ -15,6 +15,8 @@ process do |files|
         "unit"
       when "concerns"
         "unit/concerns"
+      when "controllers"
+        "functional"
       end
       
       if dir
