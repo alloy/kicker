@@ -2,6 +2,8 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker, when a change occurs" do
   before do
+    remove_tmp_files!
+    
     Kicker.any_instance.stubs(:last_command_succeeded?).returns(true)
     Kicker.any_instance.stubs(:log)
     @kicker = Kicker.new({})
@@ -80,7 +82,11 @@ describe "Kicker, when a change occurs" do
   
   def event(*files)
     event = stub('FSEvent')
-    event.stubs(:files).returns(files)
+    event.stubs(:path).returns('/tmp')
     event
+  end
+  
+  def remove_tmp_files!
+    Dir.glob("/tmp/kicker_test_tmp_*").each { |f| File.delete(f) }
   end
 end
