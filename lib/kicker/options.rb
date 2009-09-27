@@ -16,12 +16,20 @@ class Kicker
       options[:growl_command] = command
     end
     
-    option_parser.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency') do |latency|
+    option_parser.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency.') do |latency|
       options[:latency] = Float(latency)
     end
     
-    option_parser.on('-r', '--recipe [NAME]', 'A recipe to load') do |recipe|
+    option_parser.on('-r', '--recipe [NAME]', 'A recipe to load.') do |recipe|
       (options[:recipes] ||= []) << recipe
+    end
+    
+    option_parser.separator " "
+    option_parser.separator "  Available recipes:"
+    [RECIPES_DIR, USER_RECIPES_DIR].each do |dir|
+      Dir.glob("#{dir}/*.rb").each do |recipe|
+        option_parser.separator "    - #{File.basename(recipe, '.rb')}"
+      end
     end
     
     option_parser
