@@ -47,16 +47,26 @@ class Kicker
 end
 
 module Kernel
-  private
-  
+  # Adds a handler to the pre_process chain. This chain is ran before the
+  # process chain and is processed from first to last.
+  #
+  # Takes a +callback+ object that responds to <tt>#call</tt>, or a block.
   def pre_process(callback = nil, &block)
     Kicker.pre_process_chain.append_callback(block ? block : callback)
   end
   
+  # Adds a handler to the process chain. This chain is ran in between the
+  # pre_process and post_process chains. It is processed from first to last.
+  #
+  # Takes a +callback+ object that responds to <tt>#call</tt>, or a block.
   def process(callback = nil, &block)
     Kicker.process_chain.append_callback(block ? block : callback)
   end
   
+  # Adds a handler to the post_process chain. This chain is ran after the
+  # process chain and is processed from last to first.
+  #
+  # Takes a +callback+ object that responds to <tt>#call</tt>, or a block.
   def post_process(callback = nil, &block)
     Kicker.post_process_chain.prepend_callback(block ? block : callback)
   end

@@ -24,11 +24,11 @@ class Kicker
       options[:growl_command] = command
     end
     
-    option_parser.on('-l', '--latency [FLOAT]', 'FSEvent grouping latency.') do |latency|
+    option_parser.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to 1.5 sec.") do |latency|
       options[:latency] = Float(latency)
     end
     
-    option_parser.on('-r', '--recipe [NAME]', 'A recipe to load.') do |recipe|
+    option_parser.on('-r', '--recipe [NAME]', 'A named recipe to load.') do |recipe|
       (options[:recipes] ||= []) << recipe
     end
     

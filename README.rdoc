@@ -1,38 +1,139 @@
 = Kicker
 
-A simple OS X CLI tool which uses FSEvents to run a given shell command.
+A lean, flexible file-change watcher, using OS X FSEvents.
 
 http://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
 
-== Usage
+<i>Drawing by Manfred Stienstra. The character is purely fictional, so if you
+feel offended; live with it.</i>
 
-Give it paths to files or directories and a shell command to execute when any
-changes occur.
-
-  Usage: kicker [options] -e [command] [paths to watch]
-      -e, --execute [COMMAND]          The command to execute.
-          --[no-]growl                 Whether or not to use Growl. Default is to use growl.
-          --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
-
-== Examples
-
-Show all files whenever a change occurs in the current work directory:
-
-  $ kicker -e "ls -l" .
-
-Run a Rake task whenever a given file is changed:
-
-  $ kicker -e "rake guides" guides/source/nested_model_forms.textile
-
-Run a Run task whenever a given file is changed and specify a command to be
-executed if the user clicks a `succeeded' Growl message:
-
-  $ kicker -e "rake guides" --growl-command "open -a Safari guides/output/nested_model_forms.html" guides/source/nested_model_forms.textile
-
-And for fun, ghetto-autotest:
-
-  $ kicker -e "ruby test/test_case.rb" test/test_case.rb lib/file.rb
+<b>No frogs were harmed during development!</b>
 
 == Installation
 
   $ sudo gem install alloy-kicker -s http://gems.github.com
+
+== The short version
+
+  Usage: kicker [options] [paths to watch]
+      -e, --execute [COMMAND]          The command to execute.
+          --[no-]growl                 Whether or not to use Growl. Default is to use growl.
+          --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
+      -l, --latency [FLOAT]            The time to collect file change events before acting on them. Defaults to 1.5 sec.
+      -r, --recipe [NAME]              A named recipe to load.
+
+    Available recipes:
+      - ignore
+      - jstest
+      - rails
+
+== The long version
+
+=== Execute a shell command
+
+Show all files, whenever a change occurs in the current work directory:
+
+  $ kicker -e "ls -l" .
+
+Show all files, whenever a change occurs to a specific file:
+
+  $ kicker -e "ls -l" foo.txt
+
+Or use it as a ghetto-autotest, running tests whenever files change:
+
+  $ kicker -e "ruby test/test_case.rb" test/test_case.rb lib/file.rb
+
+Et cetera.
+
+=== Using recipes
+
+A recipe is a predefined handler. You can use as many as you like, by
+specifying them with the <tt>--recipe</tt> (<tt>-r</tt>) option.
+
+For instance, when in the root of a typical Ruby on Rails application, using
+the <tt>rails</tt> recipe will map models, concerns, controllers, helpers, and
+views to their respective test files. These will then all be ran with Ruby.
+
+A few recipes come shipped with Kicker:
+* Ruby on Rails, as aforementioned.
+* JavaScript tests, needs
+  HeadlessSquirrel[http://github.com/Fingertips/Headless-squirrel] to run.
+* Ignore, ignores logs, tmp, and svn and git files.
+
+Add your own shared recipes to <tt>~/.kick</tt>.
+
+=== Project specific handlers
+
+Most of the time, you’ll want to create handlers specific to the project at
+hand. This can be done by adding your handlers to a <tt>.kick</tt> file and
+running Kicker from the directory containing it.
+
+== Writing handlers
+
+Whenever file-change events occur, Kicker will go through a chain of handlers
+until that the files list is empty, or the end of the chain is reached.
+
+Handlers are objects that respond to <tt>#call</tt>. These are typically Proc
+objects. (If you know Rack, you’re familiar with this concept.) Every handler
+gets passed a list of changed files and can decide whether or not to act on
+them. Normally when handling a file, you should remove it from the files list,
+unless you want to let the file fall through to another handler. In the same
+way, one can add files to handler to the files list.
+
+==== Time for a simple example
+
+  process do |files|
+    execute("rake docs:regenerate && open -a Safari html/index.html") if files.delete("README.rdoc")
+  end
+
+A handler is defined by passing a block to <tt>process</tt>. Which is one of
+three possible callback chains to add your handlers to, the others being:
+<tt>pre_process</tt> and <tt>post_process</tt>. See Kernel for more info.
+
+Then <tt>README.rdoc</tt> is deleted from the files array. If it did exist in
+the array and was deleted, a shell command is executed which runs a rake task
+to generate rdoc and open the docs with Safari.
+
+==== Something more elaborate.
+
+Consider a Rails application with a mailer. Since the naming convention of
+mailer views tend to be fairly application specific, a specific handler has to
+be added:
+
+  process do |files|
+    test_files = files.take_and_map do |file|
+      if path =~ %r{^app/views/mailer/\w+\.erb$}
+        'test/unit/mailer_test.rb'
+      
+      # elsif ... handle more app specific stuff
+      end
+    end
+
+    run_ruby_tests test_files
+  end
+
+The files list is iterated over with the Array#take_and_map method, which both
+removes and maps the results. This is an easy way to do a common thing in
+recipes. See Kicker::ArrayExt for details.
+
+The handler then checks if the file is a mailer view and if so runs the
+mailers test case. The <tt>run_ruby_tests</tt> runs them with the following
+command:
+
+  execute "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
+
+See Kernel for more info on the utility methods.
+
+==== Addendum
+
+The recipes directory that ships with Kicker and <tt>~/.kick</tt> are both
+added to the load path, so any recipes can be required. Once they’re required
+they are added to the callback chains.
+
+As an example, say you might want to ignore files in <tt>./data</tt>:
+
+  require 'ignore'
+  ignore(/^data\//)
+
+That’s basically it, just remember that the order of specifying handlers _can_
+be important in your decision on where to specify handlers.

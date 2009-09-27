@@ -1,4 +1,5 @@
 module Rails
+  # Maps +type+, for instance `models', to a test directory.
   def self.type_to_test_dir(type)
     case type
     when "models"
@@ -12,6 +13,7 @@ module Rails
     end
   end
   
+  # Returns an array consiting of all functional tests.
   def self.all_functional_tests
     Dir.glob("test/functional/**/*_test.rb")
   end

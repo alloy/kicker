@@ -16,7 +16,7 @@ require 'execute_cli_command'
 USER_RECIPES_DIR = File.expand_path('~/.kick')
 $:.unshift USER_RECIPES_DIR if File.exist?(USER_RECIPES_DIR)
 
-class Kicker
+class Kicker #:nodoc:
   class << self
     attr_accessor :latency
     
