@@ -1,6 +1,10 @@
 require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker" do
+  before do
+    Kicker.any_instance.stubs(:start)
+  end
+  
   it "should add kicker/recipes to the load path" do
     $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
   end
@@ -18,11 +22,20 @@ describe "Kicker" do
   end
   
   it "should check if a .kick file exists and if so load it before running" do
-    Kicker.any_instance.stubs(:start)
-    
     File.expects(:exist?).with('.kick').returns(true)
     Kicker.expects(:load).with('.kick')
     Kicker.run
+  end
+  
+  it "should check if a recipe exists and load it" do
+    Kicker.expects(:require).with('rails')
+    Kicker.expects(:require).with('ignore')
+    Kicker.run(%w{ -r rails -r ignore })
+  end
+  
+  it "should raise if a recipe does not exist" do
+    Kicker.expects(:require).never
+    lambda { Kicker.run(%w{ -r foobar -r rails }) }.should.raise
   end
 end
 

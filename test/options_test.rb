@@ -22,4 +22,9 @@ describe "Kicker.parse_options" do
     Kicker.parse_options(%w{ -l 2.5 })[:latency].should == 2.5
     Kicker.parse_options(%w{ --latency 3.5 })[:latency].should == 3.5
   end
+  
+  it "should parse recipe requires" do
+    Kicker.parse_options(%w{ -r rails -r jstest })[:recipes].should == %w{ rails jstest }
+    Kicker.parse_options(%w{ --recipe rails --recipe jstest })[:recipes].should == %w{ rails jstest }
+  end
 end

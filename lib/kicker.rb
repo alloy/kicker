@@ -7,12 +7,13 @@ require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
 
-$:.unshift File.expand_path('../kicker/recipes', __FILE__)
+RECIPES_DIR = File.expand_path('../kicker/recipes', __FILE__)
+$:.unshift RECIPES_DIR
 require 'could_not_handle_file'
 require 'execute_cli_command'
 
-user_kick_dir = File.expand_path('~/.kick')
-$:.unshift user_kick_dir if File.exist?(user_kick_dir)
+USER_RECIPES_DIR = File.expand_path('~/.kick')
+$:.unshift USER_RECIPES_DIR if File.exist?(USER_RECIPES_DIR)
 
 class Kicker
   class << self
@@ -27,8 +28,23 @@ class Kicker
     end
     
     def run(argv = ARGV)
+      options = parse_options(argv)
+      load_recipes(options[:recipes]) if options[:recipes]
       load '.kick' if File.exist?('.kick')
-      new(parse_options(argv)).start
+      new(options).start
+    end
+    
+    private
+    
+    def load_recipes(recipes)
+      recipes.each do |recipe|
+        raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
+        require recipe
+      end
+    end
+    
+    def recipe_exists?(recipe)
+      File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
     end
   end
   
