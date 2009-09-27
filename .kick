@@ -14,3 +14,7 @@ process do |files|
   
   run_ruby_tests test_files
 end
+
+process do |files|
+  execute("rake docs:regenerate && open -a Safari html/index.html") if files.delete("README.rdoc")
+end
