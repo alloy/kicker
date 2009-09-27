@@ -83,7 +83,7 @@ way, one can add files to handler to the files list.
 ==== Time for a simple example
 
   process do |files|
-    execute("rake docs:regenerate && open -a Safari html/index.html") if files.delete("README.rdoc")
+    execute("rake docs:generate && open -a Safari html/index.html") if files.delete("README.rdoc")
   end
 
 A handler is defined by passing a block to <tt>process</tt>. Which is one of

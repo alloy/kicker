@@ -16,5 +16,5 @@ process do |files|
 end
 
 process do |files|
-  execute("rake docs:regenerate && open -a Safari html/index.html") if files.delete("README.rdoc")
+  execute("rake docs:generate && open -a Safari html/index.html") if files.delete("README.rdoc")
 end
