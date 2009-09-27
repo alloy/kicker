@@ -11,12 +11,12 @@ describe "The Rails helper module" do
   end
 end
 
-describe "The Rails handler" do
+describe "The rails handler" do
   before do
     @files = %w{ Rakefile }
   end
   
-  it "should match, extract, and run any test case files that have changed" do
+  it "should match any test case files" do
     should_match %w{ test/1_test.rb test/namespace/2_test.rb },
                  %w{ test/1_test.rb test/namespace/2_test.rb }
   end
