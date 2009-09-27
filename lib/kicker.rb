@@ -7,8 +7,13 @@ require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
 
-require 'kicker/recipes/could_not_handle_file'
-require 'kicker/recipes/execute_cli_command'
+RECIPES_DIR = File.expand_path('../kicker/recipes', __FILE__)
+$:.unshift RECIPES_DIR
+require 'could_not_handle_file'
+require 'execute_cli_command'
+
+USER_RECIPES_DIR = File.expand_path('~/.kick')
+$:.unshift USER_RECIPES_DIR if File.exist?(USER_RECIPES_DIR)
 
 class Kicker
   class << self
@@ -23,8 +28,23 @@ class Kicker
     end
     
     def run(argv = ARGV)
+      options = parse_options(argv)
+      load_recipes(options[:recipes]) if options[:recipes]
       load '.kick' if File.exist?('.kick')
-      new(parse_options(argv)).start
+      new(options).start
+    end
+    
+    private
+    
+    def load_recipes(recipes)
+      recipes.each do |recipe|
+        raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
+        require recipe
+      end
+    end
+    
+    def recipe_exists?(recipe)
+      File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
     end
   end
   
@@ -32,10 +52,10 @@ class Kicker
   
   def initialize(options)
     @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
+    @latency = options[:latency] || self.class.latency
     
-    @latency       = options[:latency] || self.class.latency
-    @use_growl     = options[:growl]
-    @growl_command = options[:growl_command]
+    self.class.use_growl     = options[:growl]
+    self.class.growl_command = options[:growl_command]
     
     finished_processing!
   end
@@ -47,7 +67,7 @@ class Kicker
     log ''
     
     run_watch_dog!
-    start_growl! if @use_growl
+    start_growl! if self.class.use_growl
     
     OSX.CFRunLoopRun
   end
@@ -59,7 +79,7 @@ class Kicker
     watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => @latency) { |events| process(events) }
     
     trap('INT') do
-      log "Cleaning up…"
+      log "Exiting…"
       watch_dog.stop
       exit
     end
@@ -69,22 +89,38 @@ class Kicker
     @last_event_processed_at = Time.now
   end
   
-  def changed_files(events)
-    events.map do |event|
-      event.files.select do |file|
-        begin
-          File.mtime(file) > @last_event_processed_at
-        rescue Errno::ENOENT
-          false
-        end
-      end
-    end.flatten
-  end
-  
   def process(events)
     unless (files = changed_files(events)).empty?
-      full_chain.call(self, files)
+      full_chain.call(files)
       finished_processing!
+    end
+  end
+  
+  def changed_files(events)
+    make_paths_relative(events.map do |event|
+      files_in_directory(event.path).select { |file| file_changed_since_last_event? file }
+    end.flatten.uniq.sort)
+  end
+  
+  def files_in_directory(dir)
+    Dir.glob("#{File.expand_path(dir)}/*")
+  end
+  
+  def file_changed_since_last_event?(file)
+    File.mtime(file) > @last_event_processed_at
+  rescue Errno::ENOENT
+    false
+  end
+  
+  def make_paths_relative(files)
+    return files if files.empty?
+    wd = Dir.pwd
+    files.map do |file|
+      if file[0..wd.length-1] == wd
+        file[wd.length+1..-1]
+      else
+        file
+      end
     end
   end
 end

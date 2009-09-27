@@ -52,7 +52,7 @@
         end
       end
   
-      kicker.execute_command "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
+      kicker.execute "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
     end
 
     # Match javascript changes and run with HeadlessSquirrel
@@ -65,7 +65,7 @@
         end
       end
   
-      kicker.execute_command "jstest #{test_files.join(' ')}" unless test_files.empty?
+      kicker.execute "jstest #{test_files.join(' ')}" unless test_files.empty?
     end
 
     # Exclude files

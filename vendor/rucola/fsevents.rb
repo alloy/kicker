@@ -16,7 +16,7 @@ module Rucola
       def files
         Dir.glob("#{File.expand_path(path)}/*").map do |filename|
           begin
-            [File.mtime(filename), filename] 
+            [File.mtime(filename), filename]
           rescue Errno::ENOENT
             nil
           end

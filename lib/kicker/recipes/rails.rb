@@ -1,28 +1,55 @@
-class Kicker
-  module Recipes
-    class Rails < Base
-      attr_reader :test_files
+module Rails
+  def self.type_to_test_dir(type)
+    case type
+    when "models"
+      "unit"
+    when "concerns"
+      "unit/concerns"
+    when "controllers", "views"
+      "functional"
+    when "helpers"
+      "unit/helpers"
+    end
+  end
+  
+  def self.all_functional_tests
+    Dir.glob("test/functional/**/*_test.rb")
+  end
+end
+
+process do |files|
+  test_files = []
+  
+  files.delete_if do |file|
+    case file
+    # Match any ruby test file and run it
+    when /^test\/.+_test\.rb$/
+      test_files << file
+    
+    # Run all functional tests when routes.rb is saved
+    when 'config/routes.rb'
+      files.delete(file)
+      test_files.concat Rails.all_functional_tests
+    
+    # Match lib/*
+    when /^(lib\/.+)\.rb$/
+      test_files << "test/#{$1}_test.rb"
+    
+    # Match any file in app/ and map it to a test file
+    when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
+      type, namespace, file = $1, $2, $3
       
-      def after_initialize
-        @test_files = []
-      end
-      
-      def handle!
-        @files.delete_if do |full_path|
-          path = relative_path(full_path)
-          
-          # Match any ruby test file and run it
-          if path =~ /^test\/.+_test\.rb$/
-            @test_files << path
-          end
+      if dir = Rails.type_to_test_dir(type)
+        if type == "views"
+          namespace = namespace.split('/')[1..-1]
+          file = "#{namespace.pop}_controller"
         end
         
-        run_tests
-      end
-      
-      def run_tests
-        @kicker.execute_command("ruby -r #{@test_files.join(' -r ')} -e ''")
+        test_file = File.join("test", dir, namespace, "#{file}_test.rb")
+        test_files << test_file if File.exist?(test_file)
       end
     end
   end
+  
+  run_ruby_tests test_files
 end

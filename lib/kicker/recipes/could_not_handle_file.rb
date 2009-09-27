@@ -1,5 +1,5 @@
-Kicker.post_process_callback = lambda do |kicker, files|
-  kicker.log('')
-  kicker.log("Could not handle: #{files.join(', ')}")
-  kicker.log('')
+post_process do |files|
+  log('')
+  log("Could not handle: #{files.join(', ')}")
+  log('')
 end

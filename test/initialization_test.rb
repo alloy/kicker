@@ -1,16 +1,41 @@
 require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker" do
+  before do
+    Kicker.any_instance.stubs(:start)
+  end
+  
+  it "should add kicker/recipes to the load path" do
+    $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
+  end
+  
+  if File.exist?(File.expand_path('~/.kick'))
+    it "should add ~/.kick to the load path" do
+      $:.should.include File.expand_path('~/.kick')
+    end
+  else
+    puts "[!] ~/.kick does not exist, skipping an example."
+  end
+  
   it "should return the default paths to watch" do
     Kicker.paths.should == %w{ . }
   end
   
   it "should check if a .kick file exists and if so load it before running" do
-    Kicker.any_instance.stubs(:start)
-    
     File.expects(:exist?).with('.kick').returns(true)
     Kicker.expects(:load).with('.kick')
     Kicker.run
+  end
+  
+  it "should check if a recipe exists and load it" do
+    Kicker.expects(:require).with('rails')
+    Kicker.expects(:require).with('ignore')
+    Kicker.run(%w{ -r rails -r ignore })
+  end
+  
+  it "should raise if a recipe does not exist" do
+    Kicker.expects(:require).never
+    lambda { Kicker.run(%w{ -r foobar -r rails }) }.should.raise
   end
 end
 
@@ -118,7 +143,7 @@ describe "Kicker, when starting" do
   
   it "should register with growl if growl should be used" do
     @kicker.stubs(:validate_options!)
-    @kicker.use_growl = true
+    Kicker.use_growl = true
     
     Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
     @kicker.start
@@ -126,7 +151,7 @@ describe "Kicker, when starting" do
   
   it "should _not_ register with growl if growl should not be used" do
     @kicker.stubs(:validate_options!)
-    @kicker.use_growl = false
+    Kicker.use_growl = false
     
     Growl::Notifier.sharedInstance.expects(:register).never
     @kicker.start

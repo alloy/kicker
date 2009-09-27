@@ -20,6 +20,10 @@ class Kicker
       options[:latency] = Float(latency)
     end
     
+    option_parser.on('-r', '--recipe [NAME]', 'A recipe to load') do |recipe|
+      (options[:recipes] ||= []) << recipe
+    end
+    
     option_parser
   end
   

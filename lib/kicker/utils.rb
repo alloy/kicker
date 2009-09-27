@@ -1,34 +1,68 @@
 class Kicker
-  def execute_command(command)
-    log "Change occured, executing command: #{command}"
-    growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command) if @use_growl
+  module Utils
+    extend self
     
-    output = `#{command}`
-    output.strip.split("\n").each { |line| log "  #{line}" }
-    
-    log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
-    
-    if @use_growl
-      if last_command_succeeded?
-        callback = @growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(@growl_command) }
-        growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
-      else
-        growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
+    def execute(command)
+      @last_command = command
+      
+      log "Change occured, executing command: #{command}"
+      Kicker.growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command) if Kicker.use_growl
+      
+      output = `#{command}`
+      output.strip.split("\n").each { |line| log "  #{line}" }
+      
+      log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
+      
+      if Kicker.use_growl
+        if last_command_succeeded?
+          callback = Kicker.growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(Kicker.growl_command) }
+          Kicker.growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
+        else
+          Kicker.growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
+        end
       end
     end
+    
+    def last_command
+      @last_command
+    end
+    
+    def log(message)
+      puts "[#{Time.now}] #{message}"
+    end
+    
+    def run_ruby_tests(tests)
+      execute "ruby -r #{tests.join(' -r ')} -e ''" unless tests.empty?
+    end
+    
+    private
+    
+    def last_command_succeeded?
+      $?.success?
+    end
+    
+    def last_command_status
+      $?.to_i
+    end
   end
-  
-  def log(message)
-    puts "[#{Time.now}] #{message}"
-  end
-  
+end
+
+module Kernel
   private
   
-  def last_command_succeeded?
-    $?.success?
+  def log(message)
+    Kicker::Utils.log(message)
   end
   
-  def last_command_status
-    $?.to_i
+  def execute(command)
+    Kicker::Utils.execute(command)
+  end
+  
+  def last_command
+    Kicker::Utils.last_command
+  end
+  
+  def run_ruby_tests(tests)
+    Kicker::Utils.run_ruby_tests(tests)
   end
 end
