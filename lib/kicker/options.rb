@@ -1,6 +1,14 @@
 require 'optparse'
 
 class Kicker
+  DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command }
+  
+  def self.recipes_for_display
+    [RECIPES_DIR, USER_RECIPES_DIR].map do |dir|
+      Dir.glob("#{dir}/*.rb").map { |f| File.basename(f, '.rb') }
+    end.flatten - DONT_SHOW_RECIPES
+  end
+  
   def self.option_parser
     @option_parser ||= OptionParser.new do |opt|
       opt.banner = "Usage: #{$0} [options] [paths to watch]"
@@ -26,11 +34,7 @@ class Kicker
     
     option_parser.separator " "
     option_parser.separator "  Available recipes:"
-    [RECIPES_DIR, USER_RECIPES_DIR].each do |dir|
-      Dir.glob("#{dir}/*.rb").each do |recipe|
-        option_parser.separator "    - #{File.basename(recipe, '.rb')}"
-      end
-    end
+    Kicker.recipes_for_display.each { |recipe| option_parser.separator "    - #{recipe}" }
     
     option_parser
   end
