@@ -1,15 +1,8 @@
 process do |files|
-  test_files = []
-  
-  files.delete_if do |file|
-    case file
-    when %r{^test/javascripts/(\w+)_test\.(js|html)$}
-    when %r{^public/javascripts/(\w+)\.js$}
-    else
-      next
+  test_files = files.take_and_map do |file|
+    if file =~ %r{^(test|public)/javascripts/(\w+?)(_test)*\.(js|html)$}
+      "test/javascripts/#{$2}_test.html"
     end
-    test_files << "test/javascripts/#{$1}_test.html"
   end
-  
   execute "jstest #{test_files.join(' ')}" unless test_files.empty?
 end

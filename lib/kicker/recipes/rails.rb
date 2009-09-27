@@ -18,22 +18,19 @@ module Rails
 end
 
 process do |files|
-  test_files = []
-  
-  files.delete_if do |file|
+  test_files = files.take_and_map do |file|
     case file
     # Match any ruby test file and run it
     when /^test\/.+_test\.rb$/
-      test_files << file
+      file
     
     # Run all functional tests when routes.rb is saved
     when 'config/routes.rb'
-      files.delete(file)
-      test_files.concat Rails.all_functional_tests
+      Rails.all_functional_tests
     
     # Match lib/*
     when /^(lib\/.+)\.rb$/
-      test_files << "test/#{$1}_test.rb"
+      "test/#{$1}_test.rb"
     
     # Match any file in app/ and map it to a test file
     when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
@@ -46,10 +43,10 @@ process do |files|
         end
         
         test_file = File.join("test", dir, namespace, "#{file}_test.rb")
-        test_files << test_file if File.exist?(test_file)
+        test_file if File.exist?(test_file)
       end
     end
-  end
+  end.flatten
   
   run_ruby_tests test_files
 end
