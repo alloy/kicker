@@ -7,8 +7,9 @@ require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
 
-require 'kicker/recipes/could_not_handle_file'
-require 'kicker/recipes/execute_cli_command'
+$:.unshift File.expand_path('../kicker/recipes', __FILE__)
+require 'could_not_handle_file'
+require 'execute_cli_command'
 
 class Kicker
   class << self

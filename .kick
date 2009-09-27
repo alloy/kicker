@@ -1,3 +1,5 @@
+require 'ignore'
+
 process do |files|
   test_files = []
   

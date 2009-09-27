@@ -1,6 +1,10 @@
 require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker" do
+  it "should add kicker/recipes to the load path" do
+    $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
+  end
+  
   it "should return the default paths to watch" do
     Kicker.paths.should == %w{ . }
   end
