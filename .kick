@@ -1,17 +1,14 @@
 require 'ignore'
 
 process do |files|
-  test_files = []
-  
-  files.delete_if do |file|
+  test_files = files.take_and_map do |file|
     case file
     when %r{^test/.+_test\.rb$}
-      test_files << file
+      file
     when %r{^lib/kicker(\.rb|/validate\.rb|/growl\.rb)$}
-      test_files << "test/filesystem_change_test.rb" if $1 == '.rb'
-      test_files << "test/initialization_test.rb"
+      ["test/initialization_test.rb", ("test/filesystem_change_test.rb" if $1 == '.rb')]
     when %r{^lib/kicker/(.+)\.rb$}
-      test_files << "test/#{$1}_test.rb"
+      "test/#{$1}_test.rb"
     end
   end
   

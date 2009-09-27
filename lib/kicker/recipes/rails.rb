@@ -46,7 +46,7 @@ process do |files|
         test_file if File.exist?(test_file)
       end
     end
-  end.flatten
+  end
   
   run_ruby_tests test_files
 end
