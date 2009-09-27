@@ -11,6 +11,9 @@ $:.unshift File.expand_path('../kicker/recipes', __FILE__)
 require 'could_not_handle_file'
 require 'execute_cli_command'
 
+user_kick_dir = File.expand_path('~/.kick')
+$:.unshift user_kick_dir if File.exist?(user_kick_dir)
+
 class Kicker
   class << self
     attr_accessor :latency

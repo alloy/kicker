@@ -5,6 +5,14 @@ describe "Kicker" do
     $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
   end
   
+  if File.exist?(File.expand_path('~/.kick'))
+    it "should add ~/.kick to the load path" do
+      $:.should.include File.expand_path('~/.kick')
+    end
+  else
+    puts "[!] ~/.kick does not exist, skipping an example."
+  end
+  
   it "should return the default paths to watch" do
     Kicker.paths.should == %w{ . }
   end
