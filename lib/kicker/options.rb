@@ -24,7 +24,7 @@ class Kicker
       options[:growl_command] = command
     end
     
-    option_parser.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to 1.5 sec.") do |latency|
+    option_parser.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to 1 second.") do |latency|
       options[:latency] = Float(latency)
     end
     

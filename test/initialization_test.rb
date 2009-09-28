@@ -1,5 +1,7 @@
 require File.expand_path('../test_helper', __FILE__)
 
+module ReloadDotKick; end
+
 describe "Kicker" do
   before do
     Kicker.any_instance.stubs(:start)
@@ -24,6 +26,7 @@ describe "Kicker" do
   it "should check if a .kick file exists and if so load it and add the ReloadDotKick handler" do
     File.expects(:exist?).with('.kick').returns(true)
     Kicker.expects(:require).with('dot_kick')
+    ReloadDotKick.expects(:save_state)
     Kicker.expects(:load).with('.kick')
     Kicker.run
   end
@@ -63,7 +66,7 @@ describe "Kicker, when initializing" do
   end
   
   it "should use the default FSEvents latency if none was given" do
-    @kicker.latency.should == 1.5
+    @kicker.latency.should == 1
   end
   
   it "should use the given FSEvents latency if one was given" do

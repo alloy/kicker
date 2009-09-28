@@ -21,7 +21,7 @@ class Kicker #:nodoc:
     attr_accessor :latency
     
     def latency
-      @latency ||= 1.5
+      @latency ||= 1
     end
     
     def paths
@@ -40,6 +40,7 @@ class Kicker #:nodoc:
     def load_dot_kick
       if File.exist?('.kick')
         require 'dot_kick'
+        ReloadDotKick.save_state
         load '.kick'
       end
     end
