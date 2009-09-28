@@ -12,18 +12,22 @@ class Kicker
   end
   
   class << self
+    attr_writer :pre_process_chain
     def pre_process_chain
       @pre_process_chain ||= CallbackChain.new
     end
     
+    attr_writer :process_chain
     def process_chain
       @process_chain ||= CallbackChain.new
     end
     
+    attr_writer :post_process_chain
     def post_process_chain
       @post_process_chain ||= CallbackChain.new
     end
     
+    attr_writer :full_chain
     def full_chain
       @full_chain ||= CallbackChain.new([pre_process_chain, process_chain, post_process_chain])
     end

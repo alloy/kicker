@@ -31,11 +31,18 @@ class Kicker #:nodoc:
     def run(argv = ARGV)
       options = parse_options(argv)
       load_recipes(options[:recipes]) if options[:recipes]
-      load '.kick' if File.exist?('.kick')
+      load_dot_kick
       new(options).start
     end
     
     private
+    
+    def load_dot_kick
+      if File.exist?('.kick')
+        require 'dot_kick'
+        load '.kick'
+      end
+    end
     
     def load_recipes(recipes)
       recipes.each do |recipe|
@@ -104,7 +111,7 @@ class Kicker #:nodoc:
   end
   
   def files_in_directory(dir)
-    Dir.glob("#{File.expand_path(dir)}/*")
+    Dir.entries(dir)[2..-1].map { |f| File.join(dir, f) }
   end
   
   def file_changed_since_last_event?(file)

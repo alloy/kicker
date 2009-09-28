@@ -15,7 +15,7 @@ describe "Kicker, concerning its callback chains" do
     kicker = Kicker.new({})
     
     @chains.each do |chain|
-      kicker.send(chain).should.be Kicker.send(chain)
+      kicker.send(chain).should == Kicker.send(chain)
     end
   end
   
