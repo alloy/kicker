@@ -21,7 +21,7 @@ describe "Kicker" do
     Kicker.paths.should == %w{ . }
   end
   
-  it "should check if a .kick file exists and if so load it and the ReloadDotKick handler" do
+  it "should check if a .kick file exists and if so load it and add the ReloadDotKick handler" do
     File.expects(:exist?).with('.kick').returns(true)
     Kicker.expects(:require).with('dot_kick')
     Kicker.expects(:load).with('.kick')
