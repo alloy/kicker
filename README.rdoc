@@ -68,6 +68,8 @@ Most of the time, you’ll want to create handlers specific to the project at
 hand. This can be done by adding your handlers to a <tt>.kick</tt> file and
 running Kicker from the directory containing it.
 
+This file is reloaded once saved. No need to stop Kicker.
+
 == Writing handlers
 
 Whenever file-change events occur, Kicker will go through a chain of handlers
