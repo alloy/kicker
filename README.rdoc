@@ -1,13 +1,13 @@
 = Kicker
 
-A lean, flexible file-change watcher, using OS X FSEvents.
+A lean, agnostic, flexible file-change watcher, using OS X FSEvents.
 
 http://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
 
+Meet king kikker, kicking stuff in your computers is his dream come true!
+
 <i>Drawing by Manfred Stienstra. The character is purely fictional, so if you
 feel offended; live with it.</i>
-
-<b>No frogs were harmed during development!</b>
 
 == Installation
 
