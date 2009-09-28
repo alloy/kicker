@@ -1,7 +1,7 @@
 require 'optparse'
 
 class Kicker
-  DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command }
+  DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command dot_kick }
   
   def self.recipes_for_display
     [RECIPES_DIR, USER_RECIPES_DIR].map do |dir|
