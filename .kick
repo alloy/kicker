@@ -1,5 +1,40 @@
 require 'ignore'
 
+module Watchr
+  class << self
+    def call(files)
+      watchers.each do |pattern, block|
+        files.delete_if do |file|
+          if match = file.match(pattern)
+            block.call(match)
+            true
+          end
+        end
+      end
+    end
+    
+    def watchers
+      @watchers ||= {}
+    end
+    
+    def watch(pattern, &block)
+      watchers[Regexp.new(pattern)] = block
+    end
+    
+    def load_watchr_script(script)
+      instance_eval File.read("#{script}.watchr")
+    end
+    
+    def system(command)
+      execute command
+    end
+  end
+  
+  load_watchr_script 'foo'
+end
+
+process Watchr
+
 process do |files|
   test_files = files.take_and_map do |file|
     case file
