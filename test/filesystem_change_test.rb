@@ -42,6 +42,10 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:changed_files, events).should == [file1, file3]
   end
   
+  it "should return an empty array when a directory doesn't exist while collecting the files in it" do
+    @kicker.send(:files_in_directory, '/does/not/exist').should == []
+  end
+  
   it "should not break when determining changed files from events with missing files" do
     file1 = touch('1')
     file2 = touch('2')

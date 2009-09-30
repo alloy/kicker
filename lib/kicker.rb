@@ -113,6 +113,8 @@ class Kicker #:nodoc:
   
   def files_in_directory(dir)
     Dir.entries(dir)[2..-1].map { |f| File.join(dir, f) }
+  rescue Errno::ENOENT
+    []
   end
   
   def file_changed_since_last_event?(file)
