@@ -11,7 +11,7 @@ feel offended; live with it.</i>
 
 == Installation
 
-  $ sudo gem install alloy-kicker -s http://gems.github.com
+  $ sudo gem install kicker -s http://gemcutter.org
 
 == The short version
 
