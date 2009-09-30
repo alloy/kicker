@@ -7,7 +7,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "kicker"
-    gem.summary = %Q{A simple OS X CLI tool which uses FSEvents to run a given shell command.}
+    gem.summary = %Q{A lean, agnostic, flexible file-change watcher, using OS X FSEvents.}
     gem.email = "eloy.de.enige@gmail.com"
     gem.homepage = "http://github.com/alloy/kicker"
     gem.authors = ["Eloy Duran"]
