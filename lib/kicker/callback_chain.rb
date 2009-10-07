@@ -3,15 +3,20 @@ class Kicker
     alias_method :append_callback,  :push
     alias_method :prepend_callback, :unshift
     
-    def call(files)
+    def call(files, stop_when_empty = true)
       each do |callback|
-        break if files.empty?
+        break if stop_when_empty and files.empty?
         callback.call(files)
       end
     end
   end
   
   class << self
+    attr_writer :startup_chain
+    def startup_chain
+      @startup_chain ||= CallbackChain.new
+    end
+    
     attr_writer :pre_process_chain
     def pre_process_chain
       @pre_process_chain ||= CallbackChain.new
@@ -33,6 +38,10 @@ class Kicker
     end
   end
   
+  def startup_chain
+    self.class.startup_chain
+  end
+  
   def pre_process_chain
     self.class.pre_process_chain
   end
@@ -51,6 +60,15 @@ class Kicker
 end
 
 module Kernel
+  # Adds a handler to the startup chain. This chain is ran before the once
+  # Kicker is done loading. Note that an empty files array is given to the
+  # callback.
+  #
+  # Takes a +callback+ object that responds to <tt>#call</tt>, or a block.
+  def startup(callback = nil, &block)
+    Kicker.startup_chain.append_callback(block ? block : callback)
+  end
+  
   # Adds a handler to the pre_process chain. This chain is ran before the
   # process chain and is processed from first to last.
   #

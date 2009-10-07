@@ -140,13 +140,6 @@ describe "Kicker, when starting" do
     @kicker.start
   end
   
-  it "should start a CFRunLoop" do
-    @kicker.stubs(:validate_options!)
-    
-    OSX.expects(:CFRunLoopRun)
-    @kicker.start
-  end
-  
   it "should register with growl if growl should be used" do
     @kicker.stubs(:validate_options!)
     Kicker.use_growl = true
@@ -160,6 +153,20 @@ describe "Kicker, when starting" do
     Kicker.use_growl = false
     
     Growl::Notifier.sharedInstance.expects(:register).never
+    @kicker.start
+  end
+  
+  it "should call the startup chain" do
+    @kicker.stubs(:validate_options!)
+    
+    @kicker.startup_chain.expects(:call).with([], false)
+    @kicker.start
+  end
+  
+  it "should start a CFRunLoop" do
+    @kicker.stubs(:validate_options!)
+    
+    OSX.expects(:CFRunLoopRun)
     @kicker.start
   end
 end

@@ -29,4 +29,9 @@ describe "Kicker, concerning the `execute a command-line' callback" do
     Kicker.pre_process_chain.last.call(files)
     files.should.be.empty
   end
+  
+  it "should run the command directly once Kicker is done loading" do
+    callback = Kicker.pre_process_chain.last
+    Kicker.startup_chain.should.include callback
+  end
 end

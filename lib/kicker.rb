@@ -77,6 +77,7 @@ class Kicker #:nodoc:
     
     run_watch_dog!
     start_growl! if self.class.use_growl
+    startup_chain.call([], false)
     
     OSX.CFRunLoopRun
   end

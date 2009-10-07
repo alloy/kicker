@@ -18,3 +18,7 @@ end
 process do |files|
   execute("rake docs:generate && open -a Safari html/index.html") if files.delete("README.rdoc")
 end
+
+startup do
+  log "Good choice mate!"
+end

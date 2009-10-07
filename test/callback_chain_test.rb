@@ -2,7 +2,7 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker, concerning its callback chains" do
   before do
-    @chains = [:pre_process_chain, :process_chain, :post_process_chain, :full_chain]
+    @chains = [:startup_chain, :pre_process_chain, :process_chain, :post_process_chain, :full_chain]
   end
   
   it "should return the callback chain instances" do
@@ -17,6 +17,14 @@ describe "Kicker, concerning its callback chains" do
     @chains.each do |chain|
       kicker.send(chain).should == Kicker.send(chain)
     end
+  end
+  
+  it "should provide a shortcut method which appends a callback to the startup chain" do
+    Kicker.startup_chain.expects(:append_callback).with do |callback|
+      callback.call == :from_callback
+    end
+    
+    startup { :from_callback }
   end
   
   it "should provide a shortcut method which appends a callback to the pre-process chain" do
@@ -43,10 +51,10 @@ describe "Kicker, concerning its callback chains" do
     post_process { :from_callback }
   end
   
-  it "should have assigned the chains to the `full_chain'" do
+  it "should have assigned the chains to the `full_chain' (except startup_chain)" do
     Kicker.full_chain.length.should == 3
     Kicker.full_chain.each_with_index do |chain, index|
-      chain.should.be Kicker.send(@chains[index])
+      chain.should.be Kicker.send(@chains[index + 1])
     end
   end
 end
@@ -115,6 +123,13 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
     @chain.append_callback lambda { |files| @result << 2 }
     @chain.call(%w{ /file/1 /file/2 })
     @result.should == [1]
+  end
+  
+  it "should not halt the chain if the array is empty if specified" do
+    @chain.append_callback lambda { |files| @result << 1; files.clear }
+    @chain.append_callback lambda { |files| @result << 2 }
+    @chain.call(%w{ /file/1 /file/2 }, false)
+    @result.should == [1, 2]
   end
   
   it "should not call any callback if the given array is empty" do
