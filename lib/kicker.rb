@@ -100,7 +100,13 @@ class Kicker #:nodoc:
   end
   
   def process(events)
+    # I think to properly support this we'll need:
+    # * to use Threading instead of fork
+    # * use NSTask
+    # * move to MacRuby
     files = changed_files(events)
+    log files.join(", ")
+    pre_process_chain.call(files)
     log files.join(", ")
     unless files.empty?
       if @pid && @pid > 0
@@ -108,7 +114,9 @@ class Kicker #:nodoc:
       end
 
       @pid = fork do
-        full_chain.call(files)
+        # full_chain.call(files)
+        process_chain.call(files)
+        post_process_chain.call(files) unless files.empty?
         finished_processing!
       end
     end
