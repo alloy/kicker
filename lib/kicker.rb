@@ -100,9 +100,17 @@ class Kicker #:nodoc:
   end
   
   def process(events)
-    unless (files = changed_files(events)).empty?
-      full_chain.call(files)
-      finished_processing!
+    files = changed_files(events)
+    log files.join(", ")
+    unless files.empty?
+      if @pid && @pid > 0
+        Process.kill("KILL", @pid)
+      end
+
+      @pid = fork do
+        full_chain.call(files)
+        finished_processing!
+      end
     end
   end
   
