@@ -2,7 +2,7 @@ require File.expand_path('../../test_helper', __FILE__)
 
 before = Kicker.process_chain.dup
 require 'kicker/recipes/rails'
-RAILS = (Kicker.process_chain - before).first
+RAILS_FILES, RAILS_SCHEMA = (Kicker.process_chain - before).first(2)
 
 describe "The Rails helper module" do
   it "should return all functional tests" do
@@ -19,6 +19,16 @@ end
 describe "The rails handler" do
   before do
     @files = %w{ Rakefile }
+  end
+  
+  it "should prepare the test database if db/schema.rb is modified" do
+    Kicker::Utils.expects(:execute).with('rake db:test:prepare')
+    RAILS_SCHEMA.call(%w{ db/schema.rb })
+  end
+  
+  it "should not prepare the test database if another file than db/schema.rb is modified" do
+    Kicker::Utils.expects(:execute).never
+    RAILS_SCHEMA.call(%w{ Rakefile })
   end
   
   it "should match any test case files" do
@@ -77,7 +87,7 @@ describe "The rails handler" do
     end
     
     Kicker::Utils.expects(:run_ruby_tests).with(tests)
-    RAILS.call(@files)
+    RAILS_FILES.call(@files)
     @files.should == %w{ Rakefile }
   end
 end
