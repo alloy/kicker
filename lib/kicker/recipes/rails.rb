@@ -76,3 +76,8 @@ process do |files|
   
   run_ruby_tests test_files
 end
+
+# When changing the schema, prepare the test database.
+process do |files|
+  execute 'rake db:test:prepare' if files.delete('db/schema.rb')
+end
