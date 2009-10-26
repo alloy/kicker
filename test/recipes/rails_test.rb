@@ -9,6 +9,11 @@ describe "The Rails helper module" do
     Dir.expects(:glob).with("test/functional/**/*_test.rb").returns(%w{ test.rb })
     Rails.all_functional_tests.should == %w{ test.rb }
   end
+  
+  it "should return all tests for a model" do
+    Rails.tests_for_model('members').should ==
+      %w{ test/unit/member_test.rb test/unit/helpers/members_helper_test.rb test/functional/members_controller_test.rb }
+  end
 end
 
 describe "The rails handler" do
@@ -55,6 +60,11 @@ describe "The rails handler" do
   it "should map lib files to test/lib" do
     should_match %w{ lib/money.rb           lib/views/date.rb },
                  %w{ test/lib/money_test.rb test/lib/views/date_test.rb }
+  end
+  
+  it "should map fixtures to their unit, helper and functional tests" do
+    tests = %w{ test/unit/member_test.rb test/unit/helpers/members_helper_test.rb test/functional/members_controller_test.rb }
+    should_match %w{ test/fixtures/members.yml }, tests
   end
   
   private
