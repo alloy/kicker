@@ -24,6 +24,26 @@ class Kicker
       end
       took
     end
+    
+    # Similar to +take_and_map+ but assumes the string array and provides
+    # a pattern for filtering files.
+    def take_and_map_by(pattern, flatten_and_compact = true)
+      took = []
+      reject! do |x|
+        unless File.fnmatch?(pattern, x)
+          next
+        end
+
+        if result = yield(x)
+          took << result
+        end
+      end
+      if flatten_and_compact
+        took.flatten!
+        took.compact!
+      end
+      took
+    end
   end
 end
 
