@@ -2,6 +2,9 @@ class Kicker
   module Utils #:nodoc:
     extend self
     
+    attr_accessor :ruby_bin_path
+    self.ruby_bin_path = 'ruby'
+    
     def execute(command)
       @last_command = command
       
@@ -32,7 +35,7 @@ class Kicker
     end
     
     def run_ruby_tests(tests)
-      execute "ruby -r #{tests.join(' -r ')} -e ''" unless tests.empty?
+      execute "#{ruby_bin_path} -r #{tests.join(' -r ')} -e ''" unless tests.empty?
     end
     
     private
