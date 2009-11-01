@@ -44,9 +44,12 @@ class Kicker
       end
     end
     
+    def growl_command
+      lambda { system(Kicker.growl_command) } if Kicker.growl_command
+    end
+    
     def growl_succeeded(output)
-      callback = lambda { system(Kicker.growl_command) } if Kicker.growl_command
-      callback ||= GROWL_DEFAULT_CALLBACK
+      callback = growl_command || GROWL_DEFAULT_CALLBACK
       Kicker.growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
     end
     
