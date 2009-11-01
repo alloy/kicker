@@ -7,23 +7,12 @@ class Kicker
     
     def execute(command)
       @last_command = command
-      
-      log "Change occured, executing command: #{command}"
-      Kicker.growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command) if Kicker.use_growl
+      change_occured(command)
       
       output = `#{command}`
-      output.strip.split("\n").each { |line| log "  #{line}" }
       
-      log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
-      
-      if Kicker.use_growl
-        if last_command_succeeded?
-          callback = Kicker.growl_command.nil? ? GROWL_DEFAULT_CALLBACK : lambda { system(Kicker.growl_command) }
-          Kicker.growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
-        else
-          Kicker.growl(GROWL_NOTIFICATIONS[:failed], "Kicker: Command failed (#{last_command_status})", output, &GROWL_DEFAULT_CALLBACK)
-        end
-      end
+      log_result(output)
+      growl_result(output)
     end
     
     def last_command
@@ -39,6 +28,35 @@ class Kicker
     end
     
     private
+    
+    def log_result(output)
+      output.strip.split("\n").each { |line| log "  #{line}" }
+      log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
+    end
+    
+    def change_occured(command)
+      log "Change occured, executing command: #{command}"
+      if Kicker.use_growl
+        Kicker.growl(GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command)
+      end
+    end
+    
+    def growl_result(output)
+      if Kicker.use_growl
+        last_command_succeeded? ? _growl_succeeded(output) : _growl_failed(output)
+      end
+    end
+    
+    def growl_succeeded(output)
+      callback = lambda { system(Kicker.growl_command) } if Kicker.growl_command
+      callback ||= GROWL_DEFAULT_CALLBACK
+      Kicker.growl(GROWL_NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
+    end
+    
+    def growl_failed(output)
+      message = "Kicker: Command failed (#{last_command_status})"
+      Kicker.growl(GROWL_NOTIFICATIONS[:failed], message, output, &GROWL_DEFAULT_CALLBACK)
+    end
     
     def last_command_succeeded?
       $?.success?
