@@ -43,7 +43,7 @@ class Kicker
     
     def growl_result(output)
       if Kicker.use_growl
-        last_command_succeeded? ? _growl_succeeded(output) : _growl_failed(output)
+        last_command_succeeded? ? growl_succeeded(output) : growl_failed(output)
       end
     end
     
