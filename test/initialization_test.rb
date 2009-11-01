@@ -142,15 +142,15 @@ describe "Kicker, when starting" do
   
   it "should register with growl if growl should be used" do
     @kicker.stubs(:validate_options!)
-    Kicker.use_growl = true
+    Kicker::Growl.use_growl = true
     
-    Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::GROWL_NOTIFICATIONS.values)
+    Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
     @kicker.start
   end
   
   it "should _not_ register with growl if growl should not be used" do
     @kicker.stubs(:validate_options!)
-    Kicker.use_growl = false
+    Kicker::Growl.use_growl = false
     
     Growl::Notifier.sharedInstance.expects(:register).never
     @kicker.start

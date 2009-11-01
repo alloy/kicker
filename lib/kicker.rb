@@ -63,8 +63,8 @@ class Kicker #:nodoc:
     @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
     @latency = options[:latency] || self.class.latency
     
-    self.class.use_growl     = options[:growl]
-    self.class.growl_command = options[:growl_command]
+    Kicker::Growl.use_growl     = options[:growl]
+    Kicker::Growl.growl_command = options[:growl_command]
     
     finished_processing!
   end
@@ -76,7 +76,7 @@ class Kicker #:nodoc:
     log ''
     
     run_watch_dog!
-    start_growl! if self.class.use_growl
+    Kicker::Growl.start! if Kicker::Growl.use?
     startup_chain.call([], false)
     
     OSX.CFRunLoopRun
