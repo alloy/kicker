@@ -1,3 +1,14 @@
+# Need to define these modules, because AS breaks if these aren't defined. Need to fix that in AS...
+module ActiveSupport
+  module CoreExtensions
+    module String
+      module Inflections
+      end
+    end
+  end
+end
+require 'active_support/core_ext/string'
+
 module Rails
   # Maps +type+, for instance `models', to a test directory.
   def self.type_to_test_dir(type)
@@ -17,6 +28,15 @@ module Rails
   def self.all_functional_tests
     Dir.glob("test/functional/**/*_test.rb")
   end
+  
+  # Returns an array of all tests related to the given model.
+  def self.tests_for_model(model)
+    %W{
+      test/unit/#{model.singularize}_test.rb
+      test/unit/helpers/#{model.pluralize}_helper_test.rb
+      test/functional/#{model.pluralize}_controller_test.rb
+    }
+  end
 end
 
 process do |files|
@@ -33,6 +53,10 @@ process do |files|
     # Match lib/*
     when /^(lib\/.+)\.rb$/
       "test/#{$1}_test.rb"
+    
+    # Map fixtures to their related tests
+    when %r{^test/fixtures/(\w+)\.yml$}
+      Rails.tests_for_model($1)
     
     # Match any file in app/ and map it to a test file
     when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
@@ -51,4 +75,9 @@ process do |files|
   end
   
   run_ruby_tests test_files
+end
+
+# When changing the schema, prepare the test database.
+process do |files|
+  execute 'rake db:test:prepare' if files.delete('db/schema.rb')
 end

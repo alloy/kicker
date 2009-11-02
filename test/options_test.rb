@@ -27,4 +27,9 @@ describe "Kicker.parse_options" do
     Kicker.parse_options(%w{ -r rails -r jstest })[:recipes].should == %w{ rails jstest }
     Kicker.parse_options(%w{ --recipe rails --recipe jstest })[:recipes].should == %w{ rails jstest }
   end
+  
+  it "should parse the alternative ruby bin path" do
+    Kicker.parse_options(%w{ -b /opt/ruby-1.9.2/bin/ruby })[:ruby_bin_path].should == '/opt/ruby-1.9.2/bin/ruby'
+    Kicker.parse_options(%w{ --ruby /opt/ruby-1.9.2/bin/ruby })[:ruby_bin_path].should == '/opt/ruby-1.9.2/bin/ruby'
+  end
 end
