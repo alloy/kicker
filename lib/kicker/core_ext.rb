@@ -9,8 +9,8 @@ class Kicker
     #   b # => [4]
     #   a # => [1, 3]
     #
-    # If +pattern+ is specified then string array is assumed and only files
-    # matching the pattern will be taken.
+    # If +pattern+ is specified then files matching the pattern will be taken.
+    #
     #   a = [ 'bar', 'foo/bar' ]
     #   b = a.take_and_map('*/bar') { |x| x }
     #   b # => ['foo/bar']
@@ -21,8 +21,7 @@ class Kicker
     def take_and_map(pattern = nil, flatten_and_compact = true)
       took = []
       reject! do |x|
-        next unless pattern.nil? || File.fnmatch?(pattern, x)
-
+        next if pattern and !File.fnmatch?(pattern, x)
         if result = yield(x)
           took << result
         end

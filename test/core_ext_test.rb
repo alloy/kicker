@@ -27,12 +27,12 @@ describe "Array#take_and_map" do
   end
   
   it "should take only files matching the pattern" do
-    @array.take_and_map('**/*') { |x| x }.should == %w{ foo/bar.baz foo/bar/baz }
+    @array.take_and_map('**/*') { |x| x.reverse }.should ==
+      %w{ foo/bar.baz foo/bar/baz }.map { |s| s.reverse }
   end
-
+  
   it "should not remove files not matching the pattern" do
     @array.take_and_map('**/*') { |x| x }
     @array.should == %w{ foo bar baz }
   end
-  
 end
