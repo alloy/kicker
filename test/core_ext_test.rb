@@ -2,12 +2,12 @@ require File.expand_path('../test_helper', __FILE__)
 
 describe "Array#take_and_map" do
   before do
-    @array = %w{ foo bar baz }
+    @array = %w{ foo bar baz foo/bar.baz foo/bar/baz }
   end
   
   it "should remove elements from the array for which the block evaluates to true" do
     @array.take_and_map { |x| x =~ /^ba/ }
-    @array.should == %w{ foo }
+    @array.should == %w{ foo foo/bar.baz foo/bar/baz }
   end
   
   it "should return a new array of the return values of each block call that evaluates to true" do
@@ -21,8 +21,18 @@ describe "Array#take_and_map" do
   end
   
   it "should not flatten and compact the result array if specified" do
-    @array.take_and_map(false) do |x|
+    @array.take_and_map(nil, false) do |x|
       x =~ /^ba/ ? %w{ f o o } : [nil]
-    end.should == [[nil], %w{ f o o }, %w{ f o o }]
+    end.should == [[nil], %w{ f o o }, %w{ f o o }, [nil], [nil]]
   end
+  
+  it "should take only files matching the pattern" do
+    @array.take_and_map('**/*') { |x| x }.should == %w{ foo/bar.baz foo/bar/baz }
+  end
+
+  it "should not remove files not matching the pattern" do
+    @array.take_and_map('**/*') { |x| x }
+    @array.should == %w{ foo bar baz }
+  end
+  
 end
