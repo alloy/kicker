@@ -13,7 +13,7 @@ class Kicker
   }
   
   GROWL_DEFAULT_CALLBACK = lambda do
-    OSX::NSWorkspace.sharedWorkspace.launchApplication('Terminal')
+    NSWorkspace.sharedWorkspace.launchApplication('Terminal')
   end
   
   private

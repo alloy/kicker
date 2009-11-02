@@ -1,5 +1,5 @@
-require 'osx/cocoa'
-OSX.require_framework '/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework'
+# require 'osx/cocoa'
+framework '/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework'
 
 module Rucola
   class FSEvents
@@ -97,9 +97,9 @@ module Rucola
       
       paths.each { |path| raise ArgumentError, "The specified path (#{path}) does not exist." unless File.exist?(path) }
       
-      @allocator = options[:allocator] || OSX::KCFAllocatorDefault
+      @allocator = options[:allocator] || KCFAllocatorDefault
       @context   = options[:context]   || nil
-      @since     = options[:since]     || OSX::KFSEventStreamEventIdSinceNow
+      @since     = options[:since]     || KFSEventStreamEventIdSinceNow
       @latency   = options[:latency]   || 0.0
       @flags     = options[:flags]     || 0
       @stream    = options[:stream]    || nil
@@ -116,21 +116,23 @@ module Rucola
     # Create the stream.
     # Raises a Rucola::FSEvents::StreamError if the stream could not be created.
     def create_stream
-      @stream = OSX.FSEventStreamCreate(@allocator, @callback, @context, @paths, @since, @latency, @flags)
+      callback_pointer = Pointer.new('object')
+      callback_pointer[0] = @callback
+      @stream = FSEventStreamCreate(@allocator, callback_pointer, @context, @paths, @since, @latency, @flags)
       raise(StreamError, 'Unable to create FSEvents stream.') unless @stream
-      OSX.FSEventStreamScheduleWithRunLoop(@stream, OSX.CFRunLoopGetCurrent, OSX::KCFRunLoopDefaultMode)
+      FSEventStreamScheduleWithRunLoop(@stream, CFRunLoopGetCurrent, KCFRunLoopDefaultMode)
     end
     
     # Start the stream.
     # Raises a Rucola::FSEvents::StreamError if the stream could not be started.
     def start
-      raise(StreamError, 'Unable to start FSEvents stream.') unless OSX.FSEventStreamStart(@stream)
+      raise(StreamError, 'Unable to start FSEvents stream.') unless FSEventStreamStart(@stream)
     end
     
     # Stop the stream.
     # You can resume it by calling `start` again.
     def stop
-      OSX.FSEventStreamStop(@stream)
+      FSEventStreamStop(@stream)
     end
   end
 end

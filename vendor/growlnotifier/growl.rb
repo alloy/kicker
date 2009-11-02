@@ -1,7 +1,7 @@
-require 'osx/cocoa'
+# require 'osx/cocoa'
 
 module Growl
-  class Notifier < OSX::NSObject
+  class Notifier #< OSX::NSObject
     VERSION = '1.0.2'
     
     GROWL_IS_READY = "Lend Me Some Sugar; I Am Your Neighbor!"
@@ -49,7 +49,7 @@ module Growl
     #
     #   Growl::Notifier.sharedInstance.register 'FoodApp', ['YourHamburgerIsReady', 'OhSomeoneElseAteIt'], ['DefaultNotification], OSX::NSImage.imageNamed('GreasyHamburger')
     def register(application_name, notifications, default_notifications = nil, application_icon = nil)
-      @application_name, @application_icon = application_name, (application_icon || OSX::NSApplication.sharedApplication.applicationIconImage)
+      @application_name, @application_icon = application_name, (application_icon || NSApplication.sharedApplication.applicationIconImage)
       @notifications, @default_notifications = notifications, (default_notifications || notifications)
       @callbacks = {}
       send_registration!
@@ -135,11 +135,11 @@ module Growl
     private
     
     def pid
-      OSX::NSProcessInfo.processInfo.processIdentifier.to_i
+      NSProcessInfo.processInfo.processIdentifier.to_i
     end
     
     def notification_center
-      OSX::NSDistributedNotificationCenter.defaultCenter
+      NSDistributedNotificationCenter.defaultCenter
     end
     
     def send_registration!
