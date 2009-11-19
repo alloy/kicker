@@ -10,7 +10,7 @@ describe "A Kicker instance, concerning its utility methods" do
     now = Time.now
     Time.stubs(:now).returns(now)
     
-    utils.expects(:puts).with("[#{now}] the message")
+    utils.expects(:puts).with("#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | the message")
     utils.send(:log, 'the message')
   end
   
