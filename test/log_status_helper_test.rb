@@ -31,17 +31,18 @@ describe "Kicker::LogStatus" do
   end
   
   it "should return if it's after executing the command" do
-    @status.result('output', true)
+    @status.result('output', true, 0)
     @status.call(:growl)
     yielded.should.not.be.before
     yielded.should.be.after
   end
   
   it "should return the output and status" do
-    @status.result('output', true)
+    @status.result('output', true, 123)
     @status.call(:growl)
     yielded.output.should == "output"
     yielded.should.be.success
+    yielded.exit_code.should.be 123
   end
   
   it "should set the logger type, call the proc with self, and return the output" do

@@ -10,7 +10,7 @@ class Kicker
       status = LogStatusHelper.new(block, command)
       
       will_execute_command(status)
-      status.result(`#{command}`, last_command_succeeded?)
+      status.result(`#{command}`, last_command_succeeded?, last_command_status)
       did_execute_command(status)
     end
     
@@ -48,7 +48,7 @@ class Kicker
           message = 'Success'
         else
           puts "\n#{status.output.strip}\n\n"
-          message = status.success? ? "Success" : "Failed (#{last_command_status})"
+          message = status.success? ? "Success" : "Failed (#{status.exit_code})"
         end
       end
       log message

@@ -63,7 +63,7 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker::Growl.expects(:result).with("line 1\nline 2")
     
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')
-    status.result("line 1\nline 2", true)
+    status.result("line 1\nline 2", true, 0)
     
     utils.expects(:log).with("Success")
     utils.did_execute_command(status)
@@ -73,12 +73,11 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker.silent = true
     Kicker::Growl.expects(:result).with("line 1\nline 2")
     
-    utils.stubs(:last_command_status).returns(123)
     utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')
-    status.result("line 1\nline 2", false)
+    status.result("line 1\nline 2", false, 123)
     
     utils.did_execute_command(status)
   end
