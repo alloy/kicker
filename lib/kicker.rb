@@ -7,14 +7,7 @@ require 'kicker/growl'
 require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
-
-RECIPES_DIR = File.expand_path('../kicker/recipes', __FILE__)
-$:.unshift RECIPES_DIR
-require 'could_not_handle_file'
-require 'execute_cli_command'
-
-USER_RECIPES_DIR = File.expand_path('~/.kick')
-$:.unshift USER_RECIPES_DIR if File.exist?(USER_RECIPES_DIR)
+require 'kicker/recipes'
 
 class Kicker #:nodoc:
   class << self
@@ -31,31 +24,31 @@ class Kicker #:nodoc:
     def run(argv = ARGV)
       options = parse_options(argv)
       set_ruby_bin_path(options[:ruby_bin_path]) if options[:ruby_bin_path]
-      load_recipes(options[:recipes]) if options[:recipes]
-      load_dot_kick
+      Kicker::Recipes.load(options[:recipes])
+      
       new(options).start
     end
     
     private
     
-    def load_dot_kick
-      if File.exist?('.kick')
-        require 'dot_kick'
-        ReloadDotKick.save_state
-        load '.kick'
-      end
-    end
-    
-    def load_recipes(recipes)
-      recipes.each do |recipe|
-        raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
-        require recipe
-      end
-    end
-    
-    def recipe_exists?(recipe)
-      File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
-    end
+    # def load_dot_kick
+    #   if File.exist?('.kick')
+    #     require 'dot_kick'
+    #     ReloadDotKick.save_state
+    #     load '.kick'
+    #   end
+    # end
+    # 
+    # def load_recipes(recipes)
+    #   recipes.each do |recipe|
+    #     raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
+    #     require recipe
+    #   end
+    # end
+    # 
+    # def recipe_exists?(recipe)
+    #   File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
+    # end
     
     def set_ruby_bin_path(path)
       Kicker::Utils.ruby_bin_path = path

@@ -7,41 +7,13 @@ describe "Kicker" do
     Kicker.any_instance.stubs(:start)
   end
   
-  it "should add kicker/recipes to the load path" do
-    $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
-  end
-  
-  if File.exist?(File.expand_path('~/.kick'))
-    it "should add ~/.kick to the load path" do
-      $:.should.include File.expand_path('~/.kick')
-    end
-  else
-    puts "[!] ~/.kick does not exist, skipping an example."
-  end
-  
   it "should return the default paths to watch" do
     Kicker.paths.should == %w{ . }
   end
   
-  it "should check if a .kick file exists and if so load it and add the ReloadDotKick handler" do
-    File.expects(:exist?).with('.kick').returns(true)
-    Kicker.expects(:require).with('dot_kick')
-    ReloadDotKick.expects(:save_state)
-    Kicker.expects(:load).with('.kick')
-    Kicker.run
-  end
-  
-  it "should check if a recipe exists and load it" do
-    Kicker.stubs(:load_dot_kick)
-    
-    Kicker.expects(:require).with('rails')
-    Kicker.expects(:require).with('ignore')
-    Kicker.run(%w{ -r rails -r ignore })
-  end
-  
-  it "should raise if a recipe does not exist" do
-    Kicker.expects(:require).never
-    lambda { Kicker.run(%w{ -r foobar -r rails }) }.should.raise
+  it "should load recipes and .kick related files" do
+    Kicker::Recipes.expects(:load).with(%w{ rails })
+    Kicker.run(%w{ -r rails })
   end
   
   it "should use the default ruby when no ruby bin path was given" do
