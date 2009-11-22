@@ -1,8 +1,32 @@
 class Ruby
+  class << self
+    attr_writer :test_type
+    def test_type
+      @test_type ||= File.exist?('spec') ? 'spec' : 'test'
+    end
+    
+    attr_writer :runner_bin
+    def runner_bin
+      @runner_bin ||= test_type == 'test' ? 'ruby' : 'spec'
+    end
+    
+    def run_tests(tests)
+      send("run_with_#{test_type}_runner", tests) unless tests.empty?
+    end
+    
+    def run_with_test_runner(tests)
+      execute "#{runner_bin} -r #{tests.join(' -r ')} -e ''"
+    end
+    
+    def run_with_spec_runner(tests)
+      execute "#{runner_bin} #{tests.join(' ')}"
+    end
+  end
+  
   def self.call(files)
     handler = new(files)
     handler.handle!
-    handler.run_tests
+    run_tests(handler.tests)
   end
   
   attr_reader :tests
@@ -13,11 +37,11 @@ class Ruby
   end
   
   def test_type
-    'test'
+    self.class.test_type
   end
   
   def runner_bin
-    test_type == 'test' ? 'ruby' : 'spec'
+    self.class.runner_bin
   end
   
   # Returns the file for +name+ if it exists.
@@ -48,18 +72,6 @@ class Ruby
         end
       end
     end)
-  end
-  
-  def run_tests
-    send("run_with_#{test_type}_runner") unless @tests.empty?
-  end
-  
-  def run_with_test_runner
-    execute "#{runner_bin} -r #{@tests.join(' -r ')} -e ''"
-  end
-  
-  def run_with_spec_runner
-    execute "#{runner_bin} #{@tests.join(' ')}"
   end
 end
 
