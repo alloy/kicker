@@ -14,11 +14,11 @@ require 'ignore'
 #   end
 # end
 
+require 'ruby'
+
 process do |files|
   test_files = files.take_and_map do |file|
     case file
-    when %r{^test/.+_test\.rb$}
-      file
     when %r{^lib/kicker(\.rb|/validate\.rb|/growl\.rb)$}
       ["test/initialization_test.rb", ("test/filesystem_change_test.rb" if $1 == '.rb')]
     when %r{^lib/kicker/(.+)\.rb$}
@@ -26,7 +26,7 @@ process do |files|
     end
   end
   
-  run_ruby_tests test_files
+  Ruby.run_tests test_files
 end
 
 process do |files|
