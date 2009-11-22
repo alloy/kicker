@@ -8,8 +8,13 @@ $:.unshift(USER_RECIPES_DIR) if File.exist?(USER_RECIPES_DIR)
 class Kicker
   module Recipes
     class << self
-      def load(recipes)
-        load_recipes(recipes) if recipes
+      attr_writer :recipes_to_load
+      def recipes_to_load
+        @recipes_to_load ||= []
+      end
+      
+      def load!
+        load_recipes
         load_dot_kick
       end
       
@@ -21,8 +26,8 @@ class Kicker
         end
       end
       
-      def load_recipes(recipes)
-        recipes.each do |recipe|
+      def load_recipes
+        recipes_to_load.each do |recipe|
           raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
           require recipe
         end

@@ -14,14 +14,17 @@ class Kicker
     
     class << self
       include ::Growl
-      attr_accessor :use_growl, :growl_command
+      attr_accessor :use, :command
+      
+      Growl.use = true
+      Growl.command = nil
+      
+      def use?
+        @use
+      end
       
       def notifications
         NOTIFICATIONS
-      end
-      
-      def use?
-        @use_growl
       end
       
       def start!
@@ -32,8 +35,8 @@ class Kicker
         growl(notifications[:change], 'Kicker: Change occured, executing command:', command)
       end
       
-      def command
-        lambda { system(growl_command) } if growl_command
+      def command_callback
+        lambda { system(command) } if command
       end
       
       def result(output)
@@ -41,7 +44,7 @@ class Kicker
       end
       
       def succeeded(output)
-        callback = command || DEFAULT_CALLBACK
+        callback = command_callback || DEFAULT_CALLBACK
         growl(notifications[:succeeded], "Kicker: Command succeeded", output, &callback)
       end
       

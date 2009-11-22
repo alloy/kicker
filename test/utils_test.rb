@@ -1,9 +1,8 @@
 require File.expand_path('../test_helper', __FILE__)
 
 describe "A Kicker instance, concerning its utility methods" do
-  before do
-    Kicker.stubs(:growl)
-    utils.stubs(:last_command_succeeded?).returns(true)
+  after do
+    Kicker::Growl.use = true
   end
   
   it "should print a log entry with timestamp" do
@@ -15,8 +14,11 @@ describe "A Kicker instance, concerning its utility methods" do
   end
   
   it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
+    Kicker::Growl.use = false
+    
     utils.stubs(:`).returns("line 1\nline 2")
     
+    utils.stubs(:last_command_succeeded?).returns(true)
     utils.expects(:log).with('Change occured, executing command: ls')
     utils.expects(:log).with('  line 1')
     utils.expects(:log).with('  line 2')
@@ -33,7 +35,9 @@ describe "A Kicker instance, concerning its utility methods" do
   end
     
   it "should store the last executed command" do
+    Kicker::Growl.use = false
     utils.stubs(:log)
+    
     utils.execute('date')
     utils.last_command.should == 'date'
   end

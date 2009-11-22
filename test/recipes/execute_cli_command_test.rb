@@ -4,15 +4,15 @@ describe "Kicker, concerning the `execute a command-line' callback" do
   it "should parse the command and add the callback" do
     before = Kicker.pre_process_chain.length
     
-    Kicker.parse_options(%w{ -e ls })
+    Kicker::Options.parse(%w{ -e ls })
     Kicker.pre_process_chain.length.should == before + 1
     
-    Kicker.parse_options(%w{ --execute ls })
+    Kicker::Options.parse(%w{ --execute ls })
     Kicker.pre_process_chain.length.should == before + 2
   end
   
   it "should call execute with the given command" do
-    Kicker.parse_options(%w{ -e ls })
+    Kicker::Options.parse(%w{ -e ls })
     
     callback = Kicker.pre_process_chain.last
     callback.should.be.instance_of Proc

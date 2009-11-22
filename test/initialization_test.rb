@@ -12,8 +12,8 @@ describe "Kicker" do
   end
   
   it "should load recipes and .kick related files" do
-    Kicker::Recipes.expects(:load).with(%w{ rails })
-    Kicker.run(%w{ -r rails })
+    Kicker::Recipes.expects(:load!)
+    Kicker.run
   end
   
   it "should use the default ruby when no ruby bin path was given" do
@@ -29,43 +29,44 @@ describe "Kicker" do
     
     Kicker::Utils.ruby_bin_path = before
   end
+  
+  it "should default the FSEvents latency to 1" do
+    Kicker.latency.should == 1
+  end
 end
 
 describe "Kicker, when initializing" do
-  before do
-    @now = Time.now
-    Time.stubs(:now).returns(@now)
-    
-    @kicker = Kicker.new(:paths => %w{ /some/dir a/relative/path })
+  after do
+    Kicker.paths = %w{ . }
   end
   
   it "should return the extended paths to watch" do
-    @kicker.paths.should == ['/some/dir', File.expand_path('a/relative/path')]
+    Kicker.paths = %w{ /some/dir a/relative/path }
+    Kicker.new.paths.should == ['/some/dir', File.expand_path('a/relative/path')]
   end
   
   it "should have assigned the current time to last_event_processed_at" do
-    @kicker.last_event_processed_at.should == @now
+    now = Time.now; Time.stubs(:now).returns(now)
+    Kicker.new.last_event_processed_at.should == now
   end
   
   it "should use the default paths if no paths were given" do
-    Kicker.new({}).paths.should == [File.expand_path('.')]
-  end
-  
-  it "should use the default FSEvents latency if none was given" do
-    @kicker.latency.should == 1
-  end
-  
-  it "should use the given FSEvents latency if one was given" do
-    Kicker.new(:latency => 3.5).latency.should == 3.5
+    Kicker.new.paths.should == [File.expand_path('.')]
   end
 end
 
 describe "Kicker, when starting" do
   before do
-    @kicker = Kicker.new(:paths => %w{ /some/file.rb })
+    Kicker.paths = %w{ /some/file.rb }
+    @kicker = Kicker.new
     @kicker.stubs(:log)
     Rucola::FSEvents.stubs(:start_watching)
     OSX.stubs(:CFRunLoopRun)
+  end
+  
+  after do
+    Kicker.latency = 1
+    Kicker.paths = %w{ . }
   end
   
   it "should show the usage banner and exit when there are no callbacks defined at all" do
@@ -73,7 +74,7 @@ describe "Kicker, when starting" do
     Kicker.stubs(:process_chain).returns([])
     Kicker.stubs(:pre_process_chain).returns([])
     
-    Kicker::OPTION_PARSER_CALLBACK.stubs(:call).returns(mock('OptionParser', :help => 'help'))
+    Kicker::Options.stubs(:parser).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")
     @kicker.expects(:exit)
     
@@ -92,7 +93,8 @@ describe "Kicker, when starting" do
   it "should start a FSEvents stream with the assigned latency" do
     @kicker.stubs(:validate_options!)
     
-    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
+    Kicker.latency = 2.34
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => 2.34)
     @kicker.start
   end
   
@@ -100,7 +102,7 @@ describe "Kicker, when starting" do
     @kicker.stubs(:validate_options!)
     File.stubs(:directory?).with('/some/file.rb').returns(false)
     
-    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => @kicker.latency)
+    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => Kicker.latency)
     @kicker.start
   end
   
@@ -128,7 +130,7 @@ describe "Kicker, when starting" do
   
   it "should register with growl if growl should be used" do
     @kicker.stubs(:validate_options!)
-    Kicker::Growl.use_growl = true
+    Kicker::Growl.use = true
     
     Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
     @kicker.start
@@ -136,7 +138,7 @@ describe "Kicker, when starting" do
   
   it "should _not_ register with growl if growl should not be used" do
     @kicker.stubs(:validate_options!)
-    Kicker::Growl.use_growl = false
+    Kicker::Growl.use = false
     
     Growl::Notifier.sharedInstance.expects(:register).never
     @kicker.start

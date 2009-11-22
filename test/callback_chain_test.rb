@@ -12,7 +12,7 @@ describe "Kicker, concerning its callback chains" do
   end
   
   it "should be accessible by an instance" do
-    kicker = Kicker.new({})
+    kicker = Kicker.new
     
     @chains.each do |chain|
       kicker.send(chain).should == Kicker.send(chain)

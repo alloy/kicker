@@ -6,7 +6,7 @@ describe "Kicker, when a change occurs" do
     
     Kicker.any_instance.stubs(:last_command_succeeded?).returns(true)
     Kicker.any_instance.stubs(:log)
-    @kicker = Kicker.new({})
+    @kicker = Kicker.new
   end
   
   it "should store the current time as when the last change occurred" do

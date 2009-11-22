@@ -4,53 +4,38 @@ require 'rucola/fsevents'
 require 'kicker/callback_chain'
 require 'kicker/core_ext'
 require 'kicker/growl'
-require 'kicker/options'
 require 'kicker/utils'
 require 'kicker/validate'
+
+require 'kicker/options'
 require 'kicker/recipes'
 
 class Kicker #:nodoc:
-  class << self
-    attr_accessor :latency
-    
-    def latency
-      @latency ||= 1
-    end
-    
-    def paths
-      @paths ||= %w{ . }
-    end
-    
-    def run(argv = ARGV)
-      options = parse_options(argv)
-      Kicker::Utils.ruby_bin_path = options[:ruby_bin_path] if options[:ruby_bin_path]
-      Kicker::Recipes.load(options[:recipes])
-      
-      new(options).start
-    end
+  def self.run(argv = ARGV)
+    Kicker::Options.parse(argv)
+    Kicker::Recipes.load!
+    new.start
   end
   
-  attr_reader :latency, :paths, :last_event_processed_at
+  attr_reader :last_event_processed_at
   
-  def initialize(options)
-    @paths = (options[:paths] ? options[:paths] : Kicker.paths).map { |path| File.expand_path(path) }
-    @latency = options[:latency] || self.class.latency
-    
-    Kicker::Growl.use_growl     = options[:growl]
-    Kicker::Growl.growl_command = options[:growl_command]
-    
+  def initialize
     finished_processing!
+  end
+  
+  def paths
+    @paths ||= Kicker.paths.map { |path| File.expand_path(path) }
   end
   
   def start
     validate_options!
     
-    log "Watching for changes on: #{@paths.join(', ')}"
+    log "Watching for changes on: #{paths.join(', ')}"
     log ''
     
     run_watch_dog!
     Kicker::Growl.start! if Kicker::Growl.use?
-    startup_chain.call([], false)
+    run_startup_chain
     
     OSX.CFRunLoopRun
   end
@@ -59,13 +44,17 @@ class Kicker #:nodoc:
   
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => @latency) { |events| process(events) }
+    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => self.class.latency) { |events| process(events) }
     
     trap('INT') do
       log "Exiting…"
       watch_dog.stop
       exit
     end
+  end
+  
+  def run_startup_chain
+    startup_chain.call([], false)
   end
   
   def finished_processing!

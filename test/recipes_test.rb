@@ -7,6 +7,10 @@ describe "Kicker::Recipes" do
     @recipes = Kicker::Recipes
   end
   
+  after do
+    @recipes.recipes_to_load = []
+  end
+  
   it "should add kicker/recipes to the load path" do
     $:.should.include File.expand_path('../../lib/kicker/recipes', __FILE__)
   end
@@ -25,19 +29,21 @@ describe "Kicker::Recipes" do
     ReloadDotKick.expects(:save_state)
     Kernel.expects(:load).with('.kick')
     
-    @recipes.load(nil)
+    @recipes.load!
   end
   
   it "should check if a recipe exists and load it" do
     @recipes.stubs(:load_dot_kick)
+    @recipes.recipes_to_load = %w{ rails ignore }
     
     @recipes.expects(:require).with('rails')
     @recipes.expects(:require).with('ignore')
-    @recipes.load(%w{ rails ignore })
+    @recipes.load!
   end
   
   it "should raise if a recipe does not exist" do
+    @recipes.recipes_to_load = %w{ foobar rails }
     @recipes.expects(:require).never
-    lambda { @recipes.load(%w{ foobar rails }) }.should.raise
+    lambda { @recipes.load! }.should.raise
   end
 end
