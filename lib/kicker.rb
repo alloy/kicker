@@ -23,16 +23,10 @@ class Kicker #:nodoc:
     
     def run(argv = ARGV)
       options = parse_options(argv)
-      set_ruby_bin_path(options[:ruby_bin_path]) if options[:ruby_bin_path]
+      Kicker::Utils.ruby_bin_path = options[:ruby_bin_path] if options[:ruby_bin_path]
       Kicker::Recipes.load(options[:recipes])
       
       new(options).start
-    end
-    
-    private
-    
-    def set_ruby_bin_path(path)
-      Kicker::Utils.ruby_bin_path = path
     end
   end
   
