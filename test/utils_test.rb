@@ -31,47 +31,7 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.expects(:log).with('Command failed (123)')
     utils.execute('ls')
   end
-  
-  xit "should send the Growl messages with the default click callback" do
-    utils.stubs(:log)
     
-    utils.stubs(:`).returns("line 1\nline 2")
-    Kicker::Growl.use_growl = true
-    
-    OSX::NSWorkspace.sharedWorkspace.expects(:launchApplication).with('Terminal').times(2)
-    
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    utils.execute('ls')
-    
-    utils.stubs(:last_command_succeeded?).returns(false)
-    utils.stubs(:last_command_status).returns(123)
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    utils.execute('ls')
-  end
-  
-  xit "should send the Growl messages with a click callback which executes the specified growl command when succeeded" do
-    utils.stubs(:log)
-    
-    utils.stubs(:`).returns("line 1\nline 2")
-    Kicker::Growl.use_growl = true
-    Kicker::Growl.command = 'ls -l'
-    
-    utils.expects(:system).with('ls -l').times(1)
-    OSX::NSWorkspace.sharedWorkspace.expects(:launchApplication).with('Terminal').times(1)
-    
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:succeeded], 'Kicker: Command succeeded', "line 1\nline 2").yields
-    utils.execute('ls')
-    
-    utils.stubs(:last_command_succeeded?).returns(false)
-    utils.stubs(:last_command_status).returns(123)
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', 'ls')
-    Kicker.expects(:growl).with(Kicker::GROWL_NOTIFICATIONS[:failed], 'Kicker: Command failed (123)', "line 1\nline 2").yields
-    utils.execute('ls')
-  end
-  
   it "should store the last executed command" do
     utils.stubs(:log)
     utils.execute('date')

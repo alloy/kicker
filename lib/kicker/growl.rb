@@ -16,6 +16,10 @@ class Kicker
       include ::Growl
       attr_accessor :use_growl, :growl_command
       
+      def notifications
+        NOTIFICATIONS
+      end
+      
       def use?
         @use_growl
       end
@@ -25,25 +29,25 @@ class Kicker
       end
       
       def change_occured(command)
-        growl(NOTIFICATIONS[:change], 'Kicker: Change occured, executing command:', command)
+        growl(notifications[:change], 'Kicker: Change occured, executing command:', command)
       end
       
       def command
-        lambda { system(Kicker.growl_command) } if Kicker.growl_command
+        lambda { system(growl_command) } if growl_command
       end
       
       def result(output)
-        Kicker::Util.last_command_succeeded? ? succeeded(output) : failed(output)
+        Kicker::Utils.last_command_succeeded? ? succeeded(output) : failed(output)
       end
       
       def succeeded(output)
-        callback = growl_command || DEFAULT_CALLBACK
-        growl(NOTIFICATIONS[:succeeded], "Kicker: Command succeeded", output, &callback)
+        callback = command || DEFAULT_CALLBACK
+        growl(notifications[:succeeded], "Kicker: Command succeeded", output, &callback)
       end
       
       def failed(output)
-        message = "Kicker: Command failed (#{last_command_status})"
-        growl(NOTIFICATIONS[:failed], message, output, &DEFAULT_CALLBACK)
+        message = "Kicker: Command failed (#{Kicker::Utils.last_command_status})"
+        growl(notifications[:failed], message, output, &DEFAULT_CALLBACK)
       end
     end
   end
