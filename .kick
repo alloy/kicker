@@ -1,14 +1,14 @@
 require 'ignore'
 
 # process do
-#   execute "ls -l" do |builder|
-#     if builder.before?
-#       builder.stdout? ? "Here we go!\n\n#{builder.command}" : "Here we go!"
-#     elsif builder.after?
-#       if builder.success?
-#         builder.stdout? ? "Nice!\n\n#{builder.output}" : "Nice!"
+#   execute "ls -l" do |status|
+#     if status.before?
+#       status.stdout? ? "Here we go!: #{status.command}" : "Here we go! GROWL"
+#     elsif status.after?
+#       if status.success?
+#         status.stdout? ? "Nice!\n\n#{status.output}" : "Nice!"
 #       else
-#         builder.stdout? ? "Damn brow!\n\n#{builder.output}" : "Damn bro!"
+#         status.stdout? ? "Damn brow!\n\n#{status.output}" : "Damn bro!"
 #       end
 #     end
 #   end

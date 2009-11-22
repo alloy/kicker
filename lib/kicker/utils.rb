@@ -39,21 +39,22 @@ class Kicker
     
     def will_execute_command(status)
       log(status.call(:stdout) || "Executing: #{status.command}")
-      Kicker::Growl.change_occured(status.command) if Kicker::Growl.use? && !Kicker.silent?
+      Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?
     end
     
     def did_execute_command(status)
-      unless message = status.call(:stdout)
+      if message = status.call(:stdout)
+        log message
+      else
         if status.success? && Kicker.silent?
-          message = 'Success'
+          log 'Success'
         else
-          puts "\n#{status.output.strip}\n\n"
-          message = status.success? ? "Success" : "Failed (#{status.exit_code})"
+          puts("\n#{status.output.strip}\n\n")
+          log(status.success? ? "Success" : "Failed (#{status.exit_code})")
         end
       end
-      log message
       
-      Kicker::Growl.result(status.output) if Kicker::Growl.use?
+      Kicker::Growl.result(status) if Kicker::Growl.use?
     end
   end
 end

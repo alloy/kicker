@@ -31,27 +31,27 @@ class Kicker
         ::Growl::Notifier.sharedInstance.register('Kicker', NOTIFICATIONS.values)
       end
       
-      def change_occured(command)
-        growl(notifications[:change], 'Kicker: Executing:', command)
+      def change_occured(status)
+        growl(notifications[:change], 'Kicker: Executing', status.call(:growl) || status.command)
       end
       
       def command_callback
         lambda { system(command) } if command
       end
       
-      def result(output)
-        Kicker::Utils.last_command_succeeded? ? succeeded(output) : failed(output)
+      def result(status)
+        status.success? ? succeeded(status) : failed(status)
       end
       
-      def succeeded(output)
+      def succeeded(status)
         callback = command_callback || DEFAULT_CALLBACK
-        body = Kicker.silent? ? '' : output
+        body = status.call(:growl) || (Kicker.silent? ? '' : status.output)
         growl(notifications[:succeeded], "Kicker: Success", body, &callback)
       end
       
-      def failed(output)
-        message = "Kicker: Failed (#{Kicker::Utils.last_command_status})"
-        body = Kicker.silent? ? '' : output
+      def failed(status)
+        message = "Kicker: Failed (#{status.exit_code})"
+        body = status.call(:growl) || (Kicker.silent? ? '' : status.output)
         growl(notifications[:failed], message, body, &DEFAULT_CALLBACK)
       end
     end

@@ -44,8 +44,8 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.stubs(:last_command_succeeded?).returns(true)
     utils.stubs(:log)
     
-    Kicker::Growl.expects(:change_occured).with('ls')
-    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    Kicker::Growl.expects(:change_occured).with { |status| status.command == 'ls' }
+    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
     utils.execute('ls')
   end
   
@@ -60,7 +60,7 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "should only log that is has succeeded in silent mode" do
     Kicker.silent = true
-    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
     
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')
     status.result("line 1\nline 2", true, 0)
@@ -71,7 +71,7 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "should fully log that it has failed in silent mode" do
     Kicker.silent = true
-    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
     
     utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
