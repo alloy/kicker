@@ -1,37 +1,5 @@
-* Add a basic Ruby test recipe. See GitHub issue #3.
+* Add a way that recipe files are loaded, but not queued until the app starts.
+  This way a recipe can add options to the option parser, such as the runner bin on the ruby recipe.
+  Afterwards remove the ruby test related methods and options from older code.
+* Cleanup mustache kick file. See GitHub issue #3.
 * Add a recipe which implements the basic autotest mapping API.
-* Add mappings to Rails for fixtures.
-* Need to figure out how this can occur:
-
-  [Thu Oct 01 17:21:04 +0200 2009] Could not handle: tmp/_variants/banners/bn, tmp/_variants/banners/bn/85, tmp/_variants/banners/bn/85/kz, tmp/_variants/banners/bn/85/kz/44, tmp/_variants/images/zx, tmp/_variants/images/zx/10, tmp/_variants/images/zx/10/nx, tmp/_variants/images/zx/10/nx/71
-  [Thu Oct 01 17:21:04 +0200 2009] 
-  [Thu Oct 01 17:21:05 +0200 2009] 
-  [Thu Oct 01 17:21:05 +0200 2009] Could not handle: tmp/_variants, tmp/_variants/review_photos, tmp/_variants/review_photos/kh, tmp/_variants/review_photos/kh/57, tmp/_variants/review_photos/kh/57/ll, tmp/_variants/review_photos/kh/57/ll/40
-  [Thu Oct 01 17:21:05 +0200 2009] 
-  [Thu Oct 01 17:21:15 +0200 2009] 
-  [Thu Oct 01 17:21:15 +0200 2009] Could not handle: tmp/_variants, tmp/_variants/flyers, tmp/_variants/flyers/rx, tmp/_variants/flyers/rx/84, tmp/_variants/flyers/rx/84/mc, tmp/_variants/flyers/rx/84/mc/22
-  [Thu Oct 01 17:21:15 +0200 2009] 
-  [Thu Oct 01 17:21:16 +0200 2009] 
-  [Thu Oct 01 17:21:16 +0200 2009] Could not handle: tmp/_variants, tmp/_variants/images, tmp/_variants/images/mr, tmp/_variants/images/mr/36, tmp/_variants/images/mr/36/as, tmp/_variants/images/mr/36/as/85
-  [Thu Oct 01 17:21:16 +0200 2009] 
-  [Thu Oct 01 17:21:17 +0200 2009] 
-  [Thu Oct 01 17:21:17 +0200 2009] Could not handle: tmp/_variants/images/zm/86/ez/68
-  [Thu Oct 01 17:21:17 +0200 2009] 
-  [Thu Oct 01 17:21:19 +0200 2009] 
-  [Thu Oct 01 17:21:19 +0200 2009] Could not handle: tmp/_variants, tmp/_variants/review_photos, tmp/_variants/review_photos/xd, tmp/_variants/review_photos/xd/81, tmp/_variants/review_photos/xd/81/wd, tmp/_variants/review_photos/xd/81/wd/97
-  [Thu Oct 01 17:21:19 +0200 2009] 
-  /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:115:in `files_in_directory': undefined method `map' for nil:NilClass (NoMethodError)
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:110:in `changed_files'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:109:in `map'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:109:in `changed_files'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:102:in `process'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:88:in `run_watch_dog!'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/vendor/rucola/fsevents.rb:112:in `call'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/vendor/rucola/fsevents.rb:112:in `initialize'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:81:in `call'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:81:in `CFRunLoopRun'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:81:in `start'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/lib/kicker.rb:35:in `run'
-  	from /Library/Ruby/Gems/1.8/gems/kicker-2.0.2/bin/kicker:5
-  	from /usr/bin/kicker:19:in `load'
-  	from /usr/bin/kicker:19
