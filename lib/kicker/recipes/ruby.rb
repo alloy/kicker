@@ -12,12 +12,12 @@ class Ruby
     @tests = []
   end
   
-  def ruby_bin_path
-    'ruby'
-  end
-  
   def test_type
     'test'
+  end
+  
+  def runner_bin
+    test_type == 'test' ? 'ruby' : 'spec'
   end
   
   # Returns the file for +name+ if it exists.
@@ -50,9 +50,16 @@ class Ruby
     end)
   end
   
-  # Needs different runners depending on the test_type. Eg spec.
   def run_tests
-    execute "#{ruby_bin_path} -r #{@tests.join(' -r ')} -e ''" unless @tests.empty?
+    send("run_with_#{test_type}_runner") unless @tests.empty?
+  end
+  
+  def run_with_test_runner
+    execute "#{runner_bin} -r #{@tests.join(' -r ')} -e ''"
+  end
+  
+  def run_with_spec_runner
+    execute "#{runner_bin} #{@tests.join(' ')}"
   end
 end
 

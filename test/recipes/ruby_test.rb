@@ -23,6 +23,17 @@ describe "The Ruby handler" do
     handler.run_tests
   end
   
+  it "should run collected tests with a spec runner" do
+    handler = Ruby.new(%w{ lib/1.rb spec/namespace/2_spec.rb })
+    def handler.test_type; 'spec'; end
+    File.stubs(:exist?).with('spec/1_spec.rb').returns(true)
+    File.stubs(:exist?).with('spec/namespace/2_spec.rb').returns(true)
+    handler.handle!
+    
+    handler.expects(:execute).with("spec spec/1_spec.rb spec/namespace/2_spec.rb")
+    handler.run_tests
+  end
+  
   it "should not try to run the tests if none were collected" do
     handler = Ruby.new([])
     handler.expects(:execute).never
