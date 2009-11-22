@@ -5,7 +5,6 @@ require 'kicker/callback_chain'
 require 'kicker/core_ext'
 require 'kicker/growl'
 require 'kicker/utils'
-require 'kicker/validate'
 
 require 'kicker/options'
 require 'kicker/recipes'
@@ -42,9 +41,32 @@ class Kicker #:nodoc:
   
   private
   
+  def validate_options!
+    validate_paths_and_command!
+    validate_paths_exist!
+  end
+  
+  def validate_paths_and_command!
+    if process_chain.empty? && pre_process_chain.empty?
+      puts Kicker::Options.parser.help
+      exit
+    end
+  end
+  
+  def validate_paths_exist!
+    paths.each do |path|
+      unless File.exist?(path)
+        puts "The given path `#{path}' does not exist"
+        exit 1
+      end
+    end
+  end
+  
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => self.class.latency) { |events| process(events) }
+    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
+      process events
+    end
     
     trap('INT') do
       log "Exiting…"

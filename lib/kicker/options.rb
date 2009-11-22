@@ -43,6 +43,7 @@ class Kicker
         end
       end
       
+      # This is needed, because recipes might add options, in which case we don't have to add this yet.
       unless @added_recipes_to_banner || recipes_for_display.empty?
         @parser.separator " "
         @parser.separator "  Available recipes:"
