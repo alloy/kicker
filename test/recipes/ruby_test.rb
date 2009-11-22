@@ -4,6 +4,16 @@ before = Kicker.process_chain.dup
 require 'kicker/recipes/ruby'
 RUBY_FILES = (Kicker.process_chain - before).first
 
+class Ruby
+  def self.execute(command, &block)
+    @block = block
+  end
+  
+  def self.execute_block
+    @block
+  end
+end
+
 describe "The Ruby handler" do
   it "should instantiate a Ruby instance" do
     handler = mock('Ruby', :handle! => nil, :tests => %w{ test/1_test.rb test/namespace/2_test.rb })
@@ -55,6 +65,18 @@ describe "The Ruby handler" do
     ensure
       Ruby.runner_bin = nil
     end
+  end
+  
+  it "should only show the last line of the output when growling when running test_type is `test'" do
+    Ruby.run_with_test_runner(%w{ test/1_test.rb test/namespace/2_test.rb })
+    result = Ruby.execute_block.call(mock('status', :output => "foo\nall pass", :after? => true, :growl? => true))
+    result.should == 'all pass'
+  end
+  
+  it "should only show the last line of the output when growling when running test_type is `spec'" do
+    Ruby.run_with_spec_runner(%w{ spec/1_spec.rb spec/namespace/2_spec.rb })
+    result = Ruby.execute_block.call(mock('status', :output => "foo\nall pass", :after? => true, :growl? => true))
+    result.should == 'all pass'
   end
 end
 

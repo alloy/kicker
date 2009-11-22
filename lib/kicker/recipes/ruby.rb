@@ -14,12 +14,22 @@ class Ruby
       send("run_with_#{test_type}_runner", tests) unless tests.empty?
     end
     
+    # TODO: the log/growl output can still need work
     def run_with_test_runner(tests)
-      execute "#{runner_bin} -r #{tests.join(' -r ')} -e ''"
+      execute "#{runner_bin} -r #{tests.join(' -r ')} -e ''" do |status|
+        if status.after? && status.growl?
+          status.output.split("\n").last
+        end
+      end
     end
     
+    # TODO: the log/growl output can still need work
     def run_with_spec_runner(tests)
-      execute "#{runner_bin} #{tests.join(' ')}"
+      execute "#{runner_bin} #{tests.join(' ')}" do |status|
+        if status.after? && status.growl?
+          status.output.split("\n").last
+        end
+      end
     end
   end
   
