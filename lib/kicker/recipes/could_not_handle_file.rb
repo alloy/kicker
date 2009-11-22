@@ -1,5 +1,7 @@
 post_process do |files|
-  log('')
-  log("Could not handle: #{files.join(', ')}")
-  log('')
+  unless Kicker.silent?
+    log('')
+    log("Could not handle: #{files.join(', ')}")
+    log('')
+  end
 end
