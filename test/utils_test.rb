@@ -1,7 +1,10 @@
 require File.expand_path('../test_helper', __FILE__)
 
+Kicker::Utils.send(:public, :did_execute_command)
+
 describe "A Kicker instance, concerning its utility methods" do
   after do
+    Kicker.silent = false
     Kicker::Growl.use = true
   end
   
@@ -19,21 +22,62 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.stubs(:`).returns("line 1\nline 2")
     
     utils.stubs(:last_command_succeeded?).returns(true)
-    utils.expects(:log).with('Change occured, executing command: ls')
+    utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('  line 1')
     utils.expects(:log).with('  line 2')
-    utils.expects(:log).with('Command succeeded')
+    utils.expects(:log).with('Success')
     utils.execute('ls')
     
     utils.stubs(:last_command_succeeded?).returns(false)
     utils.stubs(:last_command_status).returns(123)
-    utils.expects(:log).with('Change occured, executing command: ls')
+    utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('  line 1')
     utils.expects(:log).with('  line 2')
-    utils.expects(:log).with('Command failed (123)')
+    utils.expects(:log).with('Failed (123)')
     utils.execute('ls')
   end
+  
+  it "should growl a change occurred and the output" do
+    utils.stubs(:`).returns("line 1\nline 2")
+    utils.stubs(:last_command_succeeded?).returns(true)
+    utils.stubs(:log)
     
+    Kicker::Growl.expects(:change_occured).with('ls')
+    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    utils.execute('ls')
+  end
+  
+  it "should not growl that a change occured in silent mode" do
+    Kicker.silent = true
+    utils.stubs(:did_execute_command)
+    
+    utils.expects(:log)
+    Kicker::Growl.expects(:change_occured).never
+    utils.execute('ls')
+  end
+  
+  it "should only log that is has succeeded in silent mode" do
+    Kicker.silent = true
+    utils.stubs(:last_command_succeeded?).returns(true)
+    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    
+    utils.expects(:log).with("Success")
+    utils.did_execute_command("line 1\nline 2")
+  end
+  
+  it "should fully log that it has failed in silent mode" do
+    Kicker.silent = true
+    Kicker::Growl.expects(:result).with("line 1\nline 2")
+    
+    utils.stubs(:last_command_succeeded?).returns(false)
+    utils.stubs(:last_command_status).returns(123)
+    utils.expects(:log).with('  line 1')
+    utils.expects(:log).with('  line 2')
+    utils.expects(:log).with('Failed (123)')
+    
+    utils.did_execute_command("line 1\nline 2")
+  end
+  
   it "should store the last executed command" do
     Kicker::Growl.use = false
     utils.stubs(:log)

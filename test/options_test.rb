@@ -4,6 +4,7 @@ describe "Kicker::Options.parse" do
   after do
     Kicker.latency = 1
     Kicker.paths = %w{ . }
+    Kicker.silent = false
     Kicker::Utils.ruby_bin_path = 'ruby'
     Kicker::Growl.use = true
     Kicker::Growl.command = nil
@@ -27,6 +28,14 @@ describe "Kicker::Options.parse" do
     
     Kicker::Options.parse(%w{ --no-growl })
     Kicker::Growl.should.not.use
+  end
+  
+  it "should parse if we should keep output to a minimum" do
+    Kicker::Options.parse([])
+    Kicker.should.not.be.silent
+    
+    Kicker::Options.parse(%w{ -s })
+    Kicker.should.be.silent
   end
   
   it "should parse the Growl command to use when the user clicks the Growl succeeded message" do

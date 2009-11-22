@@ -7,14 +7,9 @@ class Kicker
     
     def execute(command)
       @last_command = command
-      
-      log "Change occured, executing command: #{command}"
-      Kicker::Growl.change_occured(command) if Kicker::Growl.use?
-      
+      will_execute_command(command)
       output = `#{command}`
-      
-      log_result(output)
-      Kicker::Growl.result(output) if Kicker::Growl.use?
+      did_execute_command(output)
     end
     
     def last_command
@@ -40,9 +35,20 @@ class Kicker
     
     private
     
-    def log_result(output)
-      output.strip.split("\n").each { |line| log "  #{line}" }
-      log "Command #{last_command_succeeded? ? 'succeeded' : "failed (#{last_command_status})"}"
+    def will_execute_command(command)
+      log "Executing: #{command}"
+      Kicker::Growl.change_occured(command) if Kicker::Growl.use? && !Kicker.silent?
+    end
+    
+    def did_execute_command(output)
+      Kicker::Growl.result(output) if Kicker::Growl.use?
+      
+      if last_command_succeeded? && Kicker.silent?
+        log 'Success'
+      else
+        output.strip.split("\n").each { |line| log "  #{line}" }
+        log(last_command_succeeded? ? 'Success' : "Failed (#{last_command_status})")
+      end
     end
   end
 end

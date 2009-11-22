@@ -32,7 +32,7 @@ class Kicker
       end
       
       def change_occured(command)
-        growl(notifications[:change], 'Kicker: Change occured, executing command:', command)
+        growl(notifications[:change], 'Kicker: Executing:', command)
       end
       
       def command_callback
@@ -45,12 +45,14 @@ class Kicker
       
       def succeeded(output)
         callback = command_callback || DEFAULT_CALLBACK
-        growl(notifications[:succeeded], "Kicker: Command succeeded", output, &callback)
+        body = Kicker.silent? ? '' : output
+        growl(notifications[:succeeded], "Kicker: Success", body, &callback)
       end
       
       def failed(output)
-        message = "Kicker: Command failed (#{Kicker::Utils.last_command_status})"
-        growl(notifications[:failed], message, output, &DEFAULT_CALLBACK)
+        message = "Kicker: Failed (#{Kicker::Utils.last_command_status})"
+        body = Kicker.silent? ? '' : output
+        growl(notifications[:failed], message, body, &DEFAULT_CALLBACK)
       end
     end
   end

@@ -2,11 +2,16 @@ require 'optparse'
 
 class Kicker
   class << self
-    attr_accessor :latency, :paths
+    attr_accessor :latency, :paths, :silent
+    
+    def silent?
+      @silent
+    end
   end
   
   self.latency = 1
   self.paths = %w{ . }
+  self.silent = false
   
   module Options
     DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command dot_kick }
@@ -21,6 +26,10 @@ class Kicker
     def self.parser
       @parser ||= OptionParser.new do |opt|
         opt.banner = "Usage: #{$0} [options] [paths to watch]"
+        
+        opt.on('-s', '--silent', 'Keep output to a minimum.') do |silent|
+          Kicker.silent = silent
+        end
         
         opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
           Kicker::Growl.use = growl
