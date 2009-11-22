@@ -3,6 +3,10 @@ require File.expand_path('../test_helper', __FILE__)
 Kicker::Utils.send(:public, :did_execute_command)
 
 describe "A Kicker instance, concerning its utility methods" do
+  before do
+    utils.stubs(:puts)
+  end
+  
   after do
     Kicker.silent = false
     Kicker::Growl.use = true
@@ -23,16 +27,14 @@ describe "A Kicker instance, concerning its utility methods" do
     
     utils.stubs(:last_command_succeeded?).returns(true)
     utils.expects(:log).with('Executing: ls')
-    utils.expects(:log).with('  line 1')
-    utils.expects(:log).with('  line 2')
+    utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Success')
     utils.execute('ls')
     
     utils.stubs(:last_command_succeeded?).returns(false)
     utils.stubs(:last_command_status).returns(123)
     utils.expects(:log).with('Executing: ls')
-    utils.expects(:log).with('  line 1')
-    utils.expects(:log).with('  line 2')
+    utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     utils.execute('ls')
   end
@@ -72,8 +74,7 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker::Growl.expects(:result).with("line 1\nline 2")
     
     utils.stubs(:last_command_status).returns(123)
-    utils.expects(:log).with('  line 1')
-    utils.expects(:log).with('  line 2')
+    utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')

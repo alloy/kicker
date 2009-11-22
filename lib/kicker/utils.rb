@@ -47,8 +47,8 @@ class Kicker
         if status.success? && Kicker.silent?
           message = 'Success'
         else
-          status.output.strip.split("\n").each { |line| log "  #{line}" }
-          message = status.success? ? 'Success' : "Failed (#{last_command_status})"
+          puts "\n#{status.output.strip}\n\n"
+          message = status.success? ? "Success" : "Failed (#{last_command_status})"
         end
       end
       log message
