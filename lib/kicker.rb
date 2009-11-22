@@ -31,25 +31,6 @@ class Kicker #:nodoc:
     
     private
     
-    # def load_dot_kick
-    #   if File.exist?('.kick')
-    #     require 'dot_kick'
-    #     ReloadDotKick.save_state
-    #     load '.kick'
-    #   end
-    # end
-    # 
-    # def load_recipes(recipes)
-    #   recipes.each do |recipe|
-    #     raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
-    #     require recipe
-    #   end
-    # end
-    # 
-    # def recipe_exists?(recipe)
-    #   File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
-    # end
-    
     def set_ruby_bin_path(path)
       Kicker::Utils.ruby_bin_path = path
     end
