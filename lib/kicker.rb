@@ -30,6 +30,7 @@ class Kicker #:nodoc:
     
     def run(argv = ARGV)
       options = parse_options(argv)
+      set_ruby_bin_path(options[:ruby_bin_path]) if options[:ruby_bin_path]
       load_recipes(options[:recipes]) if options[:recipes]
       load_dot_kick
       new(options).start
@@ -54,6 +55,10 @@ class Kicker #:nodoc:
     
     def recipe_exists?(recipe)
       File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
+    end
+    
+    def set_ruby_bin_path(path)
+      Kicker::Utils.ruby_bin_path = path
     end
   end
   

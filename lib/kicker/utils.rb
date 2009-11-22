@@ -2,6 +2,9 @@ class Kicker
   module Utils #:nodoc:
     extend self
     
+    attr_accessor :ruby_bin_path
+    self.ruby_bin_path = 'ruby'
+    
     def execute(command)
       @last_command = command
       
@@ -19,11 +22,12 @@ class Kicker
     end
     
     def log(message)
-      puts "[#{Time.now}] #{message}"
+      now = Time.now
+      puts "#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | #{message}"
     end
     
     def run_ruby_tests(tests)
-      execute "ruby -r #{tests.join(' -r ')} -e ''" unless tests.empty?
+      execute "#{ruby_bin_path} -r #{tests.join(' -r ')} -e ''" unless tests.empty?
     end
     
     def last_command_succeeded?

@@ -1,4 +1,6 @@
+* Add a basic Ruby test recipe. See GitHub issue #3.
 * Add a recipe which implements the basic autotest mapping API.
+* Add mappings to Rails for fixtures.
 * Need to figure out how this can occur:
 
   [Thu Oct 01 17:21:04 +0200 2009] Could not handle: tmp/_variants/banners/bn, tmp/_variants/banners/bn/85, tmp/_variants/banners/bn/85/kz, tmp/_variants/banners/bn/85/kz/44, tmp/_variants/images/zx, tmp/_variants/images/zx/10, tmp/_variants/images/zx/10/nx, tmp/_variants/images/zx/10/nx/71

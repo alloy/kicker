@@ -10,7 +10,7 @@ describe "A Kicker instance, concerning its utility methods" do
     now = Time.now
     Time.stubs(:now).returns(now)
     
-    utils.expects(:puts).with("[#{now}] the message")
+    utils.expects(:puts).with("#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | the message")
     utils.send(:log, 'the message')
   end
   
@@ -115,9 +115,26 @@ describe "Kernel utility methods" do
     run_ruby_tests []
   end
   
+  it "should use an alternative ruby when specified" do
+    utils.stubs(:ruby_bin_path).returns('/opt/ruby-1.9.2/bin/ruby')
+    utils.expects(:execute).with("/opt/ruby-1.9.2/bin/ruby -r test/1.rb -r test/2.rb -e ''")
+    run_ruby_tests %w{ test/1.rb test/2.rb }
+  end
+  
   private
   
   def utils
     Kicker::Utils
+  end
+end
+
+describe "Kicker::Utils" do
+  it "should have an accessor for the ruby binary path" do
+    before = Kicker::Utils.ruby_bin_path
+    alternative = '/opt/ruby-1.9.2/bin/ruby'
+    
+    Kicker::Utils.ruby_bin_path = alternative
+    Kicker::Utils.ruby_bin_path.should == alternative
+    Kicker::Utils.ruby_bin_path = before
   end
 end

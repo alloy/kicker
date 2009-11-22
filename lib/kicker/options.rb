@@ -32,6 +32,10 @@ class Kicker
       (options[:recipes] ||= []) << recipe
     end
     
+    option_parser.on('-b', '--ruby [PATH]', 'Use an alternate Ruby binary for spawned tasks. (Default is `ruby\')') do |path|
+      options[:ruby_bin_path] = path
+    end
+    
     option_parser.separator " "
     option_parser.separator "  Available recipes:"
     Kicker.recipes_for_display.each { |recipe| option_parser.separator "    - #{recipe}" }

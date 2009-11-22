@@ -43,6 +43,20 @@ describe "Kicker" do
     Kicker.expects(:require).never
     lambda { Kicker.run(%w{ -r foobar -r rails }) }.should.raise
   end
+  
+  it "should use the default ruby when no ruby bin path was given" do
+    Kicker.run
+    Kicker::Utils.ruby_bin_path.should == 'ruby'
+  end
+  
+  it "should set the ruby bin path if one was given" do
+    before = Kicker::Utils.ruby_bin_path
+    
+    Kicker.run(%w{ --ruby /opt/ruby-1.9.2/bin/ruby })
+    Kicker::Utils.ruby_bin_path.should == '/opt/ruby-1.9.2/bin/ruby'
+    
+    Kicker::Utils.ruby_bin_path = before
+  end
 end
 
 describe "Kicker, when initializing" do
