@@ -5,11 +5,13 @@ class Kicker
     attr_accessor :ruby_bin_path
     self.ruby_bin_path = 'ruby'
     
-    def execute(command)
+    def execute(command, &block)
       @last_command = command
-      will_execute_command(command)
-      output = `#{command}`
-      did_execute_command(output)
+      status = LogStatusHelper.new(block, command)
+      
+      will_execute_command(status)
+      status.result(`#{command}`, last_command_succeeded?)
+      did_execute_command(status)
     end
     
     def last_command
@@ -35,20 +37,23 @@ class Kicker
     
     private
     
-    def will_execute_command(command)
-      log "Executing: #{command}"
-      Kicker::Growl.change_occured(command) if Kicker::Growl.use? && !Kicker.silent?
+    def will_execute_command(status)
+      log(status.call(:stdout) || "Executing: #{status.command}")
+      Kicker::Growl.change_occured(status.command) if Kicker::Growl.use? && !Kicker.silent?
     end
     
-    def did_execute_command(output)
-      Kicker::Growl.result(output) if Kicker::Growl.use?
-      
-      if last_command_succeeded? && Kicker.silent?
-        log 'Success'
-      else
-        output.strip.split("\n").each { |line| log "  #{line}" }
-        log(last_command_succeeded? ? 'Success' : "Failed (#{last_command_status})")
+    def did_execute_command(status)
+      unless message = status.call(:stdout)
+        if status.success? && Kicker.silent?
+          message = 'Success'
+        else
+          status.output.strip.split("\n").each { |line| log "  #{line}" }
+          message = status.success? ? 'Success' : "Failed (#{last_command_status})"
+        end
       end
+      log message
+      
+      Kicker::Growl.result(status.output) if Kicker::Growl.use?
     end
   end
 end
@@ -60,8 +65,8 @@ module Kernel
   end
   
   # Executes the +command+, logs the output, and optionally growls.
-  def execute(command)
-    Kicker::Utils.execute(command)
+  def execute(command, &block)
+    Kicker::Utils.execute(command, &block)
   end
   
   # Returns the last executed command.

@@ -1,5 +1,19 @@
 require 'ignore'
 
+# process do
+#   execute "ls -l" do |builder|
+#     if builder.before?
+#       builder.stdout? ? "Here we go!\n\n#{builder.command}" : "Here we go!"
+#     elsif builder.after?
+#       if builder.success?
+#         builder.stdout? ? "Nice!\n\n#{builder.output}" : "Nice!"
+#       else
+#         builder.stdout? ? "Damn brow!\n\n#{builder.output}" : "Damn bro!"
+#       end
+#     end
+#   end
+# end
+
 process do |files|
   test_files = files.take_and_map do |file|
     case file

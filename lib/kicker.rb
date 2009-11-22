@@ -4,6 +4,7 @@ require 'rucola/fsevents'
 require 'kicker/callback_chain'
 require 'kicker/core_ext'
 require 'kicker/growl'
+require 'kicker/log_status_helper'
 require 'kicker/utils'
 
 require 'kicker/options'

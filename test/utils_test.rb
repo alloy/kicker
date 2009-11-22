@@ -58,24 +58,28 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "should only log that is has succeeded in silent mode" do
     Kicker.silent = true
-    utils.stubs(:last_command_succeeded?).returns(true)
     Kicker::Growl.expects(:result).with("line 1\nline 2")
     
+    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
+    status.result("line 1\nline 2", true)
+    
     utils.expects(:log).with("Success")
-    utils.did_execute_command("line 1\nline 2")
+    utils.did_execute_command(status)
   end
   
   it "should fully log that it has failed in silent mode" do
     Kicker.silent = true
     Kicker::Growl.expects(:result).with("line 1\nline 2")
     
-    utils.stubs(:last_command_succeeded?).returns(false)
     utils.stubs(:last_command_status).returns(123)
     utils.expects(:log).with('  line 1')
     utils.expects(:log).with('  line 2')
     utils.expects(:log).with('Failed (123)')
     
-    utils.did_execute_command("line 1\nline 2")
+    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
+    status.result("line 1\nline 2", false)
+    
+    utils.did_execute_command(status)
   end
   
   it "should store the last executed command" do
@@ -84,6 +88,48 @@ describe "A Kicker instance, concerning its utility methods" do
     
     utils.execute('date')
     utils.last_command.should == 'date'
+  end
+  
+  it "should call the block given to execute when and yield the log status helper with status success" do
+    Kicker.silent = true
+    Kicker::Growl.use = false
+    utils.stubs(:last_command_succeeded?).returns(true)
+    
+    utils.expects(:log).with('Start!')
+    utils.expects(:log).with('Done!')
+    
+    utils.execute('ls -l') do |status|
+      if status.after?
+        if status.success?
+          'Done!'
+        else
+          'Ohnoes!'
+        end
+      elsif status.before?
+        'Start!'
+      end
+    end
+  end
+  
+  it "should call the block given to execute when and yield the log status helper with status failed" do
+    Kicker.silent = true
+    Kicker::Growl.use = false
+    utils.stubs(:last_command_succeeded?).returns(false)
+    
+    utils.expects(:log).with('Start!')
+    utils.expects(:log).with('Ohnoes!')
+    
+    utils.execute('ls -l') do |status|
+      if status.after?
+        if status.success?
+          'Done!'
+        else
+          'Ohnoes!'
+        end
+      elsif status.before?
+        'Start!'
+      end
+    end
   end
   
   private
