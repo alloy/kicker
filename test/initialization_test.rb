@@ -66,8 +66,7 @@ describe "Kicker, when starting" do
   
   it "should show the usage banner and exit when there are no callbacks defined at all" do
     @kicker.stubs(:validate_paths_exist!)
-    Kicker.stubs(:process_chain).returns(Kicker::CallbackChain.new)
-    Kicker.stubs(:pre_process_chain).returns(Kicker::CallbackChain.new)
+    Kicker.stubs(:startup_chain).returns(Kicker::CallbackChain.new)
     
     Kicker::Options.stubs(:parser).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")
