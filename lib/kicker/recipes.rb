@@ -1,41 +1,40 @@
-$:.unshift(RECIPES_DIR = File.expand_path('../recipes', __FILE__))
-require 'could_not_handle_file'
-require 'execute_cli_command'
-
+RECIPES_DIR      = File.expand_path('../recipes', __FILE__)
 USER_RECIPES_DIR = File.expand_path('~/.kick')
+
+$:.unshift(RECIPES_DIR)
 $:.unshift(USER_RECIPES_DIR) if File.exist?(USER_RECIPES_DIR)
+
+module Kernel
+  def recipe(name, &block)
+    Kicker::Recipes.recipe(name, &block)
+  end
+end
 
 class Kicker
   module Recipes
     class << self
-      attr_writer :recipes_to_load
-      def recipes_to_load
-        @recipes_to_load ||= []
+      def recipes
+        @recipes ||= {}
       end
       
-      def load!
-        load_recipes
-        load_dot_kick
-      end
-      
-      def load_dot_kick
-        if File.exist?('.kick')
-          require 'dot_kick'
-          ReloadDotKick.save_state
-          Kernel.load '.kick'
+      def recipe(name, &block)
+        name = name.to_sym
+        if block_given?
+          recipes[name] = block
+        else
+          if recipe = recipes[name]
+            recipe.call
+          else
+            raise LoadError, "Recipe `#{name}' does not exist."
+          end
         end
       end
       
-      def load_recipes
-        recipes_to_load.each do |recipe|
-          raise "Recipe `#{recipe}' does not exist." unless recipe_exists?(recipe)
-          require recipe
-        end
-      end
-      
-      def recipe_exists?(recipe)
-        File.exist?("#{RECIPES_DIR}/#{recipe}.rb") || File.exist?("#{USER_RECIPES_DIR}/#{recipe}.rb")
+      def recipe_files
+        Dir.glob(File.join(RECIPES_DIR, '*.rb')) + Dir.glob(File.join(USER_RECIPES_DIR, '*.rb'))
       end
     end
+    
+    recipe_files.each { |file| require file }
   end
 end

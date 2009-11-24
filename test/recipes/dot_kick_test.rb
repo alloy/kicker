@@ -1,9 +1,5 @@
 require File.expand_path('../../test_helper', __FILE__)
 
-before = Kicker.process_chain.dup
-require 'kicker/recipes/dot_kick'
-DOT_KICK = (Kicker.process_chain - before).first
-
 describe "The .kick handler" do
   it "should reset $LOADED_FEATURES and callback chains to state before loading .kick and reload .kick" do
     ReloadDotKick.save_state
@@ -16,7 +12,7 @@ describe "The .kick handler" do
     2.times do
       require File.expand_path('../../fixtures/a_file_thats_reloaded', __FILE__)
       process {}
-      DOT_KICK.call(%w{ .kick })
+      ReloadDotKick.call(%w{ .kick })
     end
     
     $FROM_RELOADED_FILE.should == 2

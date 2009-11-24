@@ -85,4 +85,6 @@ class Ruby
   end
 end
 
-process Ruby
+recipe :ruby do
+  process Ruby
+end

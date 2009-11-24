@@ -11,11 +11,6 @@ describe "Kicker" do
     Kicker.paths.should == %w{ . }
   end
   
-  it "should load recipes and .kick related files" do
-    Kicker::Recipes.expects(:load!)
-    Kicker.run
-  end
-  
   it "should use the default ruby when no ruby bin path was given" do
     Kicker.run
     Kicker::Utils.ruby_bin_path.should == 'ruby'
@@ -71,8 +66,8 @@ describe "Kicker, when starting" do
   
   it "should show the usage banner and exit when there are no callbacks defined at all" do
     @kicker.stubs(:validate_paths_exist!)
-    Kicker.stubs(:process_chain).returns([])
-    Kicker.stubs(:pre_process_chain).returns([])
+    Kicker.stubs(:process_chain).returns(Kicker::CallbackChain.new)
+    Kicker.stubs(:pre_process_chain).returns(Kicker::CallbackChain.new)
     
     Kicker::Options.stubs(:parser).returns(mock('OptionParser', :help => 'help'))
     @kicker.expects(:puts).with("help")

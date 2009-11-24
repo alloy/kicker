@@ -1,7 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 before = Kicker.process_chain.dup
-require 'kicker/recipes/rails'
+recipe :rails
 RAILS_FILES, RAILS_SCHEMA = (Kicker.process_chain - before).first(2)
 
 describe "The Rails helper module" do

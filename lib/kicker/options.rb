@@ -47,8 +47,8 @@ class Kicker
           Kicker::Utils.ruby_bin_path = path
         end
         
-        opt.on('-r', '--recipe [NAME]', 'A named recipe to load.') do |recipe|
-          Kicker::Recipes.recipes_to_load << recipe
+        opt.on('-r', '--recipe [NAME]', 'A named recipe to load.') do |name|
+          recipe(name)
         end
       end
       

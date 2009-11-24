@@ -8,7 +8,6 @@ describe "Kicker::Options.parse" do
     Kicker::Utils.ruby_bin_path = 'ruby'
     Kicker::Growl.use = true
     Kicker::Growl.command = nil
-    Kicker::Recipes.recipes_to_load = []
   end
   
   it "should parse the paths" do
@@ -52,8 +51,9 @@ describe "Kicker::Options.parse" do
   end
   
   it "should parse recipe requires" do
+    Kicker::Recipes.expects(:recipe).with('rails')
+    Kicker::Recipes.expects(:recipe).with('jstest')
     Kicker::Options.parse(%w{ -r rails --recipe jstest })
-    Kicker::Recipes.recipes_to_load.should == %w{ rails jstest }
   end
   
   it "should set the alternative ruby bin path" do

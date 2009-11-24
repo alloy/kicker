@@ -1,7 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 before = Kicker.process_chain.dup
-require 'kicker/recipes/jstest'
+recipe :jstest
 JSTEST = (Kicker.process_chain - before).first
 
 describe "The HeadlessSquirrel handler" do

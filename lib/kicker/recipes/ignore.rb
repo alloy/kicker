@@ -31,9 +31,11 @@ module Kernel
   end
 end
 
-pre_process Ignore
-
-ignore("tmp")
-ignore(/\w+\.log/)
-ignore(/\.(svn|git)\//)
-ignore("svn-commit.tmp")
+recipe :ignore do
+  pre_process Ignore
+  
+  ignore("tmp")
+  ignore(/\w+\.log/)
+  ignore(/\.(svn|git)\//)
+  ignore("svn-commit.tmp")
+end

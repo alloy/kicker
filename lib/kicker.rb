@@ -5,15 +5,12 @@ require 'kicker/callback_chain'
 require 'kicker/core_ext'
 require 'kicker/growl'
 require 'kicker/log_status_helper'
-require 'kicker/utils'
-
 require 'kicker/options'
-require 'kicker/recipes'
+require 'kicker/utils'
 
 class Kicker #:nodoc:
   def self.run(argv = ARGV)
     Kicker::Options.parse(argv)
-    Kicker::Recipes.load!
     new.start
   end
   
@@ -121,3 +118,7 @@ class Kicker #:nodoc:
     end
   end
 end
+
+# Load this as last, because it actually loads all recipes, so everything has
+# to be defined before that.
+require 'kicker/recipes'

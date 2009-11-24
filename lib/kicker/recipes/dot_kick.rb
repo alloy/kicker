@@ -6,15 +6,21 @@ module ReloadDotKick #:nodoc
     end
     
     def call(files)
-      if files.delete('.kick')
-        reset!
-        load '.kick'
-      end
+      reset! if files.delete('.kick')
+    end
+    
+    def use?
+      File.exist?('.kick')
+    end
+    
+    def load!
+      load '.kick'
     end
     
     def reset!
       remove_loaded_features!
       reset_chains!
+      load!
     end
     
     def reset_chains!
@@ -32,4 +38,10 @@ module ReloadDotKick #:nodoc
   end
 end
 
-process ReloadDotKick
+if ReloadDotKick.use?
+  startup do
+    pre_process ReloadDotKick
+    ReloadDotKick.save_state
+    ReloadDotKick.load!
+  end
+end

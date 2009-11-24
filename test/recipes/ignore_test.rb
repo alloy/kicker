@@ -1,7 +1,7 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 before = Kicker.pre_process_chain.dup
-require 'kicker/recipes/ignore'
+recipe :ignore
 IGNORE = (Kicker.pre_process_chain - before).first
 
 describe "The Ignore handler" do

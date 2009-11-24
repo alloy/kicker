@@ -1,3 +1,4 @@
+recipe :rails do
 # Need to define these modules, because AS breaks if these aren't defined. Need to fix that in AS...
 module ActiveSupport
   module CoreExtensions
@@ -80,4 +81,5 @@ end
 # When changing the schema, prepare the test database.
 process do |files|
   execute 'rake db:test:prepare' if files.delete('db/schema.rb')
+end
 end
