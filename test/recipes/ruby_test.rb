@@ -15,6 +15,18 @@ class Ruby
 end
 
 describe "The Ruby handler" do
+  before do
+    Ruby.test_type = nil
+    Ruby.runner_bin = nil
+    Ruby.test_options = []
+  end
+  
+  after do
+    Ruby.test_type = 'test'
+    Ruby.runner_bin = nil
+    Ruby.test_options = []
+  end
+  
   it "should instantiate a Ruby instance" do
     handler = mock('Ruby', :handle! => nil, :tests => %w{ test/1_test.rb test/namespace/2_test.rb })
     Ruby.expects(:new).with(%w{ test/1_test.rb Rakefile test/namespace/2_test.rb }).returns(handler)
@@ -23,33 +35,23 @@ describe "The Ruby handler" do
   end
   
   it "should discover whether to use `ruby' or `spec' as the test_type" do
-    begin
-      Ruby.test_type = nil
-      File.expects(:exist?).with('spec').returns(false)
-      Ruby.test_type.should == 'test'
-      
-      Ruby.test_type = nil
-      File.expects(:exist?).with('spec').returns(true)
-      Ruby.test_type.should == 'spec'
-    ensure
-      Ruby.test_type = 'test'
-    end
+    File.expects(:exist?).with('spec').returns(false)
+    Ruby.test_type.should == 'test'
+    
+    Ruby.test_type = nil
+    File.expects(:exist?).with('spec').returns(true)
+    Ruby.test_type.should == 'spec'
   end
   
   it "should run the given tests with a test-unit runner" do
-    Ruby.expects(:execute).with("ruby -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
+    Ruby.expects(:execute).with("ruby  -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
     Ruby.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
   end
   
   it "should run the given tests with a spec runner" do
-    begin
-      Ruby.runner_bin = nil
-      Ruby.stubs(:test_type).returns('spec')
-      Ruby.expects(:execute).with("spec spec/1_spec.rb spec/namespace/2_spec.rb")
-      Ruby.run_tests(%w{ spec/1_spec.rb spec/namespace/2_spec.rb })
-    ensure
-      Ruby.runner_bin = nil
-    end
+    Ruby.stubs(:test_type).returns('spec')
+    Ruby.expects(:execute).with("spec  spec/1_spec.rb spec/namespace/2_spec.rb")
+    Ruby.run_tests(%w{ spec/1_spec.rb spec/namespace/2_spec.rb })
   end
   
   it "should not try to run the tests if none were given" do
@@ -58,13 +60,23 @@ describe "The Ruby handler" do
   end
   
   it "should be possible to override the bin path" do
-    begin
-      Ruby.runner_bin = '/some/other/runner'
-      Ruby.expects(:execute).with("/some/other/runner -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
-      Ruby.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
-    ensure
-      Ruby.runner_bin = nil
-    end
+    Ruby.runner_bin = '/some/other/runner'
+    Ruby.expects(:execute).with("/some/other/runner  -r test/1_test.rb -r test/namespace/2_test.rb -e ''")
+    Ruby.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
+  end
+  
+  it "should be possible to add runner options when test_type is `test'" do
+    Ruby.test_type = 'test'
+    Ruby.test_options << '-I ./other'
+    Ruby.expects(:execute).with("ruby -I ./other -r test/1_test.rb -e ''")
+    Ruby.run_tests(%w{ test/1_test.rb })
+  end
+  
+  it "should be possible to add runner options when test_type is `spec'" do
+    Ruby.test_type = 'spec'
+    Ruby.test_options << '-I ./other'
+    Ruby.expects(:execute).with("spec -I ./other spec/1_spec.rb")
+    Ruby.run_tests(%w{ spec/1_spec.rb })
   end
   
   it "should only show the last line of the output when growling when running test_type is `test'" do
@@ -84,6 +96,7 @@ end
   describe "An instance of the Ruby handler, with test type `#{type}'" do
     before do
       Ruby.stubs(:test_type).returns(type)
+      Ruby.stubs(:test_cases_root).returns(type)
       File.stubs(:exist?).with("#{type}/1_#{type}.rb").returns(true)
       File.stubs(:exist?).with("#{type}/namespace/2_#{type}.rb").returns(true)
     end
@@ -115,6 +128,17 @@ end
       handler.handle!
       
       handler.tests.should == %W{ #{type}/1_#{type}.rb #{type}/2_#{type}.rb }
+      files.should == %W{ Rakefile }
+    end
+    
+    it "should check if a different test case root" do
+      Ruby.stubs(:test_cases_root).returns('test/cases')
+      
+      files = %W{ Rakefile test/cases/1_#{type}.rb test/cases/namespace/2_#{type}.rb }
+      handler = Ruby.new(files)
+      handler.handle!
+      
+      handler.tests.should == %W{ test/cases/1_#{type}.rb test/cases/namespace/2_#{type}.rb }
       files.should == %W{ Rakefile }
     end
   end

@@ -16,8 +16,9 @@ describe "The Rails helper module" do
   end
 end
 
-describe "The rails handler" do
+describe "The Rails handler" do
   before do
+    File.stubs(:exist?).with('spec').returns(false)
     @files = %w{ Rakefile }
   end
   
@@ -29,11 +30,6 @@ describe "The rails handler" do
   it "should not prepare the test database if another file than db/schema.rb is modified" do
     Kicker::Utils.expects(:execute).never
     RAILS_SCHEMA.call(%w{ Rakefile })
-  end
-  
-  it "should match any test case files" do
-    should_match %w{ test/1_test.rb test/namespace/2_test.rb },
-                 %w{ test/1_test.rb test/namespace/2_test.rb }
   end
   
   it "should map model files to test/unit" do
@@ -86,7 +82,7 @@ describe "The rails handler" do
       File.stubs(:exist?).with(test).returns(true)
     end
     
-    Kicker::Utils.expects(:run_ruby_tests).with(tests)
+    Rails.expects(:run_tests).with(tests)
     RAILS_FILES.call(@files)
     @files.should == %w{ Rakefile }
   end
