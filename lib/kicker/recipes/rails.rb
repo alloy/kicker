@@ -13,30 +13,55 @@ require 'ruby'
 class Rails < Ruby
   # Maps +type+, for instance `models', to a test directory.
   def self.type_to_test_dir(type)
-    case type
-    when "models"
-      "unit"
-    when "concerns"
-      "unit/concerns"
-    when "controllers", "views"
-      "functional"
-    when "helpers"
-      "unit/helpers"
+    if test_type == 'test'
+      case type
+      when "models"
+        "unit"
+      when "concerns"
+        "unit/concerns"
+      when "controllers", "views"
+        "functional"
+      when "helpers"
+        "unit/helpers"
+      end
+    elsif test_type == 'spec'
+      case type
+      when "models"
+        "models"
+      when "concerns"
+        "models/concerns"
+      when "controllers", "views"
+        "controllers"
+      when "helpers"
+        "helpers"
+      end
     end
   end
   
-  # Returns an array consiting of all functional tests.
-  def self.all_functional_tests
-    Dir.glob("test/functional/**/*_test.rb")
+  # Returns an array consiting of all controller tests.
+  def self.all_controller_tests
+    if test_type == 'test'
+      Dir.glob("#{test_cases_root}/functional/**/*_test.rb")
+    else
+      Dir.glob("#{test_cases_root}/controllers/**/*_spec.rb")
+    end
   end
   
   # Returns an array of all tests related to the given model.
-  def self.tests_for_model(model)
-    %W{
-      test/unit/#{model.singularize}_test.rb
-      test/unit/helpers/#{model.pluralize}_helper_test.rb
-      test/functional/#{model.pluralize}_controller_test.rb
-    }
+  def tests_for_model(model)
+    if test_type == 'test'
+      %W{
+        unit/#{model.singularize}
+        unit/helpers/#{model.pluralize}_helper
+        functional/#{model.pluralize}_controller
+      }
+    else
+      %W{
+        models/#{model.singularize}
+        helpers/#{model.pluralize}_helper
+        controllers/#{model.pluralize}_controller
+      }
+    end.map { |f| test_file f }
   end
   
   def handle!
@@ -44,15 +69,15 @@ class Rails < Ruby
       case file
       # Run all functional tests when routes.rb is saved
       when 'config/routes.rb'
-        Rails.all_functional_tests
+        Rails.all_controller_tests
       
       # Match lib/*
       when /^(lib\/.+)\.rb$/
-        "test/#{$1}_test.rb"
+        test_file($1)
       
       # Map fixtures to their related tests
-      when %r{^test/fixtures/(\w+)\.yml$}
-        Rails.tests_for_model($1)
+      when %r{^#{test_cases_root}/fixtures/(\w+)\.yml$}
+        tests_for_model($1)
       
       # Match any file in app/ and map it to a test file
       when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
@@ -64,8 +89,7 @@ class Rails < Ruby
             file = "#{namespace.pop}_controller"
           end
           
-          test_file = File.join("test", dir, namespace, "#{file}_test.rb")
-          test_file if File.exist?(test_file)
+          test_file File.join(dir, namespace, file)
         end
       end
     end)
