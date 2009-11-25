@@ -135,3 +135,9 @@ To load recipes from your <tt>~/.kick</tt> file:
 
 That’s basically it, just remember that the order of specifying handlers _can_
 be important in your decision on where to specify handlers.
+
+== Contributors
+
+* Manfred Stienstra (@manfred)
+* Cristi Balan (@evilchelu)
+* Damir Zekic (@sidonath)
