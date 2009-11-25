@@ -159,22 +159,6 @@ describe "Kernel utility methods" do
     last_command.should == 'abcde'
   end
   
-  it "should call execute with the appropriate command to execute Ruby tests" do
-    utils.expects(:execute).with("ruby -r test/1.rb -r test/2.rb -e ''")
-    run_ruby_tests %w{ test/1.rb test/2.rb }
-  end
-  
-  it "should not execute anything if an empty array is given to run_ruby_tests" do
-    utils.expects(:execute).never
-    run_ruby_tests []
-  end
-  
-  it "should use an alternative ruby when specified" do
-    utils.stubs(:ruby_bin_path).returns('/opt/ruby-1.9.2/bin/ruby')
-    utils.expects(:execute).with("/opt/ruby-1.9.2/bin/ruby -r test/1.rb -r test/2.rb -e ''")
-    run_ruby_tests %w{ test/1.rb test/2.rb }
-  end
-  
   private
   
   def utils

@@ -23,10 +23,6 @@ class Kicker
       puts "#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | #{message}"
     end
     
-    def run_ruby_tests(tests)
-      execute "#{ruby_bin_path} -r #{tests.join(' -r ')} -e ''" unless tests.empty?
-    end
-    
     def last_command_succeeded?
       $?.success?
     end
@@ -74,11 +70,5 @@ module Kernel
   # Returns the last executed command.
   def last_command
     Kicker::Utils.last_command
-  end
-  
-  # A convenience method that takes an array of Ruby test files and runs them
-  # collectively.
-  def run_ruby_tests(tests)
-    Kicker::Utils.run_ruby_tests(tests)
   end
 end

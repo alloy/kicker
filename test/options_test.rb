@@ -55,13 +55,4 @@ describe "Kicker::Options.parse" do
     Kicker::Recipes.expects(:recipe).with('jstest')
     Kicker::Options.parse(%w{ -r rails --recipe jstest })
   end
-  
-  it "should set the alternative ruby bin path" do
-    Kicker::Options.parse(%w{ -b /opt/ruby-1.9.2/bin/ruby })
-    Kicker::Utils.ruby_bin_path.should == '/opt/ruby-1.9.2/bin/ruby'
-    
-    Kicker::Utils.ruby_bin_path = nil
-    Kicker::Options.parse(%w{ --ruby /opt/ruby-1.9.2/bin/ruby })
-    Kicker::Utils.ruby_bin_path.should == '/opt/ruby-1.9.2/bin/ruby'
-  end
 end

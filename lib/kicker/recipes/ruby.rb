@@ -99,6 +99,10 @@ class Ruby
   end
 end
 
+options.on('-b', '--ruby [PATH]', "Use an alternate Ruby binary for spawned test runners. (Default is `ruby')") do |command|
+  Ruby.runner_bin = command
+end
+
 recipe :ruby do
   process Ruby
 end

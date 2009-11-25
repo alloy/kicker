@@ -35,6 +35,8 @@ class Kicker
       end
     end
     
+    # We don't want this option to show up at the end
+    require 'execute_cli_command'
     recipe_files.each { |file| require file }
   end
 end

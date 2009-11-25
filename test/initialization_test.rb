@@ -16,15 +16,6 @@ describe "Kicker" do
     Kicker::Utils.ruby_bin_path.should == 'ruby'
   end
   
-  it "should set the ruby bin path if one was given" do
-    before = Kicker::Utils.ruby_bin_path
-    
-    Kicker.run(%w{ --ruby /opt/ruby-1.9.2/bin/ruby })
-    Kicker::Utils.ruby_bin_path.should == '/opt/ruby-1.9.2/bin/ruby'
-    
-    Kicker::Utils.ruby_bin_path = before
-  end
-  
   it "should default the FSEvents latency to 1" do
     Kicker.latency.should == 1
   end

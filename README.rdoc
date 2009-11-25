@@ -15,17 +15,18 @@ feel offended; live with it.</i>
 
 == The short version
 
-  Usage: kicker [options] [paths to watch]
-      -e, --execute [COMMAND]          The command to execute.
+  Usage: ./bin/kicker [options] [paths to watch]
+
+    Available recipes: active_record, ignore, jstest, rails, ruby.
+
+      -s, --silent                     Keep output to a minimum.
           --[no-]growl                 Whether or not to use Growl. Default is to use growl.
           --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
-      -l, --latency [FLOAT]            The time to collect file change events before acting on them. Defaults to 1.5 sec.
+      -l, --latency [FLOAT]            The time to collect file change events before acting on them. Defaults to 1 second.
       -r, --recipe [NAME]              A named recipe to load.
+      -e, --execute [COMMAND]          The command to execute.
+      -b, --ruby [PATH]                Use an alternate Ruby binary for spawned test runners. (Default is `ruby')
 
-    Available recipes:
-      - ignore
-      - jstest
-      - rails
 
 == The long version
 
@@ -111,7 +112,7 @@ be added:
       end
     end
 
-    run_ruby_tests test_files
+    Ruby.run_tests test_files
   end
 
 The files list is iterated over with the Array#take_and_map method, which both

@@ -65,6 +65,15 @@ describe "The Ruby handler" do
     Ruby.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
   end
   
+  it "should set the alternative ruby bin path" do
+    Kicker::Options.parse(%w{ -b /opt/ruby-1.9.2/bin/ruby })
+    Ruby.runner_bin.should == '/opt/ruby-1.9.2/bin/ruby'
+    
+    Ruby.runner_bin = nil
+    Kicker::Options.parse(%w{ --ruby /opt/ruby-1.9.2/bin/ruby })
+    Ruby.runner_bin.should == '/opt/ruby-1.9.2/bin/ruby'
+  end
+  
   it "should be possible to add runner options when test_type is `test'" do
     Ruby.test_type = 'test'
     Ruby.test_options << '-I ./other'
