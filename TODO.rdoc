@@ -1,5 +1,2 @@
-* Add a way that recipe files are loaded, but not queued until the app starts.
-  This way a recipe can add options to the option parser, such as the runner bin on the ruby recipe.
-  Afterwards remove the ruby test related methods and options from older code.
 * Cleanup mustache kick file. See GitHub issue #3.
 * Add a recipe which implements the basic autotest mapping API.

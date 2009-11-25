@@ -11,39 +11,46 @@ end
 require 'ruby'
 
 class Rails < Ruby
-  # Maps +type+, for instance `models', to a test directory.
-  def self.type_to_test_dir(type)
-    if test_type == 'test'
-      case type
-      when "models"
-        "unit"
-      when "concerns"
-        "unit/concerns"
-      when "controllers", "views"
-        "functional"
-      when "helpers"
-        "unit/helpers"
-      end
-    elsif test_type == 'spec'
-      case type
-      when "models"
-        "models"
-      when "concerns"
-        "models/concerns"
-      when "controllers", "views"
-        "controllers"
-      when "helpers"
-        "helpers"
+  class << self
+    # Call these options on the Ruby class which takes the cli options.
+    %w{ test_type runner_bin test_cases_root test_options }.each do |delegate|
+      define_method(delegate) { Ruby.send(delegate) }
+    end
+    
+    # Maps +type+, for instance `models', to a test directory.
+    def type_to_test_dir(type)
+      if test_type == 'test'
+        case type
+        when "models"
+          "unit"
+        when "concerns"
+          "unit/concerns"
+        when "controllers", "views"
+          "functional"
+        when "helpers"
+          "unit/helpers"
+        end
+      elsif test_type == 'spec'
+        case type
+        when "models"
+          "models"
+        when "concerns"
+          "models/concerns"
+        when "controllers", "views"
+          "controllers"
+        when "helpers"
+          "helpers"
+        end
       end
     end
-  end
-  
-  # Returns an array consiting of all controller tests.
-  def self.all_controller_tests
-    if test_type == 'test'
-      Dir.glob("#{test_cases_root}/functional/**/*_test.rb")
-    else
-      Dir.glob("#{test_cases_root}/controllers/**/*_spec.rb")
+
+    # Returns an array consiting of all controller tests.
+    def all_controller_tests
+      if test_type == 'test'
+        Dir.glob("#{test_cases_root}/functional/**/*_test.rb")
+      else
+        Dir.glob("#{test_cases_root}/controllers/**/*_spec.rb")
+      end
     end
   end
   

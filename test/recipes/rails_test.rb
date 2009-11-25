@@ -6,8 +6,8 @@ RAILS_FILES, RAILS_SCHEMA = (Kicker.process_chain - before).first(2)
 
 describe "The Rails helper module" do
   after do
-    Rails.test_type = nil
-    Rails.test_cases_root = nil
+    Ruby.test_type = nil
+    Ruby.test_cases_root = nil
   end
   
   it "should return all controller tests when test_type is `test'" do
@@ -16,8 +16,8 @@ describe "The Rails helper module" do
   end
   
   it "should return all controller tests when test_type is `spec'" do
-    Rails.test_type = 'spec'
-    Rails.test_cases_root = nil
+    Ruby.test_type = 'spec'
+    Ruby.test_cases_root = nil
     
     Dir.expects(:glob).with("spec/controllers/**/*_spec.rb").returns(%w{ spec.rb })
     Rails.all_controller_tests.should == %w{ spec.rb }
@@ -54,7 +54,7 @@ describe "An instance of the Rails handler, with test type `test'" do
   include SharedRailsHandlerHelper
   
   before do
-    Rails.test_type = 'test'
+    Ruby.test_type = 'test'
     File.stubs(:exist?).with('spec').returns(false)
     @files = %w{ Rakefile }
   end
@@ -112,7 +112,7 @@ describe "An instance of the Rails handler, with test type `spec'" do
   include SharedRailsHandlerHelper
   
   before do
-    Rails.test_type = Rails.runner_bin = Rails.test_cases_root = nil
+    Ruby.test_type = Ruby.runner_bin = Ruby.test_cases_root = nil
     File.stubs(:exist?).with('spec').returns(true)
     @files = %w{ Rakefile }
   end
@@ -159,7 +159,7 @@ describe "An instance of the Rails handler, with test type `spec'" do
   end
   
   it "should map fixtures to their model, helper and controller specs if they exist" do
-    Rails.test_type = 'spec'
+    Ruby.test_type = 'spec'
     specs = %w{ spec/models/member_spec.rb spec/helpers/members_helper_spec.rb spec/controllers/members_controller_spec.rb }
     File.stubs(:exist?).returns(false)
     
