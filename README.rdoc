@@ -56,9 +56,10 @@ the <tt>rails</tt> recipe will map models, concerns, controllers, helpers, and
 views to their respective test files. These will then all be ran with Ruby.
 
 A few recipes come shipped with Kicker:
+* Typical Ruby library.
 * Ruby on Rails, as aforementioned.
-* JavaScript tests, needs
-  HeadlessSquirrel[http://github.com/Fingertips/Headless-squirrel] to run.
+* JavaScript tests, to run it needs
+  HeadlessSquirrel[http://github.com/Fingertips/Headless-squirrel].
 * Ignore, ignores logs, tmp, and svn and git files.
 
 Add your own shared recipes to <tt>~/.kick</tt>.
@@ -120,22 +121,16 @@ removes and maps the results. This is an easy way to do a common thing in
 recipes. See Kicker::ArrayExt for details.
 
 The handler then checks if the file is a mailer view and if so runs the
-mailers test case. The <tt>run_ruby_tests</tt> runs them with the following
+mailers test case. Ruby.run_tests runs them with something like the following
 command:
 
   execute "ruby -r #{test_files.join(' -r ')} -e ''" unless test_files.empty?
 
 See Kernel for more info on the utility methods.
 
-==== Addendum
+To load recipes from your <tt>~/.kick</tt> file:
 
-The recipes directory that ships with Kicker and <tt>~/.kick</tt> are both
-added to the load path, so any recipes can be required. Once they’re required
-they are added to the callback chains.
-
-As an example, say you might want to ignore files in <tt>./data</tt>:
-
-  require 'ignore'
+  recipe :ignore
   ignore(/^data\//)
 
 That’s basically it, just remember that the order of specifying handlers _can_
