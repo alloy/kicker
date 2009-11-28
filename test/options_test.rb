@@ -40,7 +40,7 @@ describe "Kicker::Options.parse" do
   
   it 'should run in noisy mode by default' do
     Kicker::Options.parse([])
-    Kicker::Utils.should.not.be.quiet
+    Kicker.should.not.be.quiet
   end
   
   it 'should run in quiet mode if specified' do

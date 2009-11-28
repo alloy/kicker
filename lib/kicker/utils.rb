@@ -2,9 +2,6 @@ class Kicker
   module Utils #:nodoc:
     extend self
     
-    attr_accessor :quiet
-    self.quiet = false
-    
     attr_accessor :ruby_bin_path
     self.ruby_bin_path = 'ruby'
     
@@ -22,7 +19,7 @@ class Kicker
     end
     
     def log(message)
-      if quiet
+      if Kicker.quiet
         puts message
       else
         now = Time.now
