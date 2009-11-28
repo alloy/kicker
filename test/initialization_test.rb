@@ -19,6 +19,7 @@ describe "Kicker" do
   it "should default the FSEvents latency to 1" do
     Kicker.latency.should == 1
   end
+  
 end
 
 describe "Kicker, when initializing" do

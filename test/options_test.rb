@@ -5,6 +5,7 @@ describe "Kicker::Options.parse" do
     Kicker.latency = 1
     Kicker.paths = %w{ . }
     Kicker.silent = false
+    Kicker.quiet = false
     Kicker::Utils.ruby_bin_path = 'ruby'
     Kicker::Growl.use = true
     Kicker::Growl.command = nil
@@ -35,6 +36,16 @@ describe "Kicker::Options.parse" do
     
     Kicker::Options.parse(%w{ -s })
     Kicker.should.be.silent
+  end
+  
+  it 'should run in noisy mode by default' do
+    Kicker::Options.parse([])
+    Kicker::Utils.should.not.be.quiet
+  end
+  
+  it 'should run in quiet mode if specified' do
+    Kicker::Options.parse(%w{ --quiet })
+    Kicker.should.be.quiet
   end
   
   it "should parse the Growl command to use when the user clicks the Growl succeeded message" do

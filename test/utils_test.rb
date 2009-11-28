@@ -20,6 +20,17 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.send(:log, 'the message')
   end
   
+  it 'should print a log entry with no timestamp in quiet mode' do
+    before = Kicker::Utils.quiet
+    
+    utils.expects(:puts).with('the message')
+    
+    Kicker::Utils.quiet = true
+    utils.send(:log, 'the message')
+    
+    Kicker::Utils.quiet = before
+  end
+  
   it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
     Kicker::Growl.use = false
     

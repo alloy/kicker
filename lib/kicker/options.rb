@@ -2,16 +2,21 @@ require 'optparse'
 
 class Kicker
   class << self
-    attr_accessor :latency, :paths, :silent
+    attr_accessor :latency, :paths, :silent, :quiet
     
     def silent?
       @silent
+    end
+    
+    def quiet?
+      @quiet
     end
   end
   
   self.latency = 1
   self.paths = %w{ . }
   self.silent = false
+  self.quiet = false
   
   module Options
     DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command dot_kick }
@@ -41,6 +46,10 @@ class Kicker
         
         opt.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to #{Kicker.latency} second.") do |latency|
           Kicker.latency = Float(latency)
+        end
+        
+        opt.on('-q', '--quiet', "Quiet output. Don't print timestamps when logging.") do |quiet|
+          Kicker.quiet = true
         end
         
         opt.on('-r', '--recipe [NAME]', 'A named recipe to load.') do |name|
