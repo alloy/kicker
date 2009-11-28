@@ -7,10 +7,19 @@ describe "A Kicker instance, concerning its utility methods" do
   end
   
   it "should print a log entry with timestamp" do
+    Kicker::Utils.quiet = false
+    
     now = Time.now
     Time.stubs(:now).returns(now)
     
     utils.expects(:puts).with("[#{now}] the message")
+    utils.send(:log, 'the message')
+    
+    Kicker::Utils.quiet = true
+  end
+  
+  it 'should print a log entry with no timestamp in quiet mode' do
+    utils.expects(:puts).with('the message')
     utils.send(:log, 'the message')
   end
   

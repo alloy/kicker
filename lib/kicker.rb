@@ -31,6 +31,7 @@ class Kicker #:nodoc:
     def run(argv = ARGV)
       options = parse_options(argv)
       set_ruby_bin_path(options[:ruby_bin_path]) if options[:ruby_bin_path]
+      set_quiet(options[:quiet]) if options[:quiet]
       load_recipes(options[:recipes]) if options[:recipes]
       load_dot_kick
       new(options).start
@@ -59,6 +60,10 @@ class Kicker #:nodoc:
     
     def set_ruby_bin_path(path)
       Kicker::Utils.ruby_bin_path = path
+    end
+    
+    def set_quiet(quiet)
+      Kicker::Utils.quiet = quiet
     end
   end
   

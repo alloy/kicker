@@ -36,6 +36,10 @@ class Kicker
       options[:ruby_bin_path] = path
     end
     
+    option_parser.on('-q', '--quiet', "Quiet output. Don't print timestamps when logging.") do |quiet|
+      options[:quiet] = true
+    end
+    
     option_parser.separator " "
     option_parser.separator "  Available recipes:"
     Kicker.recipes_for_display.each { |recipe| option_parser.separator "    - #{recipe}" }

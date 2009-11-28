@@ -57,6 +57,22 @@ describe "Kicker" do
     
     Kicker::Utils.ruby_bin_path = before
   end
+  
+  it 'should run in noisy mode by default' do
+    before = Kicker::Utils.quiet
+    
+    Kicker::Utils.quiet = false
+    Kicker.run
+    Kicker::Utils.quiet.should == false
+    
+    Kicker::Utils.quiet = before
+  end
+  
+  it 'should run in quiet mode if specified' do
+    Kicker.run(%w{ --quiet})
+    Kicker::Utils.quiet.should == true
+  end
+  
 end
 
 describe "Kicker, when initializing" do
