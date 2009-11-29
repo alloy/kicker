@@ -2,9 +2,6 @@ class Kicker
   module Utils #:nodoc:
     extend self
     
-    attr_accessor :ruby_bin_path
-    self.ruby_bin_path = 'ruby'
-    
     def execute(command, &block)
       @last_command = command
       status = LogStatusHelper.new(block, command)

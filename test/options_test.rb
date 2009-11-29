@@ -6,7 +6,6 @@ describe "Kicker::Options.parse" do
     Kicker.paths = %w{ . }
     Kicker.silent = false
     Kicker.quiet = false
-    Kicker::Utils.ruby_bin_path = 'ruby'
     Kicker::Growl.use = true
     Kicker::Growl.command = nil
   end

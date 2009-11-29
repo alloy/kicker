@@ -176,14 +176,3 @@ describe "Kernel utility methods" do
     Kicker::Utils
   end
 end
-
-describe "Kicker::Utils" do
-  it "should have an accessor for the ruby binary path" do
-    before = Kicker::Utils.ruby_bin_path
-    alternative = '/opt/ruby-1.9.2/bin/ruby'
-    
-    Kicker::Utils.ruby_bin_path = alternative
-    Kicker::Utils.ruby_bin_path.should == alternative
-    Kicker::Utils.ruby_bin_path = before
-  end
-end
