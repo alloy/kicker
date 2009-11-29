@@ -18,7 +18,7 @@ class Kicker
   self.silent = false
   self.quiet = false
   
-  module Options
+  module Options #:nodoc:
     DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command dot_kick }
     
     def self.recipes_for_display
@@ -66,6 +66,8 @@ class Kicker
 end
 
 module Kernel
+  # Returns the global OptionParser instance that recipes can use to add
+  # options.
   def options
     Kicker::Options.parser
   end

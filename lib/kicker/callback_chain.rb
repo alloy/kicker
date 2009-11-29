@@ -1,5 +1,5 @@
 class Kicker
-  class CallbackChain < Array
+  class CallbackChain < Array #:nodoc:
     alias_method :append_callback,  :push
     alias_method :prepend_callback, :unshift
     
@@ -60,9 +60,9 @@ class Kicker
 end
 
 module Kernel
-  # Adds a handler to the startup chain. This chain is ran before the once
-  # Kicker is done loading. Note that an empty files array is given to the
-  # callback.
+  # Adds a handler to the startup chain. This chain is ran once Kicker is done
+  # loading _before_ starting the normal operations. Note that an empty files
+  # array is given to the callback.
   #
   # Takes a +callback+ object that responds to <tt>#call</tt>, or a block.
   def startup(callback = nil, &block)

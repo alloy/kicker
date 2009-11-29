@@ -1,8 +1,8 @@
 # Need to define these modules, because AS breaks if these aren't defined. Need to fix that in AS...
-module ActiveSupport
-  module CoreExtensions
-    module String
-      module Inflections
+module ActiveSupport #:nodoc:
+  module CoreExtensions #:nodoc:
+    module String #:nodoc:
+      module Inflections #:nodoc:
       end
     end
   end

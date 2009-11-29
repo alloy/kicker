@@ -5,13 +5,29 @@ $:.unshift(RECIPES_DIR)
 $:.unshift(USER_RECIPES_DIR) if File.exist?(USER_RECIPES_DIR)
 
 module Kernel
+  # If only given a <tt>name</tt>, the specified recipe will be loaded. For
+  # instance, the following, in a <tt>.kick</tt> file, will load the Rails
+  # recipe:
+  #
+  #   recipe :rails
+  #
+  # However, this same method is used to define a callback that is called _if_
+  # the recipe is loaded. For instance, the following, in a recipe file, will
+  # be called if the recipe is actually used:
+  #
+  #   recipe :rails do
+  #     # Load anything needed for the recipe.
+  #     process do
+  #       # ...
+  #     end
+  #   end
   def recipe(name, &block)
     Kicker::Recipes.recipe(name, &block)
   end
 end
 
 class Kicker
-  module Recipes
+  module Recipes #:nodoc:
     class << self
       def recipes
         @recipes ||= {}

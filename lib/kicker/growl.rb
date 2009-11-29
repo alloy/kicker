@@ -1,7 +1,7 @@
 require 'growlnotifier/growl_helpers'
 
 class Kicker
-  module Growl
+  module Growl #:nodoc:
     NOTIFICATIONS = {
       :change => 'Change occured',
       :succeeded => 'Command succeeded',
