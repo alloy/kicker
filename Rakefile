@@ -6,11 +6,11 @@ require 'rake/rdoctask'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "therealadam-kicker"
+    gem.name = "kicker"
     gem.summary = %Q{A lean, agnostic, flexible file-change watcher, using OS X FSEvents.}
     gem.email = "eloy.de.enige@gmail.com"
     gem.homepage = "http://github.com/alloy/kicker"
-    gem.authors = ["Eloy Duran", "Adam Keys"]
+    gem.authors = ["Eloy Duran"]
     gem.executables << 'kicker'
     gem.files.concat FileList['vendor/**/*']
     gem.require_paths = ["lib", "vendor"]
