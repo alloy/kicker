@@ -1,5 +1,4 @@
-* Cleanup mustache kick file. See GitHub issue #3.
-* Write/update docs.
+* Move larger parts of README to the GitHub wiki so the README is to the point.
 * Add a recipe which implements the basic autotest mapping API.
 * Make the loggers, stdout and growl, work in a chain so one can add others.
   This should improve portability as well, as people can easily insert growl
