@@ -37,14 +37,14 @@ describe "Kicker::Options.parse" do
     Kicker.should.be.silent
   end
   
-  it 'should run in noisy mode by default' do
+  it 'should parse whether or not to run in quiet mode and enable silent mode if quiet' do
     Kicker::Options.parse([])
     Kicker.should.not.be.quiet
-  end
-  
-  it 'should run in quiet mode if specified' do
+    Kicker.should.not.be.silent
+    
     Kicker::Options.parse(%w{ --quiet })
     Kicker.should.be.quiet
+    Kicker.should.be.silent
   end
   
   it "should parse the Growl command to use when the user clicks the Growl succeeded message" do

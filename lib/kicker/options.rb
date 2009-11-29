@@ -33,7 +33,11 @@ class Kicker
         opt.separator " "
         
         opt.on('-s', '--silent', 'Keep output to a minimum.') do |silent|
-          Kicker.silent = silent
+          Kicker.silent = true
+        end
+        
+        opt.on('-q', '--quiet', "Quiet output. Don't print timestamps when logging.") do |quiet|
+          Kicker.silent = Kicker.quiet = true
         end
         
         opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
@@ -46,10 +50,6 @@ class Kicker
         
         opt.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to #{Kicker.latency} second.") do |latency|
           Kicker.latency = Float(latency)
-        end
-        
-        opt.on('-q', '--quiet', "Quiet output. Don't print timestamps when logging.") do |quiet|
-          Kicker.quiet = true
         end
         
         opt.on('-r', '--recipe [NAME]', 'A named recipe to load.') do |name|
