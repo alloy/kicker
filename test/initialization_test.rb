@@ -41,6 +41,7 @@ describe "Kicker, when starting" do
     Kicker.paths = %w{ /some/file.rb }
     @kicker = Kicker.new
     @kicker.stubs(:log)
+    @kicker.startup_chain.stubs(:call)
     Rucola::FSEvents.stubs(:start_watching)
     OSX.stubs(:CFRunLoopRun)
   end
