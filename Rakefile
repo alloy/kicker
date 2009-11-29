@@ -11,7 +11,6 @@ begin
     gem.email = "eloy.de.enige@gmail.com"
     gem.homepage = "http://github.com/alloy/kicker"
     gem.authors = ["Eloy Duran"]
-    gem.executables << 'kicker'
     gem.files.concat FileList['vendor/**/*']
     gem.require_paths = ["lib", "vendor"]
     gem.has_rdoc = true
