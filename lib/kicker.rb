@@ -45,7 +45,7 @@ class Kicker #:nodoc:
   end
   
   def validate_paths_and_command!
-    if process_chain.empty? && pre_process_chain.empty?
+    if startup_chain.empty? && process_chain.empty? && pre_process_chain.empty?
       puts Kicker::Options.parser.help
       exit
     end
