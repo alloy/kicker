@@ -34,7 +34,10 @@ class Kicker
     
     private
     
+    CLEAR = "\e[H\e[2J"
+    
     def will_execute_command(status)
+      puts(CLEAR) if Kicker.clear_console?
       message = status.call(:stdout) || "Executing: #{status.command}"
       log(message) unless message.empty?
       Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?

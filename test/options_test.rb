@@ -47,6 +47,14 @@ describe "Kicker::Options.parse" do
     Kicker.should.be.silent
   end
   
+  it "should parse whether or not to clear the console before running" do
+    Kicker::Options.parse([])
+    Kicker.should.not.clear_console
+
+    Kicker::Options.parse(%w{ --clear })
+    Kicker.should.clear_console
+  end
+  
   it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
     Kicker::Options.parse(%w{ --growl-command ls })
     Kicker::Growl.command.should == 'ls'

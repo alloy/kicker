@@ -1,6 +1,10 @@
 require File.expand_path('../test_helper', __FILE__)
 
-Kicker::Utils.send(:public, :did_execute_command)
+class Kicker
+  module Utils
+    public :will_execute_command, :did_execute_command
+  end
+end
 
 describe "A Kicker instance, concerning its utility methods" do
   before do
@@ -93,6 +97,17 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.did_execute_command(status)
   end
   
+  it "should clear the console before running a command" do
+    Kicker.clear_console = true
+    utils.expects(:puts).with("\e[H\e[2J")
+    
+    Kicker::Growl.stubs(:change_occured)
+    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
+    status.result("line 1\nline 2", false, 123)
+
+    utils.will_execute_command(status)
+  end
+  
   it "should store the last executed command" do
     Kicker::Growl.use = false
     utils.stubs(:log)
@@ -101,7 +116,7 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.last_command.should == 'date'
   end
   
-  it "should call the block given to execute when and yield the log status helper with status success" do
+  it "should call the block given to execute and yield the log status helper with status success" do
     Kicker.silent = true
     Kicker::Growl.use = false
     utils.stubs(:last_command_succeeded?).returns(true)
@@ -122,7 +137,7 @@ describe "A Kicker instance, concerning its utility methods" do
     end
   end
   
-  it "should call the block given to execute when and yield the log status helper with status failed" do
+  it "should call the block given to execute and yield the log status helper with status failed" do
     Kicker.silent = true
     Kicker::Growl.use = false
     utils.stubs(:last_command_succeeded?).returns(false)

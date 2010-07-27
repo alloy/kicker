@@ -2,7 +2,7 @@ require 'optparse'
 
 class Kicker
   class << self
-    attr_accessor :latency, :paths, :silent, :quiet
+    attr_accessor :latency, :paths, :silent, :quiet, :clear_console
     
     def silent?
       @silent
@@ -11,12 +11,17 @@ class Kicker
     def quiet?
       @quiet
     end
+    
+    def clear_console?
+      @clear_console
+    end
   end
   
   self.latency = 1
   self.paths = %w{ . }
   self.silent = false
   self.quiet = false
+  self.clear_console = false
   
   module Options #:nodoc:
     DONT_SHOW_RECIPES = %w{ could_not_handle_file execute_cli_command dot_kick }
@@ -38,6 +43,10 @@ class Kicker
         
         opt.on('-q', '--quiet', "Quiet output. Don't print timestamps when logging.") do |quiet|
           Kicker.silent = Kicker.quiet = true
+        end
+        
+        opt.on('-c', '--clear', "Clear console before each run.") do |clear|
+          Kicker.clear_console = true
         end
         
         opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
