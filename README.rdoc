@@ -2,7 +2,7 @@
 
 A lean, agnostic, flexible file-change watcher, using OS X FSEvents.
 
-http://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
+https://github.com/alloy/kicker/raw/master/html/images/kikker.jpg
 
 Meet king kikker, kicking stuff in your computers is his dream come true!
 
