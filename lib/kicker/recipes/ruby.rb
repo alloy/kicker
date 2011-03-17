@@ -20,7 +20,7 @@ class Ruby
     # Defaults to `ruby' if test_type is `test' and `spec' if test_type is
     # `spec'.
     def runner_bin
-      @runner_bin ||= test_type == 'test' ? 'ruby' : 'spec'
+      @runner_bin ||= test_type == 'test' ? 'ruby' : 'rspec'
     end
     
     # Assigns the root directory of where test cases will be looked up.
