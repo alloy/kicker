@@ -67,7 +67,7 @@ class Kicker #:nodoc:
     end
     
     trap('INT') do
-      log "Exiting…"
+      log "Exiting ..."
       watch_dog.stop
       exit
     end
