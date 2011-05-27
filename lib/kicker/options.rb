@@ -15,6 +15,10 @@ class Kicker
     def clear_console?
       @clear_console
     end
+    
+    def has_growl?
+      Kicker.const_defined?(:Growl)
+    end
   end
   
   self.latency = 1
@@ -49,12 +53,16 @@ class Kicker
           Kicker.clear_console = true
         end
         
-        opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
-          Kicker::Growl.use = growl
-        end
-        
-        opt.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
-          Kicker::Growl.command = command
+        if Kicker::Growl.usable?
+          opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
+            Kicker::Growl.use = growl
+          end
+          
+          opt.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
+            Kicker::Growl.command = command
+          end
+        else
+          Kicker::Growl.use = false
         end
         
         opt.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to #{Kicker.latency} second.") do |latency|

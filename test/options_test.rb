@@ -21,12 +21,14 @@ describe "Kicker::Options.parse" do
     Kicker.paths.should == %w{ /some/file.rb /a/dir /and/some/other/file.rb }
   end
   
-  it "should parse if growl shouldn't be used" do
-    Kicker::Options.parse([])
-    Kicker::Growl.should.use
+  if Kicker::Growl.usable?
+    it "should parse if growl shouldn't be used" do
+      Kicker::Options.parse([])
+      Kicker::Growl.should.use
     
-    Kicker::Options.parse(%w{ --no-growl })
-    Kicker::Growl.should.not.use
+      Kicker::Options.parse(%w{ --no-growl })
+      Kicker::Growl.should.not.use
+    end
   end
   
   it "should parse if we should keep output to a minimum" do
@@ -55,9 +57,11 @@ describe "Kicker::Options.parse" do
     Kicker.should.clear_console
   end
   
-  it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
-    Kicker::Options.parse(%w{ --growl-command ls })
-    Kicker::Growl.command.should == 'ls'
+  if Kicker::Growl.usable?
+    it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
+      Kicker::Options.parse(%w{ --growl-command ls })
+      Kicker::Growl.command.should == 'ls'
+    end
   end
   
   it "should parse the latency to pass to FSEvents" do

@@ -110,20 +110,22 @@ describe "Kicker, when starting" do
     @kicker.start
   end
   
-  xit "should register with growl if growl should be used" do
-    @kicker.stubs(:validate_options!)
-    Kicker::Growl.use = true
+  if Kicker::Growl.usable?
+    it "should register with growl if growl should be used" do
+      @kicker.stubs(:validate_options!)
+      Kicker::Growl.use = true
+      
+      Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
+      @kicker.start
+    end
     
-    Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
-    @kicker.start
-  end
-  
-  xit "should _not_ register with growl if growl should not be used" do
-    @kicker.stubs(:validate_options!)
-    Kicker::Growl.use = false
-    
-    Growl::Notifier.sharedInstance.expects(:register).never
-    @kicker.start
+    it "should _not_ register with growl if growl should not be used" do
+      @kicker.stubs(:validate_options!)
+      Kicker::Growl.use = false
+      
+      Growl::Notifier.sharedInstance.expects(:register).never
+      @kicker.start
+    end
   end
   
   it "should call the startup chain" do
