@@ -42,8 +42,7 @@ describe "Kicker, when starting" do
     @kicker = Kicker.new
     @kicker.stubs(:log)
     @kicker.startup_chain.stubs(:call)
-    Rucola::FSEvents.stubs(:start_watching)
-    OSX.stubs(:CFRunLoopRun)
+    Kicker::FSEvents.stubs(:start_watching)
   end
   
   after do
@@ -77,7 +76,7 @@ describe "Kicker, when starting" do
     @kicker.stubs(:validate_options!)
     
     Kicker.latency = 2.34
-    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => 2.34)
+    Kicker::FSEvents.expects(:start_watching).with(['/some'], :latency => 2.34)
     @kicker.start
   end
   
@@ -85,14 +84,14 @@ describe "Kicker, when starting" do
     @kicker.stubs(:validate_options!)
     File.stubs(:directory?).with('/some/file.rb').returns(false)
     
-    Rucola::FSEvents.expects(:start_watching).with(['/some'], :latency => Kicker.latency)
+    Kicker::FSEvents.expects(:start_watching).with(['/some'], :latency => Kicker.latency)
     @kicker.start
   end
   
   it "should start a FSEvents stream with a block which calls #process with any generated events" do
     @kicker.stubs(:validate_options!)
     
-    Rucola::FSEvents.expects(:start_watching).yields(['event'])
+    Kicker::FSEvents.expects(:start_watching).yields(['event'])
     @kicker.expects(:process).with(['event'])
     
     @kicker.start
@@ -101,8 +100,8 @@ describe "Kicker, when starting" do
   it "should setup a signal handler for `INT' which stops the FSEvents stream and exits" do
     @kicker.stubs(:validate_options!)
     
-    watch_dog = stub('Rucola::FSEvents')
-    Rucola::FSEvents.stubs(:start_watching).returns(watch_dog)
+    watch_dog = stub('Kicker::FSEvents')
+    Kicker::FSEvents.stubs(:start_watching).returns(watch_dog)
     
     @kicker.expects(:trap).with('INT').yields
     watch_dog.expects(:stop)
@@ -111,33 +110,28 @@ describe "Kicker, when starting" do
     @kicker.start
   end
   
-  it "should register with growl if growl should be used" do
-    @kicker.stubs(:validate_options!)
-    Kicker::Growl.use = true
+  if Kicker::Growl.usable?
+    it "should register with growl if growl should be used" do
+      @kicker.stubs(:validate_options!)
+      Kicker::Growl.use = true
+      
+      Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
+      @kicker.start
+    end
     
-    Growl::Notifier.sharedInstance.expects(:register).with('Kicker', Kicker::Growl::NOTIFICATIONS.values)
-    @kicker.start
-  end
-  
-  it "should _not_ register with growl if growl should not be used" do
-    @kicker.stubs(:validate_options!)
-    Kicker::Growl.use = false
-    
-    Growl::Notifier.sharedInstance.expects(:register).never
-    @kicker.start
+    it "should _not_ register with growl if growl should not be used" do
+      @kicker.stubs(:validate_options!)
+      Kicker::Growl.use = false
+      
+      Growl::Notifier.sharedInstance.expects(:register).never
+      @kicker.start
+    end
   end
   
   it "should call the startup chain" do
     @kicker.stubs(:validate_options!)
     
     @kicker.startup_chain.expects(:call).with([], false)
-    @kicker.start
-  end
-  
-  it "should start a CFRunLoop" do
-    @kicker.stubs(:validate_options!)
-    
-    OSX.expects(:CFRunLoopRun)
     @kicker.start
   end
 end
