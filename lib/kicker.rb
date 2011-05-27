@@ -1,6 +1,6 @@
 $:.unshift File.expand_path('../../vendor', __FILE__)
-require 'rucola/fsevents'
 
+require 'kicker/fsevents'
 require 'kicker/callback_chain'
 require 'kicker/core_ext'
 require 'kicker/growl'
@@ -33,8 +33,6 @@ class Kicker #:nodoc:
     run_watch_dog!
     Kicker::Growl.start! if Kicker::Growl.use?
     run_startup_chain
-    
-    OSX.CFRunLoopRun
   end
   
   private
@@ -62,7 +60,7 @@ class Kicker #:nodoc:
   
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Rucola::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
+    watch_dog = Kicker::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
       process events
     end
     

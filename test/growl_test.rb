@@ -21,7 +21,7 @@ describe "Kicker::Growl" do
     @growler.change_occured(status)
   end
   
-  it "should use the default click callback if a command succeeded and no user callback is defined" do
+  xit "should use the default click callback if a command succeeded and no user callback is defined" do
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')
     status.result("line 1\nline 2", true, 0)
     
@@ -35,7 +35,7 @@ describe "Kicker::Growl" do
     @growler.result(status)
   end
   
-  it "should use the default click callback if a command failed and no user callback is defined" do
+  xit "should use the default click callback if a command failed and no user callback is defined" do
     status = Kicker::LogStatusHelper.new(nil, 'ls -l')
     status.result("line 1\nline 2", false, 123)
     

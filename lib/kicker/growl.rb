@@ -1,4 +1,5 @@
-require 'growlnotifier/growl_helpers'
+module Growl
+end
 
 class Kicker
   module Growl #:nodoc:
@@ -9,7 +10,7 @@ class Kicker
     }
     
     DEFAULT_CALLBACK = lambda do
-      OSX::NSWorkspace.sharedWorkspace.launchApplication('Terminal')
+      # OSX::NSWorkspace.sharedWorkspace.launchApplication('Terminal')
     end
     
     class << self
@@ -28,7 +29,7 @@ class Kicker
       end
       
       def start!
-        ::Growl::Notifier.sharedInstance.register('Kicker', NOTIFICATIONS.values)
+        # ::Growl::Notifier.sharedInstance.register('Kicker', NOTIFICATIONS.values)
       end
       
       def change_occured(status)
