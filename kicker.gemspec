@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kicker}
-  s.version = "2.3.0"
+  s.version = "2.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
@@ -62,7 +62,9 @@ Gem::Specification.new do |s|
      "test/recipes/ruby_test.rb",
      "test/recipes_test.rb",
      "test/test_helper.rb",
-     "test/utils_test.rb"
+     "test/utils_test.rb",
+     "vendor/growlnotifier/growl.rb",
+     "vendor/growlnotifier/growl_helpers.rb"
   ]
   s.homepage = %q{http://github.com/alloy/kicker}
   s.rdoc_options = ["--charset=UTF-8"]
