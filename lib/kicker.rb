@@ -30,9 +30,9 @@ class Kicker #:nodoc:
     log "Watching for changes on: #{paths.join(', ')}"
     log ''
     
-    run_watch_dog!
     Kicker::Growl.start! if Kicker::Growl.use?
     run_startup_chain
+    run_watch_dog!
   end
   
   private

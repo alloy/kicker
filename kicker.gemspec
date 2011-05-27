@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2010-07-27}
+  s.date = %q{2011-05-27}
   s.default_executable = %q{kicker}
   s.email = %q{eloy.de.enige@gmail.com}
   s.executables = ["kicker"]
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
      "lib/kicker.rb",
      "lib/kicker/callback_chain.rb",
      "lib/kicker/core_ext.rb",
+     "lib/kicker/fsevents.rb",
      "lib/kicker/growl.rb",
      "lib/kicker/log_status_helper.rb",
      "lib/kicker/options.rb",
@@ -47,6 +48,7 @@ Gem::Specification.new do |s|
      "test/core_ext_test.rb",
      "test/filesystem_change_test.rb",
      "test/fixtures/a_file_thats_reloaded.rb",
+     "test/fsevents_test.rb",
      "test/growl_test.rb",
      "test/initialization_test.rb",
      "test/log_status_helper_test.rb",
@@ -60,21 +62,19 @@ Gem::Specification.new do |s|
      "test/recipes/ruby_test.rb",
      "test/recipes_test.rb",
      "test/test_helper.rb",
-     "test/utils_test.rb",
-     "vendor/growlnotifier/growl.rb",
-     "vendor/growlnotifier/growl_helpers.rb",
-     "vendor/rucola/fsevents.rb"
+     "test/utils_test.rb"
   ]
   s.homepage = %q{http://github.com/alloy/kicker}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib", "vendor"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{A lean, agnostic, flexible file-change watcher, using OS X FSEvents.}
   s.test_files = [
     "test/callback_chain_test.rb",
      "test/core_ext_test.rb",
      "test/filesystem_change_test.rb",
      "test/fixtures/a_file_thats_reloaded.rb",
+     "test/fsevents_test.rb",
      "test/growl_test.rb",
      "test/initialization_test.rb",
      "test/log_status_helper_test.rb",
@@ -95,10 +95,13 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<rb-fsevent>, [">= 0"])
     else
+      s.add_dependency(%q<rb-fsevent>, [">= 0"])
     end
   else
+    s.add_dependency(%q<rb-fsevent>, [">= 0"])
   end
 end
 

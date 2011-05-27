@@ -14,6 +14,7 @@ begin
     gem.files.concat FileList['vendor/**/*']
     gem.require_paths = ["lib", "vendor"]
     gem.has_rdoc = true
+    gem.add_dependency 'rb-fsevent'
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"

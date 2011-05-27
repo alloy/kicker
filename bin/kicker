@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
-$:.unshift File.expand_path('../../lib', __FILE__) if $0 == __FILE__
 
-require 'rubygems'
+if $0 == __FILE__
+  $:.unshift File.expand_path('../../lib', __FILE__)
+  $:.unshift File.expand_path('../../vendor', __FILE__)
+  require 'rubygems'
+end
+
 require 'kicker'
 Kicker.run

@@ -14,7 +14,10 @@ class Kicker
   end
 end
 
-if Kernel.const_defined?(:OSX)
+begin
+  require 'osx/cocoa'
+  require 'growlnotifier/growl_helpers'
+
   class Kicker
     module Growl #:nodoc:
       NOTIFICATIONS = {
@@ -71,4 +74,6 @@ if Kernel.const_defined?(:OSX)
       end
     end
   end
+
+rescue LoadError
 end
