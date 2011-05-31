@@ -84,6 +84,4 @@ if Kicker::Growl.usable?
       @growler.failed(status)
     end
   end
-else
-  puts "Poo"
 end
