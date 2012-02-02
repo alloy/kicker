@@ -1,16 +1,4 @@
-# Need to define these modules and require core_ext/module, because AS breaks
-# if these aren't defined. Need to fix that in AS...
-require 'active_support/core_ext/module'
-module ActiveSupport #:nodoc:
-  module CoreExtensions #:nodoc:
-    module String #:nodoc:
-      module Inflections #:nodoc:
-      end
-    end
-  end
-end
-
-require 'ruby'
+recipe :ruby
 
 class Rails < Ruby
   class << self
