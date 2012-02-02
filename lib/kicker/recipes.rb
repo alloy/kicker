@@ -86,7 +86,9 @@ class Kicker
       end
     end
     
-    # We always load the CLI command recipe because using it without a Kicker file is the whole idea.
+    # Always load all the base recipes
     load_recipe :execute_cli_command
+    load_recipe :could_not_handle_file
+    load_recipe :dot_kick
   end
 end
