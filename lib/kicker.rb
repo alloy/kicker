@@ -7,6 +7,7 @@ require 'kicker/growl'
 require 'kicker/log_status_helper'
 require 'kicker/options'
 require 'kicker/utils'
+require 'kicker/recipes'
 
 class Kicker #:nodoc:
   def self.run(argv = ARGV)
@@ -116,7 +117,3 @@ class Kicker #:nodoc:
     end
   end
 end
-
-# Load this as last, because it actually loads all recipes, so everything has
-# to be defined before that.
-require 'kicker/recipes'

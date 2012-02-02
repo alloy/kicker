@@ -4,7 +4,7 @@ module ReloadDotKick; end
 
 describe "Kicker::Recipes" do
   before do
-    @recipes = Kicker::Recipes
+    Kicker::Recipes.reset!
   end
   
   it "returns a list of recipes" do
@@ -19,7 +19,7 @@ describe "Kicker::Recipes" do
   end
   
   it "returns a list of recipe names" do
-    expected = Set.new(%w(could_not_handle_file dot_kick execute_cli_command ignore jstest rails ruby))
+    expected = Set.new(%w(could_not_handle_file dot_kick execute_cli_command ignore jstest rails ruby).map { |n| n.to_sym })
     actual = Kicker::Recipes.recipe_names
     if File.exist?(File.expand_path('~/.kick'))
       actual.should == expected
@@ -39,9 +39,14 @@ describe "Kicker::Recipes" do
   end
   
   it "should load a recipe" do
-    expected_recipe = @recipes.recipes.first
-    expected_recipe.last.expects(:call)
-    recipe expected_recipe.first
+    name = Kicker::Recipes.recipe_names.last
+    recipe name
+  end
+  
+  it "does not break when a recipe is loaded twice" do
+    name = Kicker::Recipes.recipe_names.last
+    recipe name
+    recipe name
   end
   
   it "should define a recipe load callback" do
@@ -56,7 +61,7 @@ describe "Kicker::Recipes" do
     begin
       recipe :foobar
     rescue LoadError => e
-      e.message.should == "Recipe `foobar' does not exist."
+      e.message.should.start_with "Can't load recipe `foobar', it doesn't exist on disk."
     end
   end
 end
