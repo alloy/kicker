@@ -46,6 +46,10 @@ class Kicker
         end
       end
       
+      def recipe_names
+        recipe_files.map { |filename| File.basename(filename, '.rb') }
+      end
+      
       def recipe_files
         Dir.glob(File.join(RECIPES_DIR, '*.rb')) + Dir.glob(File.join(USER_RECIPES_DIR, '*.rb'))
       end
