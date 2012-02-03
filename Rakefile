@@ -17,7 +17,7 @@ begin
     gem.add_dependency 'rb-fsevent'
   end
 rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler not available. Install it with: sudo gem install jeweler -s http://gems.github.com"
 end
 
 Rake::TestTask.new do |t|
