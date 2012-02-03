@@ -27,16 +27,3 @@ class File
 end
 
 File.use_original_exist = true
-
-class Kicker::Recipes::Ruby
-end
-
-class Kicker::Recipes::Rails < Kicker::Recipes::Ruby
-  class << self
-    attr_accessor :tests_ran
-    def run_tests(tests)
-      self.tests_ran ||= []
-      self.tests_ran << tests
-    end
-  end
-end

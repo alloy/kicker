@@ -49,6 +49,17 @@ class Kicker::Recipes::Ruby
       @test_options = nil
     end
     
+    def runner_command(*parts)
+      parts.map do |part|
+        case part
+        when Array
+          part.empty? ? nil : part.join(' ')
+        else
+          part.to_s
+        end
+      end.compact.join(' ')
+    end
+    
     # Runs the given tests, if there are any, with the method defined by
     # test_type. If test_type is `test' the run_with_test_runner method is
     # used. The same applies when test_type is `spec'.
@@ -57,7 +68,7 @@ class Kicker::Recipes::Ruby
     end
     
     def test_runner_command(tests)
-      "#{runner_bin} #{test_options.join(' ')} -r #{tests.join(' -r ')} -e ''"
+      runner_command(runner_bin, test_options, '-r', tests.join(' -r '), "-e ''")
     end
     
     # Runs the given tests with `ruby' as unit-test tests.
@@ -74,7 +85,7 @@ class Kicker::Recipes::Ruby
     end
     
     def spec_runner_command(tests)
-      "#{runner_bin} #{test_options.join(' ')} #{tests.join(' ')}"
+      runner_command(runner_bin, test_options, tests)
     end
     
     # Runs the given tests with `spec' as RSpec tests.

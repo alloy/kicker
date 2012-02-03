@@ -1,10 +1,17 @@
 require File.expand_path('../../test_helper', __FILE__)
-
-before = Kicker.process_chain.dup
 recipe :rails
-RAILS_FILES, RAILS_SCHEMA = Kicker.process_chain.last(2)
 
-describe "The Rails helper module" do
+class Kicker::Recipes::Rails
+  class << self
+    attr_accessor :tests_ran
+    def run_tests(tests)
+      self.tests_ran ||= []
+      self.tests_ran << tests
+    end
+  end
+end
+
+describe "The Rails handler" do
   it "should return all controller tests when test_type is `test'" do
     tests = %w{ test.rb }
     
@@ -29,15 +36,21 @@ describe "The Rails helper module" do
   end
 end
 
-describe "The misc Rails handlers" do
+describe "The Rails schema handler" do
+  before do
+    # We assume the Rails schema handler is in the chain after the Rails handler
+    # because it's defined in the same recipe
+    @handler = Kicker.process_chain[Kicker.process_chain.index(Kicker::Recipes::Rails) + 1]
+  end
+  
   it "should prepare the test database if db/schema.rb is modified" do
     Kicker::Utils.expects(:execute).with('rake db:test:prepare')
-    RAILS_SCHEMA.call(%w{ db/schema.rb })
+    @handler.call(%w{ db/schema.rb })
   end
   
   it "should not prepare the test database if another file than db/schema.rb is modified" do
     Kicker::Utils.expects(:execute).never
-    RAILS_SCHEMA.call(%w{ Rakefile })
+    @handler.call(%w{ Rakefile })
   end
 end
 
@@ -46,7 +59,7 @@ module SharedRailsHandlerHelper
     File.use_original_exist = false
     File.existing_files = existing_files || tests
     @files += files
-    RAILS_FILES.call(@files)
+    Kicker::Recipes::Rails.call(@files)
     @files.should == %w{ Rakefile }
   end
 end
