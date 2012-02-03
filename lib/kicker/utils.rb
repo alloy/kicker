@@ -5,9 +5,21 @@ class Kicker
     def execute(command, &block)
       @last_command = command
       status = LogStatusHelper.new(block, command)
-      
       will_execute_command(status)
-      status.result(`#{command}`, last_command_succeeded?, last_command_status)
+
+      puts unless Kicker.silent?
+      $stdout.sync = true
+      output = ""
+      IO.popen(command) do |stdout|
+        while str = stdout.read(1)
+          output << str
+          $stdout.print str unless Kicker.silent?
+        end
+      end
+      $stdout.sync = false
+      puts("\n\n") unless Kicker.silent?
+
+      status.result(output, last_command_succeeded?, last_command_status)
       did_execute_command(status)
     end
     
@@ -47,12 +59,8 @@ class Kicker
       if message = status.call(:stdout)
         log(message) unless message.empty?
       else
-        if status.success? && Kicker.silent?
-          log 'Success'
-        else
-          puts("\n#{status.output.strip}\n\n")
-          log(status.success? ? "Success" : "Failed (#{status.exit_code})")
-        end
+        puts("\n#{status.output.strip}\n\n") if Kicker.silent? && !status.success?
+        log(status.success? ? "Success" : "Failed (#{status.exit_code})")
       end
       
       Kicker::Growl.result(status) if Kicker::Growl.use?
