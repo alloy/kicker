@@ -1,51 +1,65 @@
 require File.expand_path('../../test_helper', __FILE__)
-
-before = Kicker.process_chain.dup
 recipe :rails
-RAILS_FILES, RAILS_SCHEMA = (Kicker.process_chain - before).first(2)
 
-describe "The Rails helper module" do
-  after do
-    Ruby.test_type = nil
-    Ruby.test_cases_root = nil
-  end
-  
-  it "should return all controller tests when test_type is `test'" do
-    Dir.expects(:glob).with("test/functional/**/*_test.rb").returns(%w{ test.rb })
-    Rails.all_controller_tests.should == %w{ test.rb }
-  end
-  
-  it "should return all controller tests when test_type is `spec'" do
-    Ruby.test_type = 'spec'
-    Ruby.test_cases_root = nil
-    
-    Dir.expects(:glob).with("spec/controllers/**/*_spec.rb").returns(%w{ spec.rb })
-    Rails.all_controller_tests.should == %w{ spec.rb }
+class Kicker::Recipes::Rails
+  class << self
+    attr_accessor :tests_ran
+    def run_tests(tests)
+      self.tests_ran ||= []
+      self.tests_ran << tests
+    end
   end
 end
 
-describe "The misc Rails handlers" do
+describe "The Rails handler" do
+  it "should return all controller tests when test_type is `test'" do
+    tests = %w{ test.rb }
+    
+    File.use_original_exist = false
+    File.existing_files = tests
+    
+    Dir.expects(:glob).with("test/functional/**/*_test.rb").returns(tests)
+    Kicker::Recipes::Rails.all_controller_tests.should == tests
+  end
+  
+  it "should return all controller tests when test_type is `spec'" do
+    specs = %w{ spec.rb }
+    
+    File.use_original_exist = false
+    File.existing_files = specs
+    
+    Kicker::Recipes::Ruby.test_type = 'spec'
+    Kicker::Recipes::Ruby.test_cases_root = nil
+    
+    Dir.expects(:glob).with("spec/controllers/**/*_spec.rb").returns(specs)
+    Kicker::Recipes::Rails.all_controller_tests.should == specs
+  end
+end
+
+describe "The Rails schema handler" do
+  before do
+    # We assume the Rails schema handler is in the chain after the Rails handler
+    # because it's defined in the same recipe
+    @handler = Kicker.process_chain[Kicker.process_chain.index(Kicker::Recipes::Rails) + 1]
+  end
+  
   it "should prepare the test database if db/schema.rb is modified" do
     Kicker::Utils.expects(:execute).with('rake db:test:prepare')
-    RAILS_SCHEMA.call(%w{ db/schema.rb })
+    @handler.call(%w{ db/schema.rb })
   end
   
   it "should not prepare the test database if another file than db/schema.rb is modified" do
     Kicker::Utils.expects(:execute).never
-    RAILS_SCHEMA.call(%w{ Rakefile })
+    @handler.call(%w{ Rakefile })
   end
 end
 
 module SharedRailsHandlerHelper
-  def should_match(files, tests)
+  def should_match(files, tests, existing_files=nil)
+    File.use_original_exist = false
+    File.existing_files = existing_files || tests
     @files += files
-    
-    tests.each do |test|
-      File.stubs(:exist?).with(test).returns(true)
-    end
-    
-    Rails.expects(:run_tests).with(tests)
-    RAILS_FILES.call(@files)
+    Kicker::Recipes::Rails.call(@files)
     @files.should == %w{ Rakefile }
   end
 end
@@ -54,9 +68,12 @@ describe "An instance of the Rails handler, with test type `test'" do
   include SharedRailsHandlerHelper
   
   before do
-    Ruby.test_type = 'test'
-    File.stubs(:exist?).with('spec').returns(false)
+    Kicker::Recipes::Ruby.reset!
     @files = %w{ Rakefile }
+  end
+  
+  after do
+    File.use_original_exist = true
   end
   
   it "should map model files to test/unit" do
@@ -86,7 +103,7 @@ describe "An instance of the Rails handler, with test type `test'" do
   
   it "should run all functional tests when config/routes.rb is saved" do
     tests = %w{ test/functional/members_controller_test.rb test/functional/admin/articles_controller_test.rb }
-    Rails.expects(:all_controller_tests).returns(tests)
+    Kicker::Recipes::Rails.expects(:all_controller_tests).returns(tests)
     should_match %w{ config/routes.rb }, tests
   end
   
@@ -97,14 +114,14 @@ describe "An instance of the Rails handler, with test type `test'" do
   
   it "should map fixtures to their unit, helper and functional tests if they exist" do
     tests = %w{ test/unit/member_test.rb test/unit/helpers/members_helper_test.rb test/functional/members_controller_test.rb }
-    File.stubs(:exist?).returns(false)
-    
-    expected_tests = []
-    tests.each do |test|
-      expected_tests << test
-      File.stubs(:exist?).with(test).returns(true)
-      should_match %w{ test/fixtures/members.yml }, expected_tests
-    end
+    should_match %w{ test/fixtures/members.yml }, tests, []
+    Kicker::Recipes::Rails.tests_ran.last.should == []
+  end
+  
+  it "should map fixtures to their unit, helper and functional tests if they exist" do
+    tests = %w{ test/unit/member_test.rb test/unit/helpers/members_helper_test.rb test/functional/members_controller_test.rb }
+    should_match %w{ test/fixtures/members.yml }, tests
+    Kicker::Recipes::Rails.tests_ran.last.should == tests
   end
 end
 
@@ -112,9 +129,13 @@ describe "An instance of the Rails handler, with test type `spec'" do
   include SharedRailsHandlerHelper
   
   before do
-    Ruby.test_type = Ruby.runner_bin = Ruby.test_cases_root = nil
-    File.stubs(:exist?).with('spec').returns(true)
+    Kicker::Recipes::Ruby.reset!
+    Kicker::Recipes::Ruby.test_type = 'spec'
     @files = %w{ Rakefile }
+  end
+  
+  after do
+    File.use_original_exist = true
   end
   
   it "should map model files to spec/models" do
@@ -144,7 +165,7 @@ describe "An instance of the Rails handler, with test type `spec'" do
   
   it "should run all controller tests when config/routes.rb is saved" do
     specs = %w{ spec/controllers/members_controller_test.rb spec/controllers/admin/articles_controller_test.rb }
-    Rails.expects(:all_controller_tests).returns(specs)
+    Kicker::Recipes::Rails.expects(:all_controller_tests).returns(specs)
     should_match %w{ config/routes.rb }, specs
   end
   
@@ -159,15 +180,7 @@ describe "An instance of the Rails handler, with test type `spec'" do
   end
   
   it "should map fixtures to their model, helper and controller specs if they exist" do
-    Ruby.test_type = 'spec'
     specs = %w{ spec/models/member_spec.rb spec/helpers/members_helper_spec.rb spec/controllers/members_controller_spec.rb }
-    File.stubs(:exist?).returns(false)
-    
-    expected_specs = []
-    specs.each do |spec|
-      expected_specs << spec
-      File.stubs(:exist?).with(spec).returns(true)
-      should_match %w{ spec/fixtures/members.yml }, expected_specs
-    end
+    should_match %w{ spec/fixtures/members.yml }, specs
   end
 end

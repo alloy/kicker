@@ -16,12 +16,12 @@ feel offended; live with it.</i>
 == The short version
 
   Usage: ./bin/kicker [options] [paths to watch]
-
-    Available recipes: active_record, ignore, jstest, rails, ruby.
-
+ 
+    Available recipes: ignore, jstest, rails, ruby.
+ 
       -s, --silent                     Keep output to a minimum.
-          --[no-]growl                 Whether or not to use Growl. Default is to use growl.
-          --growl-command [COMMAND]    The command to execute when the Growl succeeded message is clicked.
+      -q, --quiet                      Quiet output. Don't print timestamps when logging.
+      -c, --clear                      Clear console before each run.
       -l, --latency [FLOAT]            The time to collect file change events before acting on them. Defaults to 1 second.
       -r, --recipe [NAME]              A named recipe to load.
       -e, --execute [COMMAND]          The command to execute.

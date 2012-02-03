@@ -1,4 +1,4 @@
-class Ruby
+class Kicker::Recipes::Ruby
   class << self
     # Assigns the type of tests to run. Eg: `test' or `spec'.
     attr_writer :test_type
@@ -42,6 +42,24 @@ class Ruby
       @test_options ||= []
     end
     
+    def reset!
+      @test_type = nil
+      @runner_bin = nil
+      @test_cases_root = nil
+      @test_options = nil
+    end
+    
+    def runner_command(*parts)
+      parts.map do |part|
+        case part
+        when Array
+          part.empty? ? nil : part.join(' ')
+        else
+          part.to_s
+        end
+      end.compact.join(' ')
+    end
+    
     # Runs the given tests, if there are any, with the method defined by
     # test_type. If test_type is `test' the run_with_test_runner method is
     # used. The same applies when test_type is `spec'.
@@ -50,7 +68,7 @@ class Ruby
     end
     
     def test_runner_command(tests)
-      "#{runner_bin} #{test_options.join(' ')} -r #{tests.join(' -r ')} -e ''"
+      runner_command(runner_bin, test_options, '-r', tests.join(' -r '), "-e ''")
     end
     
     # Runs the given tests with `ruby' as unit-test tests.
@@ -67,7 +85,7 @@ class Ruby
     end
     
     def spec_runner_command(tests)
-      "#{runner_bin} #{test_options.join(' ')} #{tests.join(' ')}"
+      runner_command(runner_bin, test_options, tests)
     end
     
     # Runs the given tests with `spec' as RSpec tests.
@@ -147,9 +165,9 @@ class Ruby
 end
 
 options.on('-b', '--ruby [PATH]', "Use an alternate Ruby binary for spawned test runners. (Default is `ruby')") do |command|
-  Ruby.runner_bin = command
+  Kicker::Recipes::Ruby.runner_bin = command
 end
 
 recipe :ruby do
-  process Ruby
+  process Kicker::Recipes::Ruby
 end
