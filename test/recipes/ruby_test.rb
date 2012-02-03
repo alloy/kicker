@@ -52,7 +52,7 @@ describe "The Ruby handler" do
   it "should run the given tests with a spec runner" do
     @handler.test_type = 'spec'
     @handler.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
-    @handler.executed.last.should == "spec test/1_test.rb test/namespace/2_test.rb"
+    @handler.executed.last.should == "rspec test/1_test.rb test/namespace/2_test.rb"
   end
   
   it "should not try to run the tests if none were given" do
@@ -88,7 +88,7 @@ describe "The Ruby handler" do
     @handler.test_type = 'spec'
     @handler.test_options << '-I ./other'
     @handler.run_tests(%w{ spec/1_spec.rb })
-    @handler.executed.last.should == "spec -I ./other spec/1_spec.rb"
+    @handler.executed.last.should == "rspec -I ./other spec/1_spec.rb"
   end
   
   it "should only show the last line of the output when growling when running test_type is `test'" do
