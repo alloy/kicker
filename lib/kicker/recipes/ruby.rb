@@ -1,4 +1,4 @@
-class Ruby
+class Kicker::Recipes::Ruby
   class << self
     # Assigns the type of tests to run. Eg: `test' or `spec'.
     attr_writer :test_type
@@ -40,6 +40,13 @@ class Ruby
     #   Ruby.test_options << '-I ./lib/foo'
     def test_options
       @test_options ||= []
+    end
+    
+    def reset!
+      @test_type = nil
+      @runner_bin = nil
+      @test_cases_root = nil
+      @test_options = nil
     end
     
     # Runs the given tests, if there are any, with the method defined by
@@ -147,9 +154,9 @@ class Ruby
 end
 
 options.on('-b', '--ruby [PATH]', "Use an alternate Ruby binary for spawned test runners. (Default is `ruby')") do |command|
-  Ruby.runner_bin = command
+  Kicker::Recipes::Ruby.runner_bin = command
 end
 
 recipe :ruby do
-  process Ruby
+  process Kicker::Recipes::Ruby
 end

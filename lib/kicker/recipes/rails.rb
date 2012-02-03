@@ -1,10 +1,10 @@
 recipe :ruby
 
-class Rails < Ruby
+class Kicker::Recipes::Rails < Kicker::Recipes::Ruby
   class << self
     # Call these options on the Ruby class which takes the cli options.
     %w{ test_type runner_bin test_cases_root test_options }.each do |delegate|
-      define_method(delegate) { Ruby.send(delegate) }
+      define_method(delegate) { Kicker::Recipes::Ruby.send(delegate) }
     end
     
     # Maps +type+, for instance `models', to a test directory.
@@ -48,15 +48,15 @@ class Rails < Ruby
   def tests_for_model(model)
     if test_type == 'test'
       %W{
-        unit/#{model.singularize}
-        unit/helpers/#{model.pluralize}_helper
-        functional/#{model.pluralize}_controller
+        unit/#{ActiveSupport::Inflector.singularize(model)}
+        unit/helpers/#{ActiveSupport::Inflector.pluralize(model)}_helper
+        functional/#{ActiveSupport::Inflector.pluralize(model)}_controller
       }
     else
       %W{
-        models/#{model.singularize}
-        helpers/#{model.pluralize}_helper
-        controllers/#{model.pluralize}_controller
+        models/#{ActiveSupport::Inflector.singularize(model)}
+        helpers/#{ActiveSupport::Inflector.pluralize(model)}_helper
+        controllers/#{ActiveSupport::Inflector.pluralize(model)}_controller
       }
     end.map { |f| test_file f }
   end
@@ -66,7 +66,7 @@ class Rails < Ruby
       case file
       # Run all functional tests when routes.rb is saved
       when 'config/routes.rb'
-        Rails.all_controller_tests
+        Kicker::Recipes::Rails.all_controller_tests
       
       # Match lib/*
       when /^(lib\/.+)\.rb$/
@@ -80,7 +80,7 @@ class Rails < Ruby
       when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
         type, namespace, file = $1, $2, $3
         
-        if dir = Rails.type_to_test_dir(type)
+        if dir = Kicker::Recipes::Rails.type_to_test_dir(type)
           if type == "views"
             namespace = namespace.split('/')[1..-1]
             file = "#{namespace.pop}_controller"
@@ -98,9 +98,9 @@ end
 
 recipe :rails do
   require 'rubygems' rescue LoadError
-  require 'active_support/core_ext/string'
+  require 'active_support/inflector'
   
-  process Rails
+  process Kicker::Recipes::Rails
   
   # When changing the schema, prepare the test database.
   process do |files|
