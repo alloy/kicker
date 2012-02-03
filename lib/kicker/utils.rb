@@ -10,7 +10,11 @@ class Kicker
       puts unless Kicker.silent?
       $stdout.sync = true
       output = ""
-      IO.popen(command) do |stdout|
+      # On redirect stderr to stdout the lame way:
+      # http://unethicalblogger.com/2011/11/12/popen-can-suck-it.html
+      #
+      # TODO use the new API in 1.9 which can redirect streams
+      IO.popen("#{command} 2>&1") do |stdout|
         while str = stdout.read(1)
           output << str
           $stdout.print str unless Kicker.silent?
