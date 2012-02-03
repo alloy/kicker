@@ -1,5 +1,6 @@
 # Need to define these modules and require core_ext/module, because AS breaks
 # if these aren't defined. Need to fix that in AS...
+require 'active_support/deprecation'
 require 'active_support/core_ext/module'
 module ActiveSupport #:nodoc:
   module CoreExtensions #:nodoc:
@@ -18,7 +19,7 @@ class Rails < Ruby
     %w{ test_type runner_bin test_cases_root test_options }.each do |delegate|
       define_method(delegate) { Ruby.send(delegate) }
     end
-    
+
     # Maps +type+, for instance `models', to a test directory.
     def type_to_test_dir(type)
       if test_type == 'test'
@@ -55,7 +56,7 @@ class Rails < Ruby
       end
     end
   end
-  
+
   # Returns an array of all tests related to the given model.
   def tests_for_model(model)
     if test_type == 'test'
@@ -72,37 +73,37 @@ class Rails < Ruby
       }
     end.map { |f| test_file f }
   end
-  
+
   def handle!
     @tests.concat(@files.take_and_map do |file|
       case file
       # Run all functional tests when routes.rb is saved
       when 'config/routes.rb'
         Rails.all_controller_tests
-      
+
       # Match lib/*
       when /^(lib\/.+)\.rb$/
         test_file($1)
-      
+
       # Map fixtures to their related tests
       when %r{^#{test_cases_root}/fixtures/(\w+)\.yml$}
         tests_for_model($1)
-      
+
       # Match any file in app/ and map it to a test file
       when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
         type, namespace, file = $1, $2, $3
-        
+
         if dir = Rails.type_to_test_dir(type)
           if type == "views"
             namespace = namespace.split('/')[1..-1]
             file = "#{namespace.pop}_controller"
           end
-          
+
           test_file File.join(dir, namespace, file)
         end
       end
     end)
-    
+
     # And let the Ruby handler match other stuff.
     super
   end
@@ -111,9 +112,9 @@ end
 recipe :rails do
   require 'rubygems' rescue LoadError
   require 'active_support/core_ext/string'
-  
+
   process Rails
-  
+
   # When changing the schema, prepare the test database.
   process do |files|
     execute 'rake db:test:prepare' if files.delete('db/schema.rb')
