@@ -38,7 +38,7 @@ describe "A Kicker instance, concerning its utility methods" do
   it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
     Kicker::Growl.use = false
     
-    utils.stubs(:`).returns("line 1\nline 2")
+    utils.stubs(:_execute).returns("line 1\nline 2")
     
     utils.stubs(:last_command_succeeded?).returns(true)
     utils.expects(:log).with('Executing: ls')
@@ -55,7 +55,7 @@ describe "A Kicker instance, concerning its utility methods" do
   end
   
   it "should growl a change occurred and the output" do
-    utils.stubs(:`).returns("line 1\nline 2")
+    utils.stubs(:_execute).returns("line 1\nline 2")
     utils.stubs(:last_command_succeeded?).returns(true)
     utils.stubs(:log)
     
@@ -110,6 +110,7 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "should store the last executed command" do
     Kicker::Growl.use = false
+    Kicker.silent = true
     utils.stubs(:log)
     
     utils.execute('date')

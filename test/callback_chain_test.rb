@@ -95,8 +95,8 @@ describe "An instance of Kicker::CallbackChain, when calling the chain" do
   end
   
   it "should call the callbacks from first to last" do
-    @chain.append_callback lambda { @result << 1 }
-    @chain.append_callback lambda { @result << 2 }
+    @chain.append_callback lambda { |files| @result << 1 }
+    @chain.append_callback lambda { |files| @result << 2 }
     @chain.call(%w{ file })
     @result.should == [1, 2]
   end

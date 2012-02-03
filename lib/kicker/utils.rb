@@ -1,3 +1,5 @@
+require 'shellwords' if RUBY_VERSION >= "1.9"
+
 class Kicker
   module Utils #:nodoc:
     extend self
@@ -6,23 +8,7 @@ class Kicker
       @last_command = command
       status = LogStatusHelper.new(block, command)
       will_execute_command(status)
-
-      puts unless Kicker.silent?
-      $stdout.sync = true
-      output = ""
-      # On redirect stderr to stdout the lame way:
-      # http://unethicalblogger.com/2011/11/12/popen-can-suck-it.html
-      #
-      # TODO use the new API in 1.9 which can redirect streams
-      IO.popen("#{command} 2>&1") do |stdout|
-        while str = stdout.read(1)
-          output << str
-          $stdout.print str unless Kicker.silent?
-        end
-      end
-      $stdout.sync = false
-      puts("\n\n") unless Kicker.silent?
-
+      output = _execute(command)
       status.result(output, last_command_succeeded?, last_command_status)
       did_execute_command(status)
     end
@@ -51,6 +37,37 @@ class Kicker
     private
     
     CLEAR = "\e[H\e[2J"
+
+    def _execute(command)
+      silent = Kicker.silent?
+      unless silent
+        puts
+        sync_before, $stdout.sync = $stdout.sync, true
+      end
+      output = ""
+      popen(command) do |io|
+        while str = io.read(1)
+          output << str
+          $stdout.print str unless silent
+        end
+      end
+      output
+    ensure
+      unless silent
+        $stdout.sync = sync_before
+        puts("\n\n")
+      end
+    end
+
+    def popen(command, &block)
+      if RUBY_VERSION >= "1.9"
+        args = Shellwords.shellsplit(command)
+        args << { :err => [:child, :out] }
+        IO.popen(args, &block)
+      else
+        IO.popen("#{command} 2>&1", &block)
+      end
+    end
     
     def will_execute_command(status)
       puts(CLEAR) if Kicker.clear_console?

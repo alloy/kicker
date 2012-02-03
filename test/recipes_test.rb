@@ -10,7 +10,7 @@ describe "Kicker::Recipes" do
   it "returns a list of recipes" do
     recipe_files = Kicker::Recipes.recipe_files
     if File.exist?(File.expand_path('~/.kick'))
-      Set.new(recipe_files).should == Set.new(Dir.glob('../../lib/kicker/recipes/**/*.rb'))
+      Set.new(recipe_files).should == Set.new(Dir.glob(File.expand_path('../../lib/kicker/recipes/**/*.rb', __FILE__)))
     else
       Dir.glob('../../lib/kicker/recipes/**/*.rb').each do |filename|
         recipe_files.should.include?(filename)
@@ -20,7 +20,7 @@ describe "Kicker::Recipes" do
   
   it "returns a list of recipe names" do
     expected = Set.new(%w(could_not_handle_file dot_kick execute_cli_command ignore jstest rails ruby).map { |n| n.to_sym })
-    actual = Kicker::Recipes.recipe_names
+    actual = Set.new(Kicker::Recipes.recipe_names)
     if File.exist?(File.expand_path('~/.kick'))
       actual.should == expected
     else
@@ -30,13 +30,16 @@ describe "Kicker::Recipes" do
     end
   end
   
-  if File.exist?(File.expand_path('~/.kick'))
-    it "should add ~/.kick to the load path" do
-      $:.should.include File.expand_path('~/.kick')
-    end
-  else
-    puts "[!] ~/.kick does not exist, not testing the Kicker directory support."
-  end
+  # TODO ~/.kick is no longer added to the load path, but files are looked up
+  # in lib/kicker/recipes.rb recipe_filename
+  #
+  #if File.exist?(File.expand_path('~/.kick'))
+    #it "should add ~/.kick to the load path" do
+      #$:.should.include File.expand_path('~/.kick')
+    #end
+  #else
+    #puts "[!] ~/.kick does not exist, not testing the Kicker directory support."
+  #end
   
   it "should load a recipe" do
     name = Kicker::Recipes.recipe_names.last

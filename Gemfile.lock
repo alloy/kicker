@@ -21,6 +21,7 @@ GEM
     rdoc (3.12)
       json (~> 1.4)
     test-spec (0.10.0)
+    test-unit (2.3.1)
 
 PLATFORMS
   ruby
@@ -32,3 +33,4 @@ DEPENDENCIES
   rake
   rb-fsevent
   test-spec
+  test-unit

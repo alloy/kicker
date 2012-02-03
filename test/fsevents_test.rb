@@ -19,8 +19,7 @@ describe "Kicker::FSEvents" do
     events = nil
     faker = FakeFSEvent.new
     ::FSEvent.expects(:new).returns(faker)
-    Kicker::FSEvents.start_watching(%w(/path/to/first /path/to/second)) do |events|
-    end
+    Kicker::FSEvents.start_watching(%w(/path/to/first /path/to/second)) { |e| events = e }
     paths = %w(/path/to/first)
     faker.fake_event(paths)
     events.map { |e| e.path }.should == paths
