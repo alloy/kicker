@@ -11,7 +11,7 @@ process do |files|
     end
   end
   
-  Ruby.run_tests test_files
+  Kicker::Recipes::Ruby.run_tests test_files
 end
 
 process do |files|

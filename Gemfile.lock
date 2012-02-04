@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    kicker (2.4.0)
+    kicker (2.5.0)
       rb-fsevent
 
 GEM

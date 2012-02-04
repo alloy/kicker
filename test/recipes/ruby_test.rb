@@ -46,7 +46,7 @@ describe "The Ruby handler" do
   
   it "should run the given tests with a test-unit runner" do
     @handler.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
-    @handler.executed.last.should == "ruby -r test/1_test.rb -r test/namespace/2_test.rb -e ''"
+    @handler.executed.last.should == "ruby -I. -r test/1_test -r test/namespace/2_test -e ''"
   end
   
   it "should run the given tests with a spec runner" do
@@ -64,7 +64,7 @@ describe "The Ruby handler" do
   it "should be possible to override the bin path" do
     @handler.runner_bin = '/some/other/runner'
     @handler.run_tests(%w{ test/1_test.rb test/namespace/2_test.rb })
-    @handler.executed.last.should == "/some/other/runner -r test/1_test.rb -r test/namespace/2_test.rb -e ''"
+    @handler.executed.last.should == "/some/other/runner -I. -r test/1_test -r test/namespace/2_test -e ''"
   end
   
   it "should set the alternative ruby bin path" do
@@ -81,7 +81,7 @@ describe "The Ruby handler" do
     @handler.test_type = 'test'
     @handler.test_options << '-I ./other'
     @handler.run_tests(%w{ test/1_test.rb })
-    @handler.executed.last.should == "ruby -I ./other -r test/1_test.rb -e ''"
+    @handler.executed.last.should == "ruby -I. -I ./other -r test/1_test -e ''"
   end
   
   it "should be possible to add runner options when test_type is `spec'" do

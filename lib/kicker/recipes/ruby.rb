@@ -68,7 +68,8 @@ class Kicker::Recipes::Ruby
     end
     
     def test_runner_command(tests)
-      runner_command(runner_bin, test_options, '-r', tests.join(' -r '), "-e ''")
+      tests_without_ext = tests.map { |f| f[0,f.size-3] }
+      runner_command(runner_bin, %w{ -I. } + test_options, '-r', tests_without_ext.join(' -r '), "-e ''")
     end
     
     # Runs the given tests with `ruby' as unit-test tests.
