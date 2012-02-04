@@ -1,5 +1,6 @@
 $:.unshift File.expand_path('../../vendor', __FILE__)
 
+require 'kicker/version'
 require 'kicker/fsevents'
 require 'kicker/callback_chain'
 require 'kicker/core_ext'

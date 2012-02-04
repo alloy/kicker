@@ -2,24 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'rake/testtask'
-require 'rdoc/task'
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "kicker"
-    gem.summary = %Q{A lean, agnostic, flexible file-change watcher, using OS X FSEvents.}
-    gem.email = "eloy.de.enige@gmail.com"
-    gem.homepage = "http://github.com/alloy/kicker"
-    gem.authors = ["Eloy Duran"]
-    gem.files.concat FileList['vendor/**/*']
-    gem.require_paths = ["lib", "vendor"]
-    gem.has_rdoc = true
-    gem.add_dependency 'rb-fsevent'
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install jeweler -s http://gems.github.com"
-end
+require 'rake/rdoctask'
 
 Rake::TestTask.new do |t|
   t.libs << "test"

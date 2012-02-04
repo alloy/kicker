@@ -1,5 +1,7 @@
 = Kicker
 
+{<img src="https://secure.travis-ci.org/alloy/kicker.png" />}[http://travis-ci.org/alloy/kicker]
+
 A lean, agnostic, flexible file-change watcher, using OS X FSEvents.
 
 https://github.com/alloy/kicker/raw/master/html/images/kikker.jpg

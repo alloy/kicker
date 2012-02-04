@@ -41,6 +41,11 @@ class Kicker
         opt.separator "  Available recipes: #{recipes_for_display.join(", ")}."
         opt.separator " "
         
+        opt.on('-v', 'Print the Kicker version') do
+          puts VERSION
+          exit
+        end
+
         opt.on('-s', '--silent', 'Keep output to a minimum.') do |silent|
           Kicker.silent = true
         end

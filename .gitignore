@@ -1,4 +1,6 @@
-*.sw?
+.*.sw?
+*.gem
+.rbenv-version
 .DS_Store
 coverage
 rdoc
