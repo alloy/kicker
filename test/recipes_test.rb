@@ -42,14 +42,12 @@ describe "Kicker::Recipes" do
   #end
   
   it "should load a recipe" do
-    name = Kicker::Recipes.recipe_names.last
-    recipe name
+    recipe :ignore
   end
   
   it "does not break when a recipe is loaded twice" do
-    name = Kicker::Recipes.recipe_names.last
-    recipe name
-    recipe name
+    recipe :ignore
+    recipe :ignore
   end
   
   it "should define a recipe load callback" do
