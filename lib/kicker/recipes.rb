@@ -28,6 +28,10 @@ class Kicker
     class << self
       def reset!
         @recipes = nil
+        # Always load all the base recipes
+        load_recipe :execute_cli_command
+        load_recipe :could_not_handle_file
+        load_recipe :dot_kick
       end
       
       def recipes
@@ -86,9 +90,6 @@ class Kicker
       end
     end
     
-    # Always load all the base recipes
-    load_recipe :execute_cli_command
-    load_recipe :could_not_handle_file
-    load_recipe :dot_kick
+    reset!
   end
 end
