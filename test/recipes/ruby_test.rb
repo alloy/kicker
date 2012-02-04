@@ -108,6 +108,7 @@ end
   describe "An instance of the Ruby handler, with test type `#{type}'" do
     before do
       @handler = Kicker::Recipes::Ruby
+      @test_type, @test_cases_root = @handler.test_type, @handler.test_cases_root
       @handler.test_type = type
       @handler.test_cases_root = type
       
@@ -116,6 +117,7 @@ end
     end
     
     after do
+      @handler.test_type, @handler.test_cases_root = @test_type, @test_cases_root
       File.use_original_exist = true
     end
     

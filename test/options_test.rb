@@ -6,6 +6,7 @@ describe "Kicker::Options.parse" do
     Kicker.paths = %w{ . }
     Kicker.silent = false
     Kicker.quiet = false
+    Kicker.clear_console = false
     Kicker::Growl.use = true
     Kicker::Growl.command = nil
   end

@@ -1,12 +1,13 @@
 require 'rubygems'
 require 'bundler/setup'
 
-require 'rake/testtask'
 require 'rdoc/task'
 
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/**/*_test.rb']
+desc "Run tests"
+task :test do
+  # shuffle to ensure that tests are run in different order
+  files = FileList['test/**/*_test.rb'].map { |f| f[0,f.size-3] }.shuffle
+  sh "ruby -Ilib -I. -r '#{files.join("' -r '")}' -e ''"
 end
 
 namespace :docs do
