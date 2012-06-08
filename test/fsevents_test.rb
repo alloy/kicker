@@ -1,12 +1,17 @@
 require File.expand_path('../test_helper', __FILE__)
 
-class FakeFSEvent
-  def watch(paths, options={}, &block)
+class FakeListener
+  def initialize(paths, options={})
     @paths = paths
-    @block = block
   end
   
-  def run
+  def change(&block)
+    @block = block
+    self
+  end
+  
+  def start blocking=true
+    self
   end
   
   def fake_event(paths)
@@ -16,13 +21,15 @@ end
 
 describe "Kicker::FSEvents" do
   it "calls the provided block with changed directories wrapped in an event instance" do
+    all_paths = %w(/path/to/first /path/to/second)
+    faker = FakeListener.new all_paths
+    Listen.expects(:to).with(*all_paths, {}).returns(faker)
+
     events = nil
-    faker = FakeFSEvent.new
-    ::FSEvent.expects(:new).returns(faker)
-    Kicker::FSEvents.start_watching(%w(/path/to/first /path/to/second)) { |e| events = e }
-    paths = %w(/path/to/first)
-    faker.fake_event(paths)
-    events.map { |e| e.path }.should == paths
+    Kicker::FSEvents.start_watching(all_paths) { |e| events = e }
+
+    faker.fake_event(%w(/path/to/first/file))
+    events.map { |e| e.path }.should == %w(/path/to/first)
   end
 end
 

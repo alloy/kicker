@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'rb-fsevent'
+require 'listen'
 
 class Kicker
   class FSEvents
@@ -23,11 +23,12 @@ class Kicker
     end
     
     def self.start_watching(paths, options={}, &block)
-      fsevent = ::FSEvent.new
-      fsevent.watch(paths, options) do |directories|
+      listener = Listen.to *paths, options
+      listener.change do |*args|
+        files = args.flatten
+        directories = files.map {|file| File.dirname file}.uniq
         yield directories.map { |directory| Kicker::FSEvents::FSEvent.new(directory) }
-      end
-      fsevent.run
+      end.start
     end
   end
 end
