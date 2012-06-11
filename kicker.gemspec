@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version  = Kicker::VERSION
   s.date     = Date.today
 
-  s.summary  = "A lean, agnostic, flexible file-change watcher, using OS X FSEvents."
+  s.summary  = "A lean, agnostic, flexible file-change watcher."
   s.authors  = ["Eloy Duran", "Manfred Stienstra"]
   s.homepage = "http://github.com/alloy/kicker"
   s.email    = %w{ eloy.de.enige@gmail.com manfred@fngtps.com }
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files            = Dir['bin/kicker', '{lib,vendor}/**/*.rb', 'README.rdoc', 'LICENSE', 'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
-  s.add_runtime_dependency("rb-fsevent")
+  s.add_runtime_dependency("listen")
 
   s.add_development_dependency("rake")
   s.add_development_dependency("rdoc") # purely so it doesn't warn about deprecated rake task

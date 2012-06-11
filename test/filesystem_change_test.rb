@@ -84,6 +84,14 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:process, [event()])
   end
   
+  it "should not break when directory entries are not sorted" do
+    sleep(1)
+    file = touch('1')
+    
+    Dir.stubs(:entries).returns([File.basename(file), ".", ".."])
+    @kicker.send(:changed_files, [event(file)]).should == [file]
+  end
+  
   private
   
   def touch(file)

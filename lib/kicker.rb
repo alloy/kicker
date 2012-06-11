@@ -95,7 +95,7 @@ class Kicker #:nodoc:
   end
   
   def files_in_directory(dir)
-    Dir.entries(dir)[2..-1].map { |f| File.join(dir, f) }
+    Dir.entries(dir).sort[2..-1].map { |f| File.join(dir, f) }
   rescue Errno::ENOENT
     []
   end
