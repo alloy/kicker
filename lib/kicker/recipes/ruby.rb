@@ -171,4 +171,9 @@ end
 
 recipe :ruby do
   process Kicker::Recipes::Ruby
+
+  # When changing the Gemfile, install dependencies
+  process do |files|
+    execute 'bundle install' if files.delete('Gemfile')
+  end
 end

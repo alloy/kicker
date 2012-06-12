@@ -162,3 +162,21 @@ end
     end
   end
 end
+
+describe "The Ruby Bundler handler" do
+  before do
+    # We assume the Ruby Bundler handler is in the chain after the Ruby handler
+    # because it's defined in the same recipe
+    @handler = Kicker.process_chain[Kicker.process_chain.index(Kicker::Recipes::Ruby) + 1]
+  end
+
+  it "runs `bundle install` whenever the Gemfile changes" do
+    Kicker::Utils.expects(:execute).with('bundle install')
+    @handler.call(%w{ Gemfile })
+  end
+
+  it "does not run `bundle install` when another file is changed" do
+    Kicker::Utils.expects(:execute).never
+    @handler.call(%w{ Rakefile })
+  end
+end
