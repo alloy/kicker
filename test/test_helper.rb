@@ -1,6 +1,9 @@
 require 'rubygems'
-require 'bundler/setup'
+
+gem 'test-unit'
+require 'test/unit'
 require 'test/spec'
+
 require 'mocha'
 require 'set'
 

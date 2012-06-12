@@ -35,21 +35,19 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker.quiet = before
   end
   
-  it "should log the output of the command indented by 2 spaces and whether or not the command succeeded" do
+  it "logs whether or not the command succeeded" do
     Kicker::Growl.use = false
     
     utils.stubs(:_execute).returns("line 1\nline 2")
     
     utils.stubs(:last_command_succeeded?).returns(true)
     utils.expects(:log).with('Executing: ls')
-    utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Success')
     utils.execute('ls')
     
     utils.stubs(:last_command_succeeded?).returns(false)
     utils.stubs(:last_command_status).returns(123)
     utils.expects(:log).with('Executing: ls')
-    utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     utils.execute('ls')
   end

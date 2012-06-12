@@ -1,7 +1,8 @@
-require 'rubygems'
-require 'bundler/setup'
-
-require 'rdoc/task'
+begin
+  require 'rdoc/task'
+rescue LoadError
+  require 'rake/rdoctask'
+end
 
 desc "Run tests"
 task :test do
