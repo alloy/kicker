@@ -15,7 +15,7 @@ class FakeListener
   end
   
   def fake_event(paths)
-    @block.call(paths)
+    @block.call(paths, [], [])
   end
 end
 

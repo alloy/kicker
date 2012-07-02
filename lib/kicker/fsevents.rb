@@ -24,9 +24,9 @@ class Kicker
     
     def self.start_watching(paths, options={}, &block)
       listener = Listen.to(*(paths.dup << options))
-      listener.change do |args|
-        files = args.flatten
-        directories = files.map {|file| File.dirname file}.uniq
+      listener.change do |modified, added, removed|
+        files = modified + added + removed
+        directories = files.map { |file| File.dirname(file) }.uniq
         yield directories.map { |directory| Kicker::FSEvents::FSEvent.new(directory) }
       end.start
     end
