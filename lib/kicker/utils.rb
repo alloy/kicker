@@ -12,7 +12,7 @@ class Kicker
 
     def perform_work(command)
       @last_command = command
-      status = Status.new(command)
+      status = Status.new(command, 0, '')
       will_execute_command(status)
       yield status
       did_execute_command(status)
