@@ -16,6 +16,7 @@ class Kicker
       will_execute_command(status)
       yield status
       did_execute_command(status)
+      status
     end
 
     def execute(command)
