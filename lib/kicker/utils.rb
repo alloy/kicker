@@ -113,6 +113,13 @@ module Kernel
     Kicker::Utils.log(message)
   end
   
+  # When you perform some work (like shelling out a command to run without
+  # using +execute+) you need to call this method, with a block in which you
+  # perform your work, which will take care of logging the work appropriately.
+  def perform_work(command, &block)
+    Kicker::Utils.perform_work(command, &block)
+  end
+  
   # Executes the +command+, logs the output, and optionally growls.
   def execute(command, &block)
     Kicker::Utils.execute(command, &block)
