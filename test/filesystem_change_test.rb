@@ -91,7 +91,17 @@ describe "Kicker, when a change occurs" do
     Dir.stubs(:entries).returns([File.basename(file), ".", ".."])
     @kicker.send(:changed_files, [event(file)]).should == [file]
   end
-  
+
+  it "clears the console before running the chain" do
+    Kicker.clear_console = true
+    Kicker::Utils.expects(:puts).with("\e[H\e[2J")
+
+    files = %w{ /file/1 /file/2 }
+    @kicker.stubs(:changed_files).returns(files)
+    @kicker.full_chain.stubs(:call)
+    @kicker.send(:process, files.map { |f| event(f) })
+  end
+
   private
   
   def touch(file)

@@ -94,18 +94,7 @@ describe "A Kicker instance, concerning its utility methods" do
     
     utils.did_execute_command(status)
   end
-  
-  it "should clear the console before running a command" do
-    Kicker.clear_console = true
-    utils.expects(:puts).with("\e[H\e[2J")
-    
-    Kicker::Growl.stubs(:change_occured)
-    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
-    status.result("line 1\nline 2", false, 123)
 
-    utils.will_execute_command(status)
-  end
-  
   it "should store the last executed command" do
     Kicker::Growl.use = false
     Kicker.silent = true
