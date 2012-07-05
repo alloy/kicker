@@ -10,6 +10,9 @@ class Kicker
   module Utils #:nodoc:
     extend self
 
+    attr_accessor :should_clear_screen
+    alias_method :should_clear_screen?, :should_clear_screen
+
     def perform_work(command)
       @last_command = command
       status = Status.new(command, 0, '')
@@ -89,6 +92,9 @@ class Kicker
     end
     
     def will_execute_command(status)
+      puts(CLEAR) if Kicker.clear_console? && should_clear_screen?
+      @should_clear_screen = false
+
       log "Executing: #{status.command}"
       Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?
     end

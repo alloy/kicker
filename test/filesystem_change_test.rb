@@ -92,9 +92,22 @@ describe "Kicker, when a change occurs" do
     @kicker.send(:changed_files, [event(file)]).should == [file]
   end
 
-  it "clears the console before running the chain" do
+  it "clears the console only once during running the chain" do
     Kicker.clear_console = true
-    Kicker::Utils.expects(:puts).with("\e[H\e[2J")
+    Kicker.silent = true
+    Kicker::Utils.stubs(:log)
+    Kicker::Utils.expects(:puts).with("\e[H\e[2J").once
+
+    files = %w{ /file/1 /file/2 }
+    @kicker.stubs(:changed_files).returns(files)
+    @kicker.process_chain.append_callback lambda { |files| Kicker::Utils.perform_work('ls -l') {} }
+    @kicker.process_chain.append_callback lambda { |files| Kicker::Utils.perform_work('ls -l') {} }
+    @kicker.send(:process, files.map { |f| event(f) })
+  end
+
+  it "does not clear the console if no work is ever performed" do
+    Kicker.clear_console = true
+    Kicker::Utils.expects(:puts).with("\e[H\e[2J").never
 
     files = %w{ /file/1 /file/2 }
     @kicker.stubs(:changed_files).returns(files)

@@ -82,7 +82,7 @@ class Kicker #:nodoc:
   
   def process(events)
     unless (files = changed_files(events)).empty?
-      Utils.clear_console!
+      Utils.should_clear_screen = true
       full_chain.call(files)
       finished_processing!
     end
