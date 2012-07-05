@@ -90,18 +90,6 @@ describe "The Ruby handler" do
     @handler.run_tests(%w{ spec/1_spec.rb })
     @handler.executed.last.should == "rspec -I ./other spec/1_spec.rb"
   end
-  
-  it "should only show the last line of the output when growling when running test_type is `test'" do
-    @handler.run_with_test_runner(%w{ test/1_test.rb test/namespace/2_test.rb })
-    result = @handler.blocks.last.call(mock('status', :output => "foo\nall pass", :after? => true, :growl? => true))
-    result.should == 'all pass'
-  end
-  
-  it "should only show the last line of the output when growling when running test_type is `spec'" do
-    @handler.run_with_spec_runner(%w{ spec/1_spec.rb spec/namespace/2_spec.rb })
-    result = @handler.blocks.last.call(mock('status', :output => "foo\nall pass", :after? => true, :growl? => true))
-    result.should == 'all pass'
-  end
 end
 
 %w{ test spec }.each do |type|

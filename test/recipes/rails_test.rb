@@ -18,6 +18,9 @@ describe "The Rails handler" do
     File.use_original_exist = false
     File.existing_files = tests
     
+    Kicker::Recipes::Ruby.test_type = 'test'
+    Kicker::Recipes::Ruby.test_cases_root = nil
+
     Dir.expects(:glob).with("test/functional/**/*_test.rb").returns(tests)
     Kicker::Recipes::Rails.all_controller_tests.should == tests
   end

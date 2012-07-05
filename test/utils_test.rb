@@ -35,28 +35,34 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker.quiet = before
   end
   
-  it "logs whether or not the command succeeded" do
+  it "logs that the command succeeded" do
     Kicker::Growl.use = false
-    
-    utils.stubs(:_execute).returns("line 1\nline 2")
-    
-    utils.stubs(:last_command_succeeded?).returns(true)
+
+    utils.stubs(:_execute).with do |status|
+      status.output = "line 1\nline 2"
+      status.exit_code = 0
+    end
     utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('Success')
     utils.execute('ls')
-    
-    utils.stubs(:last_command_succeeded?).returns(false)
-    utils.stubs(:last_command_status).returns(123)
+  end
+
+  it "logs that the command failed" do
+    Kicker::Growl.use = false
+    utils.stubs(:_execute).with do |status|
+      status.output = "line 1\nline 2"
+      status.exit_code = 123
+    end
     utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('Failed (123)')
     utils.execute('ls')
   end
-  
+
   it "should growl a change occurred and the output" do
-    utils.stubs(:_execute).returns("line 1\nline 2")
-    utils.stubs(:last_command_succeeded?).returns(true)
     utils.stubs(:log)
-    
+    utils.stubs(:_execute).with do |status|
+      status.output = "line 1\nline 2"
+    end 
     Kicker::Growl.expects(:change_occured).with { |status| status.command == 'ls' }
     Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
     utils.execute('ls')
@@ -75,8 +81,7 @@ describe "A Kicker instance, concerning its utility methods" do
     Kicker.silent = true
     Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
     
-    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
-    status.result("line 1\nline 2", true, 0)
+    status = Kicker::Status.new('ls -l', 0, "line 1\nline 2")
     
     utils.expects(:log).with("Success")
     utils.did_execute_command(status)
@@ -89,9 +94,7 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     
-    status = Kicker::LogStatusHelper.new(nil, 'ls -l')
-    status.result("line 1\nline 2", false, 123)
-    
+    status = Kicker::Status.new('ls -l', 123, "line 1\nline 2")
     utils.did_execute_command(status)
   end
 
@@ -104,45 +107,21 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.last_command.should == 'date'
   end
   
-  it "should call the block given to execute and yield the log status helper with status success" do
+  it "calls the block given to execute and yields the status so the user can transform the output" do
     Kicker.silent = true
     Kicker::Growl.use = false
-    utils.stubs(:last_command_succeeded?).returns(true)
-    
-    utils.expects(:log).with('Start!')
-    utils.expects(:log).with('Done!')
-    
-    utils.execute('ls -l') do |status|
-      if status.after?
-        if status.success?
-          'Done!'
-        else
-          'Ohnoes!'
-        end
-      elsif status.before?
-        'Start!'
-      end
+
+    utils.stubs(:_execute).with do |status|
+      status.output = "line 1\nline 2"
+      status.exit_code = 123
     end
-  end
-  
-  it "should call the block given to execute and yield the log status helper with status failed" do
-    Kicker.silent = true
-    Kicker::Growl.use = false
-    utils.stubs(:last_command_succeeded?).returns(false)
-    
-    utils.expects(:log).with('Start!')
-    utils.expects(:log).with('Ohnoes!')
-    
+
+    utils.expects(:log).with('Executing: ls -l')
+    utils.expects(:puts).with("\nOhnoes!\n\n")
+    utils.expects(:log).with('Failed (123)')
+
     utils.execute('ls -l') do |status|
-      if status.after?
-        if status.success?
-          'Done!'
-        else
-          'Ohnoes!'
-        end
-      elsif status.before?
-        'Start!'
-      end
+      status.output = status.success? ? 'Done!' : 'Ohnoes!'
     end
   end
   

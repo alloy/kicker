@@ -1,22 +1,34 @@
 require 'shellwords' if RUBY_VERSION >= "1.9"
 
 class Kicker
+  Status = Struct.new(:command, :exit_code, :output) do
+    def success?
+      exit_code == 0
+    end
+  end
+
   module Utils #:nodoc:
     extend self
-    
-    def execute(command, &block)
+
+    def perform_work(command)
       @last_command = command
-      status = LogStatusHelper.new(block, command)
+      status = Status.new(command)
       will_execute_command(status)
-      output = _execute(command)
-      status.result(output, last_command_succeeded?, last_command_status)
+      yield status
       did_execute_command(status)
     end
-    
+
+    def execute(command)
+      perform_work(command) do |status|
+        _execute(status)
+        yield status if block_given?
+      end
+    end
+
     def last_command
       @last_command
     end
-    
+
     def log(message)
       if Kicker.quiet
         puts message
@@ -31,7 +43,7 @@ class Kicker
     end
     
     def last_command_status
-      $?.to_i
+      $?.exitstatus
     end
 
     def clear_console!
@@ -42,20 +54,22 @@ class Kicker
 
     CLEAR = "\e[H\e[2J"
 
-    def _execute(command)
+    def _execute(status)
       silent = Kicker.silent?
       unless silent
         puts
         sync_before, $stdout.sync = $stdout.sync, true
       end
       output = ""
-      popen(command) do |io|
+      popen(status.command) do |io|
         while str = io.read(1)
           output << str
           $stdout.print str unless silent
         end
       end
-      output
+      status.output = output.strip
+      status.exit_code = last_command_status
+      status
     ensure
       unless silent
         $stdout.sync = sync_before
@@ -74,19 +88,13 @@ class Kicker
     end
     
     def will_execute_command(status)
-      message = status.call(:stdout) || "Executing: #{status.command}"
-      log(message) unless message.empty?
+      log "Executing: #{status.command}"
       Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?
     end
     
     def did_execute_command(status)
-      if message = status.call(:stdout)
-        log(message) unless message.empty?
-      else
-        puts("\n#{status.output.strip}\n\n") if Kicker.silent? && !status.success?
-        log(status.success? ? "Success" : "Failed (#{status.exit_code})")
-      end
-      
+      puts("\n#{status.output}\n\n") if Kicker.silent? && !status.success?
+      log(status.success? ? "Success" : "Failed (#{status.exit_code})")
       Kicker::Growl.result(status) if Kicker::Growl.use?
     end
   end

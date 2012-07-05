@@ -49,11 +49,7 @@ begin
         end
         
         def change_occured(status)
-          growl(notifications[:change], 'Kicker: Executing', status.call(:growl) || status.command)
-        end
-        
-        def command_callback
-          lambda { system(command) } if command
+          growl(notifications[:change], 'Kicker: Executing', status.command)
         end
         
         def result(status)
@@ -61,14 +57,13 @@ begin
         end
         
         def succeeded(status)
-          callback = command_callback || DEFAULT_CALLBACK
-          body = status.call(:growl) || (Kicker.silent? ? '' : status.output)
-          growl(notifications[:succeeded], "Kicker: Success", body, &callback)
+          body = Kicker.silent? ? '' : status.output
+          growl(notifications[:succeeded], "Kicker: Success", body, &DEFAULT_CALLBACK)
         end
         
         def failed(status)
           message = "Kicker: Failed (#{status.exit_code})"
-          body = status.call(:growl) || (Kicker.silent? ? '' : status.output)
+          body = Kicker.silent? ? '' : status.output
           growl(notifications[:failed], message, body, &DEFAULT_CALLBACK)
         end
       end

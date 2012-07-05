@@ -73,16 +73,8 @@ class Kicker::Recipes::Ruby
     end
     
     # Runs the given tests with `ruby' as unit-test tests.
-    #
-    # If you want to adjust the logging, stdout and growl, override this, call
-    # test_runner_command with the tests to get the command and call execute
-    # with the custom logging block.
     def run_with_test_runner(tests)
-      execute(test_runner_command(tests)) do |status|
-        if status.after? && status.growl?
-          status.output.split("\n").last
-        end
-      end
+      execute(test_runner_command(tests))
     end
     
     def spec_runner_command(tests)
@@ -90,16 +82,8 @@ class Kicker::Recipes::Ruby
     end
     
     # Runs the given tests with `spec' as RSpec tests.
-    #
-    # If you want to adjust the logging, stdout and growl, override this, call
-    # spec_runner_command with the tests to get the command and call execute
-    # with the custom logging block.
     def run_with_spec_runner(tests)
-      execute(spec_runner_command(tests)) do |status|
-        if status.after? && status.growl?
-          status.output.split("\n").last
-        end
-      end
+      execute(spec_runner_command(tests))
     end
   end
   
