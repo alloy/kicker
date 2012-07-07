@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
   s.add_runtime_dependency("listen")
+  s.add_runtime_dependency("open4")
 
   s.add_development_dependency("rake")
   s.add_development_dependency("rdoc") # purely so it doesn't warn about deprecated rake task

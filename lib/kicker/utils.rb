@@ -1,4 +1,4 @@
-require 'shellwords' if RUBY_VERSION >= "1.9"
+require 'open4'
 
 class Kicker
   Status = Struct.new(:command, :exit_code, :output) do
@@ -56,7 +56,19 @@ class Kicker
 
     private
 
-    CLEAR = "\e[H\e[2J"
+    class Output < ::String
+      attr_accessor :io
+
+      def initialize(io)
+        @io = io
+      end
+
+      def <<(value)
+        super
+      ensure
+        @io << value if @io
+      end
+    end
 
     def _execute(status)
       silent = Kicker.silent?
@@ -64,15 +76,21 @@ class Kicker
         puts
         sync_before, $stdout.sync = $stdout.sync, true
       end
-      output = ""
-      popen(status.command) do |io|
-        while str = io.read(1)
-          output << str
-          $stdout.print str unless silent
-        end
-      end
+
+      #output = ""
+      #popen(status.command) do |io|
+        #while str = io.read(1)
+          #output << str
+          #$stdout.print str unless silent
+        #end
+      #end
+
+      output = Output.new((STDOUT unless Kicker.silent?))
+      #process = Open4.spawn(status.command, :stdin => '', :stdout => output, :stderr => output, :status => true)
+      process = Open4.spawn(status.command, :stdin => '', :stdout => STDOUT, :stderr => STDERR, :status => true)
+
       status.output = output.strip
-      status.exit_code = last_command_status
+      status.exit_code = process.exitstatus
       status
     ensure
       unless silent
@@ -81,16 +99,8 @@ class Kicker
       end
     end
 
-    def popen(command, &block)
-      if RUBY_VERSION >= "1.9"
-        args = Shellwords.shellsplit(command)
-        args << { :err => [:child, :out] }
-        IO.popen(args, &block)
-      else
-        IO.popen("#{command} 2>&1", &block)
-      end
-    end
-    
+    CLEAR = "\e[H\e[2J"
+
     def will_execute_command(status)
       puts(CLEAR) if Kicker.clear_console? && should_clear_screen?
       @should_clear_screen = false
