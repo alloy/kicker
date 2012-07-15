@@ -3,7 +3,9 @@ require File.expand_path('../test_helper', __FILE__)
 describe "Kicker, when a change occurs" do
   before do
     remove_tmp_files!
-    
+
+    Kicker::Notification.stubs(:`)
+
     Kicker.any_instance.stubs(:last_command_succeeded?).returns(true)
     Kicker.any_instance.stubs(:log)
     @kicker = Kicker.new

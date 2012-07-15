@@ -15,10 +15,6 @@ class Kicker
     def clear_console?
       @clear_console
     end
-    
-    def has_growl?
-      Kicker.const_defined?(:Growl)
-    end
   end
   
   self.latency = 1
@@ -58,16 +54,16 @@ class Kicker
           Kicker.clear_console = true
         end
         
-        if Kicker::Growl.usable?
-          opt.on('--[no-]growl', 'Whether or not to use Growl. Default is to use growl.') do |growl|
-            Kicker::Growl.use = growl
+        if Notification.usable?
+          opt.on('--[no-]notification', 'Whether or not to send user notifications (on Mac OS X). Defaults to enabled.') do |notifications|
+            Notification.use = notifications
           end
           
-          opt.on('--growl-command [COMMAND]', 'The command to execute when the Growl succeeded message is clicked.') do |command|
-            Kicker::Growl.command = command
+          opt.on('--activate-app [BUNDLE ID]', "The application to activate when a notification is clicked. Defaults to `com.apple.Terminal'.") do |bundle_id|
+            Kicker::Notification.app_bundle_identifier = bundle_id
           end
         else
-          Kicker::Growl.use = false
+          Kicker::Notification.use = false
         end
         
         opt.on('-l', '--latency [FLOAT]', "The time to collect file change events before acting on them. Defaults to #{Kicker.latency} second.") do |latency|

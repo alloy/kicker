@@ -9,11 +9,13 @@ end
 describe "A Kicker instance, concerning its utility methods" do
   before do
     utils.stubs(:puts)
+    Kicker::Notification.use = false
+    Kicker::Notification.stubs(:`)
   end
   
   after do
     Kicker.silent = false
-    Kicker::Growl.use = true
+    Kicker::Notification.use = true
   end
   
   it "should print a log entry with timestamp" do
@@ -36,8 +38,6 @@ describe "A Kicker instance, concerning its utility methods" do
   end
   
   it "logs that the command succeeded" do
-    Kicker::Growl.use = false
-
     utils.stubs(:_execute).with do |status|
       status.output = "line 1\nline 2"
       status.exit_code = 0
@@ -48,7 +48,6 @@ describe "A Kicker instance, concerning its utility methods" do
   end
 
   it "logs that the command failed" do
-    Kicker::Growl.use = false
     utils.stubs(:_execute).with do |status|
       status.output = "line 1\nline 2"
       status.exit_code = 123
@@ -58,48 +57,17 @@ describe "A Kicker instance, concerning its utility methods" do
     utils.execute('ls')
   end
 
-  it "should growl a change occurred and the output" do
+  it "notifies that a change occurred and shows the output" do
     utils.stubs(:log)
     utils.stubs(:_execute).with do |status|
       status.output = "line 1\nline 2"
     end 
-    Kicker::Growl.expects(:change_occured).with { |status| status.command == 'ls' }
-    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
+    Kicker::Notification.expects(:change_occured).with { |status| status.command == 'ls' }
+    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
     utils.execute('ls')
-  end
-  
-  it "should not growl that a change occured in silent mode" do
-    Kicker.silent = true
-    utils.stubs(:did_execute_command)
-    
-    utils.expects(:log)
-    Kicker::Growl.expects(:change_occured).never
-    utils.execute('ls')
-  end
-  
-  it "should only log that is has succeeded in silent mode" do
-    Kicker.silent = true
-    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
-    
-    status = Kicker::Status.new('ls -l', 0, "line 1\nline 2")
-    
-    utils.expects(:log).with("Success")
-    utils.did_execute_command(status)
-  end
-  
-  it "should fully log that it has failed in silent mode" do
-    Kicker.silent = true
-    Kicker::Growl.expects(:result).with { |status| status.output == "line 1\nline 2" }
-    
-    utils.expects(:puts).with("\nline 1\nline 2\n\n")
-    utils.expects(:log).with('Failed (123)')
-    
-    status = Kicker::Status.new('ls -l', 123, "line 1\nline 2")
-    utils.did_execute_command(status)
   end
 
-  it "should store the last executed command" do
-    Kicker::Growl.use = false
+  it "stores the last executed command" do
     Kicker.silent = true
     utils.stubs(:log)
     
@@ -109,7 +77,6 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "calls the block given to execute and yields the status so the user can transform the output" do
     Kicker.silent = true
-    Kicker::Growl.use = false
 
     utils.stubs(:_execute).with do |status|
       status.output = "line 1\nline 2"
@@ -124,7 +91,41 @@ describe "A Kicker instance, concerning its utility methods" do
       status.output = status.success? ? 'Done!' : 'Ohnoes!'
     end
   end
+
+  before do
+    Kicker::Notification.use = true
+  end
   
+  it "does not notify that a change occured in silent mode" do
+    Kicker.silent = true
+    utils.stubs(:did_execute_command)
+    
+    utils.expects(:log)
+    Kicker::Notification.expects(:change_occured).never
+    utils.execute('ls')
+  end
+  
+  it "only logs that it has succeeded in silent mode" do
+    Kicker.silent = true
+    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
+    
+    status = Kicker::Status.new('ls -l', 0, "line 1\nline 2")
+    
+    utils.expects(:log).with("Success")
+    utils.did_execute_command(status)
+  end
+  
+  it "fully logs that it has failed in silent mode" do
+    Kicker.silent = true
+    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
+    
+    utils.expects(:puts).with("\nline 1\nline 2\n\n")
+    utils.expects(:log).with('Failed (123)')
+    
+    status = Kicker::Status.new('ls -l', 123, "line 1\nline 2")
+    utils.did_execute_command(status)
+  end
+
   private
   
   def utils

@@ -96,13 +96,13 @@ class Kicker
       @should_clear_screen = false
 
       log "Executing: #{status.command}"
-      Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?
+      Notification.change_occured(status) if Notification.use? && !Kicker.silent?
     end
     
     def did_execute_command(status)
       puts("\n#{status.output}\n\n") if Kicker.silent? && !status.success?
       log(status.success? ? "Success" : "Failed (#{status.exit_code})")
-      Kicker::Growl.result(status) if Kicker::Growl.use?
+      Notification.result(status) if Notification.use?
     end
   end
 end
@@ -120,7 +120,8 @@ module Kernel
     Kicker::Utils.perform_work(command, &block)
   end
   
-  # Executes the +command+, logs the output, and optionally growls.
+  # Executes the +command+, logs the output, and optionally sends user
+  # notifications on Mac OS X (10.8 or higher).
   def execute(command, &block)
     Kicker::Utils.execute(command, &block)
   end

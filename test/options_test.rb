@@ -7,8 +7,8 @@ describe "Kicker::Options.parse" do
     Kicker.silent = false
     Kicker.quiet = false
     Kicker.clear_console = false
-    Kicker::Growl.use = true
-    Kicker::Growl.command = nil
+    Kicker::Notification.use = true
+    Kicker::Notification.app_bundle_identifier = 'com.apple.Terminal'
   end
   
   it "should parse the paths" do
@@ -22,13 +22,13 @@ describe "Kicker::Options.parse" do
     Kicker.paths.should == %w{ /some/file.rb /a/dir /and/some/other/file.rb }
   end
   
-  if Kicker::Growl.usable?
-    it "should parse if growl shouldn't be used" do
+  if Kicker::Notification.usable?
+    it "parses wether or not user notifications should be used" do
       Kicker::Options.parse([])
-      Kicker::Growl.should.use
-    
-      Kicker::Options.parse(%w{ --no-growl })
-      Kicker::Growl.should.not.use
+      Kicker::Notification.should.use
+
+      Kicker::Options.parse(%w{ --no-notification })
+      Kicker::Notification.should.not.use
     end
   end
   
@@ -58,10 +58,10 @@ describe "Kicker::Options.parse" do
     Kicker.should.clear_console
   end
   
-  if Kicker::Growl.usable?
-    it "should parse the Growl command to use when the user clicks the Growl succeeded message" do
-      Kicker::Options.parse(%w{ --growl-command ls })
-      Kicker::Growl.command.should == 'ls'
+  if Kicker::Notification.usable?
+    it "parses the application to activate when a user notification is clicked" do
+      Kicker::Options.parse(%w{ --activate-app com.apple.Safari })
+      Kicker::Notification.app_bundle_identifier.should == 'com.apple.Safari'
     end
   end
   
