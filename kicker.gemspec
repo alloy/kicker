@@ -14,7 +14,12 @@ Gem::Specification.new do |s|
 
   s.executables      = %w{ kicker }
   s.require_paths    = %w{ lib vendor }
-  s.files            = Dir['bin/kicker', '{lib,vendor}/**/*.rb', 'README.rdoc', 'LICENSE', 'html/images/kikker.jpg']
+  s.files            = Dir['bin/kicker',
+                           'lib/**/*.rb',
+                           'vendor/terminal-notifier_v1.0/**/*',
+                           'README.rdoc',
+                           'LICENSE',
+                           'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
   s.add_runtime_dependency("listen")
