@@ -1,9 +1,57 @@
 require 'shellwords' if RUBY_VERSION >= "1.9"
 
 class Kicker
-  Status = Struct.new(:command, :exit_code, :output) do
+  class Job
+    def self.attr_with_default(name, &default)
+      # If `nil` this returns the `default`, unless explicitely set to `nil` by
+      # the user.
+      define_method(name) do
+        if instance_variable_get("@#{name}_assigned")
+          instance_variable_get("@#{name}")
+        else
+          instance_eval(&default)
+        end
+      end
+      define_method("#{name}=") do |value|
+        instance_variable_set("@#{name}_assigned", true)
+        instance_variable_set("@#{name}", value)
+      end
+    end
+
+    attr_accessor :command, :exit_code, :output
+
+    def initialize(attributes)
+      @exit_code = 0
+      @output = ''
+      attributes.each { |k,v| send("#{k}=", v) }
+    end
+
     def success?
       exit_code == 0
+    end
+
+    attr_with_default(:print_before) do
+      "Executing: #{command}"
+    end
+
+    attr_with_default(:print_after) do
+      # Show all output if it wasn't shown before and the command fails.
+      "\n#{output}\n\n" if Kicker.silent? && !success?
+    end
+
+    # TODO default titles??
+
+    attr_with_default(:notify_before) do
+      ["Kicker: Executing", command] unless Kicker.silent?
+    end
+
+    attr_with_default(:notify_after)  do
+      message = Kicker.silent? ? "" : output
+      if success?
+        ["Kicker: Success", message]
+      else
+        ["Kicker: Failed (#{exit_code})", message]
+      end
     end
   end
 
@@ -13,24 +61,26 @@ class Kicker
     attr_accessor :should_clear_screen
     alias_method :should_clear_screen?, :should_clear_screen
 
-    def perform_work(command)
-      @last_command = command
-      status = Status.new(command, 0, '')
-      will_execute_command(status)
-      yield status
-      did_execute_command(status)
-      status
-    end
-
-    def execute(command)
-      perform_work(command) do |status|
-        _execute(status)
-        yield status if block_given?
+    def perform_work(command_or_options)
+      if command_or_options.is_a?(Hash)
+        options = command_or_options
+      elsif command_or_options.is_a?(String)
+        options = { :command => command_or_options }
+      else
+        raise ArgumentError, "Should be a string or a hash."
       end
+      job = Job.new(options)
+      will_execute_command(job)
+      yield job
+      did_execute_command(job)
+      job
     end
 
-    def last_command
-      @last_command
+    def execute(command_or_options)
+      perform_work(command_or_options) do |job|
+        _execute(job)
+        yield job if block_given?
+      end
     end
 
     def log(message)
@@ -58,22 +108,22 @@ class Kicker
 
     CLEAR = "\e[H\e[2J"
 
-    def _execute(status)
+    def _execute(job)
       silent = Kicker.silent?
       unless silent
         puts
         sync_before, $stdout.sync = $stdout.sync, true
       end
       output = ""
-      popen(status.command) do |io|
+      popen(job.command) do |io|
         while str = io.read(1)
           output << str
           $stdout.print str unless silent
         end
       end
-      status.output = output.strip
-      status.exit_code = last_command_status
-      status
+      job.output = output.strip
+      job.exit_code = last_command_status
+      job
     ensure
       unless silent
         $stdout.sync = sync_before
@@ -91,18 +141,29 @@ class Kicker
       end
     end
     
-    def will_execute_command(status)
+    def will_execute_command(job)
       puts(CLEAR) if Kicker.clear_console? && should_clear_screen?
       @should_clear_screen = false
 
-      log "Executing: #{status.command}"
-      Notification.change_occured(status) if Notification.use? && !Kicker.silent?
+      if message = job.print_before
+        log(message)
+      end
+
+      if notification = job.notify_before
+        Notification.notify(*notification)
+      end
     end
     
-    def did_execute_command(status)
-      puts("\n#{status.output}\n\n") if Kicker.silent? && !status.success?
-      log(status.success? ? "Success" : "Failed (#{status.exit_code})")
-      Notification.result(status) if Notification.use?
+    def did_execute_command(job)
+      if message = job.print_after
+        puts(message)
+      end
+
+      log(job.success? ? "Success" : "Failed (#{job.exit_code})")
+
+      if notification = job.notify_after
+        Notification.notify(*notification)
+      end
     end
   end
 end
