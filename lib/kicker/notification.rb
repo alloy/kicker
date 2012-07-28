@@ -1,19 +1,18 @@
+require 'terminal-notifier'
+
 class Kicker
   module Notification #:nodoc:
-    vendor = File.expand_path('../../../vendor', __FILE__)
-    TERMINAL_NOTIFICATION_BIN = File.join(vendor, 'terminal-notifier_v1.0/terminal-notifier.app/Contents/MacOS/terminal-notifier')
-
     class << self
       attr_accessor :use, :app_bundle_identifier
       alias_method :use?, :use
 
       def usable?
-        @usable ||= `uname`.strip == 'Darwin' && `sw_vers -productVersion`.strip >= '10.8'
+        TerminalNotifier.available?
       end
 
       def notify(title, message)
         if usable? && use?
-          `'#{TERMINAL_NOTIFICATION_BIN}' #{Dir.pwd} '#{title}' '#{message}' '#{app_bundle_identifier}'`
+          TerminalNotifier.notify(message, :title => title, :activate => app_bundle_identifier)
         end
       end
     end
