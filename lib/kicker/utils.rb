@@ -1,60 +1,6 @@
 require 'shellwords' if RUBY_VERSION >= "1.9"
 
 class Kicker
-  class Job
-    def self.attr_with_default(name, &default)
-      # If `nil` this returns the `default`, unless explicitely set to `nil` by
-      # the user.
-      define_method(name) do
-        if instance_variable_get("@#{name}_assigned")
-          instance_variable_get("@#{name}")
-        else
-          instance_eval(&default)
-        end
-      end
-      define_method("#{name}=") do |value|
-        instance_variable_set("@#{name}_assigned", true)
-        instance_variable_set("@#{name}", value)
-      end
-    end
-
-    attr_accessor :command, :exit_code, :output
-
-    def initialize(attributes)
-      @exit_code = 0
-      @output = ''
-      attributes.each { |k,v| send("#{k}=", v) }
-    end
-
-    def success?
-      exit_code == 0
-    end
-
-    attr_with_default(:print_before) do
-      "Executing: #{command}"
-    end
-
-    attr_with_default(:print_after) do
-      # Show all output if it wasn't shown before and the command fails.
-      "\n#{output}\n\n" if Kicker.silent? && !success?
-    end
-
-    # TODO default titles??
-
-    attr_with_default(:notify_before) do
-      { :title => "Kicker: Executing", :message => command } unless Kicker.silent?
-    end
-
-    attr_with_default(:notify_after)  do
-      message = Kicker.silent? ? "" : output
-      if success?
-        { :title => "Kicker: Success", :message => message }
-      else
-        { :title => "Kicker: Failed (#{exit_code})", :message => message }
-      end
-    end
-  end
-
   module Utils #:nodoc:
     extend self
 
@@ -91,14 +37,6 @@ class Kicker
         puts "#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | #{message}"
       end
     end
-    
-    def last_command_succeeded?
-      $?.success?
-    end
-    
-    def last_command_status
-      $?.exitstatus
-    end
 
     def clear_console!
       puts(CLEAR) if Kicker.clear_console?
@@ -122,7 +60,7 @@ class Kicker
         end
       end
       job.output = output.strip
-      job.exit_code = last_command_status
+      job.exit_code = $?.exitstatus
       job
     ensure
       unless silent

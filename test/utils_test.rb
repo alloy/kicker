@@ -126,10 +126,6 @@ describe "A Kicker instance, concerning its utility methods" do
 end
 
 describe "Kernel utility methods" do
-  before do
-    utils.stubs(:last_command_succeeded?).returns(true)
-  end
-  
   it "should forward log calls to the Kicker::Utils module" do
     utils.expects(:log).with('the message')
     log 'the message'
