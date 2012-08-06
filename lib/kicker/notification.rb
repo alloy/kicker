@@ -10,9 +10,16 @@ class Kicker
         TerminalNotifier.available?
       end
 
-      def notify(title, message)
+      def notify(options)
         if usable? && use?
-          TerminalNotifier.notify(message, :title => title, :activate => app_bundle_identifier)
+          unless message = options.delete(:message)
+            raise "A notification requires a `:message'"
+          end
+          options = {
+            :group    => Dir.pwd,
+            :activate => app_bundle_identifier
+          }.merge(options)
+          TerminalNotifier.notify(message, options)
         end
       end
     end

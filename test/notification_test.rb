@@ -1,36 +1,22 @@
 require File.expand_path('../test_helper', __FILE__)
 
 describe "Kicker::Notification" do
-  before do
-    @notifier = Kicker::Notification
+  it "sends a notification, grouped by the project (identified by the working dir)" do
+    TerminalNotifier.stubs(:available?).returns(true)
+    TerminalNotifier.expects(:notify).with('ls -l', :title => 'Kicker: Executing', :group => Dir.pwd, :activate => 'com.apple.Terminal')
+    Kicker::Notification.notify(:title => 'Kicker: Executing', :message => 'ls -l')
   end
 
-  after do
-    Kicker.silent = false
+  it "does not send a notification if TerminalNotifier is not available" do
+    TerminalNotifier.stubs(:available?).returns(false)
+    TerminalNotifier.expects(:notify).never
+    Kicker::Notification.notify(:title => 'Kicker: Executing', :message => 'ls -l')
   end
 
-  it "notifies that an event occurred" do
-    status = Kicker::Status.new('ls -l')
-    @notifier.expects(:notify).with('Kicker: Executing', 'ls -l')
-    @notifier.change_occured(status)
-  end
-
-  it "only notifies that the command succeeded in silent mode" do
-    Kicker.silent = true
-    status = Kicker::Status.new('ls -l', 0, "line 1\nline 2")
-    @notifier.expects(:notify).with('Kicker: Success', '')
-    @notifier.result(status)
-  end
-
-  it "only notifies that the command failed in silent mode" do
-    Kicker.silent = true
-    status = Kicker::Status.new('ls -l', 123, "line 1\nline 2")
-    @notifier.expects(:notify).with('Kicker: Failed (123)', '')
-    @notifier.failed(status)
-  end
-
-  it "calls the terminal-notifier tool and scopes notifications by the current working dir" do
-    @notifier.expects(:`).with("'#{Kicker::Notification::TERMINAL_NOTIFICATION_BIN}' #{Dir.pwd} 'the title' 'the message' 'com.apple.Terminal'")
-    @notifier.notify('the title', 'the message')
+  it "does not send a notification if notifying is disabled" do
+    TerminalNotifier.stubs(:available?).returns(true)
+    Kicker::Notification.use = false
+    TerminalNotifier.expects(:notify).never
+    Kicker::Notification.notify(:title => 'Kicker: Executing', :message => 'ls -l')
   end
 end

@@ -38,9 +38,9 @@ describe "A Kicker instance, concerning its utility methods" do
   end
   
   it "logs that the command succeeded" do
-    utils.stubs(:_execute).with do |status|
-      status.output = "line 1\nline 2"
-      status.exit_code = 0
+    utils.stubs(:_execute).with do |job|
+      job.output = "line 1\nline 2"
+      job.exit_code = 0
     end
     utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('Success')
@@ -48,52 +48,44 @@ describe "A Kicker instance, concerning its utility methods" do
   end
 
   it "logs that the command failed" do
-    utils.stubs(:_execute).with do |status|
-      status.output = "line 1\nline 2"
-      status.exit_code = 123
+    utils.stubs(:_execute).with do |job|
+      job.output = "line 1\nline 2"
+      job.exit_code = 123
     end
     utils.expects(:log).with('Executing: ls')
     utils.expects(:log).with('Failed (123)')
     utils.execute('ls')
   end
 
-  it "notifies that a change occurred and shows the output" do
-    utils.stubs(:log)
-    utils.stubs(:_execute).with do |status|
-      status.output = "line 1\nline 2"
-    end 
-    Kicker::Notification.expects(:change_occured).with { |status| status.command == 'ls' }
-    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
-    utils.execute('ls')
-  end
-
-  it "stores the last executed command" do
-    Kicker.silent = true
-    utils.stubs(:log)
-    
-    utils.execute('date')
-    utils.last_command.should == 'date'
-  end
-  
-  it "calls the block given to execute and yields the status so the user can transform the output" do
+  it "calls the block given to execute and yields the job so the user can transform the output" do
     Kicker.silent = true
 
-    utils.stubs(:_execute).with do |status|
-      status.output = "line 1\nline 2"
-      status.exit_code = 123
+    utils.stubs(:_execute).with do |job|
+      job.output = "line 1\nline 2"
+      job.exit_code = 123
     end
 
     utils.expects(:log).with('Executing: ls -l')
     utils.expects(:puts).with("\nOhnoes!\n\n")
     utils.expects(:log).with('Failed (123)')
 
-    utils.execute('ls -l') do |status|
-      status.output = status.success? ? 'Done!' : 'Ohnoes!'
+    utils.execute('ls -l') do |job|
+      job.output = job.success? ? 'Done!' : 'Ohnoes!'
     end
   end
 
   before do
     Kicker::Notification.use = true
+  end
+
+  it "notifies that a change occurred and shows the command and then the output" do
+    utils.stubs(:log)
+    utils.stubs(:_execute).with do |job|
+      job.output = "line 1\nline 2"
+    end 
+    Kicker::Notification.expects(:notify).with(:title => 'Kicker: Executing', :message => "ls")
+    Kicker::Notification.expects(:notify).with(:title => 'Kicker: Success', :message => "line 1\nline 2")
+    utils.execute('ls')
   end
   
   it "does not notify that a change occured in silent mode" do
@@ -107,23 +99,23 @@ describe "A Kicker instance, concerning its utility methods" do
   
   it "only logs that it has succeeded in silent mode" do
     Kicker.silent = true
-    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
+    Kicker::Notification.expects(:notify).with(:title => "Kicker: Success", :message => "")
     
-    status = Kicker::Status.new('ls -l', 0, "line 1\nline 2")
+    job = Kicker::Job.new(:command => 'ls -l', :exit_code => 0, :output => "line 1\nline 2")
     
     utils.expects(:log).with("Success")
-    utils.did_execute_command(status)
+    utils.did_execute_command(job)
   end
   
   it "fully logs that it has failed in silent mode" do
     Kicker.silent = true
-    Kicker::Notification.expects(:result).with { |status| status.output == "line 1\nline 2" }
+    Kicker::Notification.expects(:notify).with(:title => "Kicker: Failed (123)", :message => "")
     
     utils.expects(:puts).with("\nline 1\nline 2\n\n")
     utils.expects(:log).with('Failed (123)')
     
-    status = Kicker::Status.new('ls -l', 123, "line 1\nline 2")
-    utils.did_execute_command(status)
+    job = Kicker::Job.new(:command => 'ls -l', :exit_code => 123, :output => "line 1\nline 2")
+    utils.did_execute_command(job)
   end
 
   private
@@ -147,12 +139,7 @@ describe "Kernel utility methods" do
     utils.expects(:execute).with('ls')
     execute 'ls'
   end
-  
-  it "should return the last_command" do
-    utils.stubs(:last_command).returns('abcde')
-    last_command.should == 'abcde'
-  end
-  
+
   private
   
   def utils

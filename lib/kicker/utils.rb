@@ -42,15 +42,15 @@ class Kicker
     # TODO default titles??
 
     attr_with_default(:notify_before) do
-      ["Kicker: Executing", command] unless Kicker.silent?
+      { :title => "Kicker: Executing", :message => command } unless Kicker.silent?
     end
 
     attr_with_default(:notify_after)  do
       message = Kicker.silent? ? "" : output
       if success?
-        ["Kicker: Success", message]
+        { :title => "Kicker: Success", :message => message }
       else
-        ["Kicker: Failed (#{exit_code})", message]
+        { :title => "Kicker: Failed (#{exit_code})", :message => message }
       end
     end
   end
@@ -150,7 +150,7 @@ class Kicker
       end
 
       if notification = job.notify_before
-        Notification.notify(*notification)
+        Notification.notify(notification)
       end
     end
     
@@ -162,7 +162,7 @@ class Kicker
       log(job.success? ? "Success" : "Failed (#{job.exit_code})")
 
       if notification = job.notify_after
-        Notification.notify(*notification)
+        Notification.notify(notification)
       end
     end
   end
@@ -185,10 +185,5 @@ module Kernel
   # notifications on Mac OS X (10.8 or higher).
   def execute(command, &block)
     Kicker::Utils.execute(command, &block)
-  end
-  
-  # Returns the last executed command.
-  def last_command
-    Kicker::Utils.last_command
   end
 end
