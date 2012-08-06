@@ -1,16 +1,15 @@
 class Kicker
   class Job
-    def self.attr_with_default(name, &default)
+    def self.attr_with_default(name, merge_hash = false, &default)
       # If `nil` this returns the `default`, unless explicitely set to `nil` by
       # the user.
       define_method(name) do
-        options = instance_eval(&default)
         if instance_variable_get("@#{name}_assigned")
-          if assigned_options = instance_variable_get("@#{name}")
-            options.merge(assigned_options)
+          if assigned_value = instance_variable_get("@#{name}")
+            merge_hash ? instance_eval(&default).merge(assigned_value) : assigned_value
           end
         else
-          options
+          instance_eval(&default)
         end
       end
       define_method("#{name}=") do |value|
@@ -42,11 +41,11 @@ class Kicker
 
     # TODO default titles??
 
-    attr_with_default(:notify_before) do
-      { :title => "Kicker: Executing", :message => command } unless Kicker.silent?
+    attr_with_default(:notify_before, true) do
+      { :title => "Kicker: Executing", :message => command }
     end
 
-    attr_with_default(:notify_after)  do
+    attr_with_default(:notify_after, true)  do
       message = Kicker.silent? ? "" : output
       if success?
         { :title => "Kicker: Success", :message => message }

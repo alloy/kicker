@@ -4,11 +4,11 @@ rescue LoadError
   require 'rake/rdoctask'
 end
 
-desc "Run tests"
-task :test do
+desc "Run specs"
+task :spec do
   # shuffle to ensure that tests are run in different order
-  files = FileList['test/**/*_test.rb'].map { |f| f[0,f.size-3] }.shuffle
-  sh "ruby -Ilib -I. -r '#{files.join("' -r '")}' -e ''"
+  files = FileList['spec/**/*_spec.rb'].shuffle
+  sh "bundle exec bacon #{files.map { |file| "'#{file}'" }.join(' ')}"
 end
 
 namespace :docs do
@@ -19,4 +19,4 @@ namespace :docs do
   end
 end
 
-task :default => :test
+task :default => :spec

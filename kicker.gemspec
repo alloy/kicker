@@ -28,9 +28,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency("rake")
   s.add_development_dependency("rdoc") # purely so it doesn't warn about deprecated rake task
 
+  s.add_development_dependency("bacon")
   s.add_development_dependency("mocha")
-  s.add_development_dependency("test-unit")
-  s.add_development_dependency("test-spec")
+  s.add_development_dependency("mocha-on-bacon")
   s.add_development_dependency("activesupport")
 end
 
