@@ -1,12 +1,18 @@
-require 'rubygems'
-
 require 'bacon'
-require 'mocha'
-require 'mocha-on-bacon'
+
+if defined?(RSpec)
+  RSpec.configure do |config|
+    config.mock_framework = :mocha
+  end
+else
+  require 'mocha-on-bacon'
+end
 
 Bacon.summary_at_exit
 
 require 'set'
+
+ENV['SPEC'] = '1'
 
 $:.unshift File.expand_path('../../lib', __FILE__)
 require 'kicker'

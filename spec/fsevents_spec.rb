@@ -21,15 +21,18 @@ end
 
 describe "Kicker::FSEvents" do
   it "calls the provided block with changed directories wrapped in an event instance" do
-    all_paths = %w(/path/to/first /path/to/second)
-    faker = FakeListener.new all_paths
-    Listen.expects(:to).with(*(all_paths.dup << {})).returns(faker)
+    tmp = Pathname.new('tmp').join('test')
+    test = tmp.join('what')
+    test.mkpath
 
-    events = nil
-    Kicker::FSEvents.start_watching(all_paths) { |e| events = e }
+    FileUtils.touch(tmp.join('file'))
 
-    faker.fake_event(%w(/path/to/first/file))
-    events.map { |e| e.path }.should == %w(/path/to/first)
+    watch_dog = Kicker::FSEvents.start_watching([tmp.to_s]) { |e| events = e }
+    Kicker::FSEvents::FSEvent.expects(:new).with('what')
+
+    FileUtils.touch(test.join('file'))
+
+    sleep 1
   end
 end
 

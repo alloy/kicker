@@ -5,7 +5,7 @@ require 'kicker/version'
 Gem::Specification.new do |s|
   s.name     = "kicker"
   s.version  = Kicker::VERSION
-  s.date     = Date.today
+  s.date     = Time.new
 
   s.summary  = "A lean, agnostic, flexible file-change watcher."
   s.authors  = ["Eloy Duran", "Manfred Stienstra"]

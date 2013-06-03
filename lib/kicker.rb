@@ -73,7 +73,13 @@ class Kicker #:nodoc:
   end
 
   def wait_for_threads
-    (Thread.list - [Thread.current]).each(&:join)
+    if wait_for_threads?
+      (Thread.list - [Thread.current]).each(&:join)
+    end
+  end
+
+  def wait_for_threads?
+    !!ENV['SPEC']
   end
 
   def run_startup_chain
