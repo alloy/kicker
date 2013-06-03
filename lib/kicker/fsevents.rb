@@ -28,7 +28,9 @@ class Kicker
         files = modified + added + removed
         directories = files.map { |file| File.dirname(file) }.uniq
         yield directories.map { |directory| Kicker::FSEvents::FSEvent.new(directory) }
-      end.start
+      end
+      listener.start
+      listener
     end
   end
 end

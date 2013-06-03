@@ -22,11 +22,10 @@ Gem::Specification.new do |s|
                            'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
-  s.add_runtime_dependency("listen")
+  s.add_runtime_dependency("listen", '~> 1.1.0')
   s.add_runtime_dependency("terminal-notifier")
 
   s.add_development_dependency("rake")
-  s.add_development_dependency("rdoc") # purely so it doesn't warn about deprecated rake task
 
   s.add_development_dependency("bacon")
   s.add_development_dependency("mocha")

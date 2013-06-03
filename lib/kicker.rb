@@ -68,8 +68,14 @@ class Kicker #:nodoc:
       watch_dog.stop
       exit
     end
+
+    wait_for_threads
   end
-  
+
+  def wait_for_threads
+    (Thread.list - [Thread.current]).each(&:join)
+  end
+
   def run_startup_chain
     startup_chain.call([], false)
   end
