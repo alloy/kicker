@@ -81,6 +81,8 @@ describe "Kicker::Job" do
   end
 
   describe "concerning explicit print and notification messages" do
+    before { Kicker.silent = false }
+
     it "returns `nil' if that was explicitely assigned" do
       %w{ print_before print_after notify_before notify_after }.each do |attr|
         @job.send("#{attr}=", nil)
@@ -99,7 +101,7 @@ describe "Kicker::Job" do
       @job.notify_before = { :message => 'Checking file list' }
       @job.notify_before.should == { :title => 'Kicker: Executing', :message => 'Checking file list' }
       @job.notify_after = { :title => 'OMG' }
-      @job.notify_after.should == { :title => 'OMG', :message => "line 1\nline 2" }
+      @job.notify_after.should ==  {:title => 'OMG', :message => "line 1\nline2" }
     end
   end
 end

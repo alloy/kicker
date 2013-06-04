@@ -1,7 +1,7 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
 describe "Kicker, concerning the default `could not handle file' callback" do
-  after do
+  before do
     Kicker.silent = false
   end
   
