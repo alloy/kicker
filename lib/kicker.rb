@@ -11,7 +11,7 @@ require 'kicker/recipes'
 class Kicker #:nodoc:
   def self.run(argv = ARGV)
     Kicker::Options.parse(argv)
-    new.start
+    new.start.loop!
   end
   
   attr_reader :last_event_processed_at
@@ -32,6 +32,8 @@ class Kicker #:nodoc:
     
     run_startup_chain
     run_watch_dog!
+
+    self
   end
   
   private
@@ -62,24 +64,15 @@ class Kicker #:nodoc:
     watch_dog = Kicker::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
       process events
     end
-    
     trap('INT') do
       log "Exiting ..."
       watch_dog.stop
       exit
     end
-
-    wait_for_threads
   end
 
-  def wait_for_threads
-    if wait_for_threads?
-      (Thread.list - [Thread.current]).each(&:join)
-    end
-  end
-
-  def wait_for_threads?
-    !!ENV['SPEC']
+  def loop!
+    (Thread.list - [Thread.current]).each(&:join)
   end
 
   def run_startup_chain
