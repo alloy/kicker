@@ -1,18 +1,9 @@
 require 'bacon'
-
-if defined?(RSpec)
-  RSpec.configure do |config|
-    config.mock_framework = :mocha
-  end
-else
-  require 'mocha-on-bacon'
-end
+require 'mocha-on-bacon'
 
 Bacon.summary_at_exit
 
 require 'set'
-
-ENV['SPEC'] = '1'
 
 $:.unshift File.expand_path('../../lib', __FILE__)
 require 'kicker'

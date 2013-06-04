@@ -16,19 +16,15 @@ Gem::Specification.new do |s|
   s.require_paths    = %w{ lib vendor }
   s.files            = Dir['bin/kicker',
                            'lib/**/*.rb',
-                           'vendor/terminal-notifier_v1.0/**/*',
                            'README.rdoc',
                            'LICENSE',
                            'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
   s.add_runtime_dependency("listen", '~> 1.1.0')
-  s.add_runtime_dependency("terminal-notifier")
-
-  s.add_development_dependency("rake")
+  s.add_runtime_dependency("terminal-notifier", '~> 1.4.2')
 
   s.add_development_dependency("bacon")
-  s.add_development_dependency("mocha")
   s.add_development_dependency("mocha-on-bacon")
   s.add_development_dependency("activesupport")
 end
