@@ -12,7 +12,7 @@ class File
   class << self
     attr_accessor :existing_files
     attr_accessor :use_original_exist
-    
+
     alias exist_without_stubbing? exist?
     def exist?(file)
       if use_original_exist

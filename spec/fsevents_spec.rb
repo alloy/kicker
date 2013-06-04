@@ -4,16 +4,16 @@ class FakeListener
   def initialize(paths, options={})
     @paths = paths
   end
-  
+
   def change(&block)
     @block = block
     self
   end
-  
+
   def start blocking=true
     self
   end
-  
+
   def fake_event(paths)
     @block.call(paths, [], [])
   end

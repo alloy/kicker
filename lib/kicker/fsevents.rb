@@ -6,11 +6,11 @@ class Kicker
   class FSEvents
     class FSEvent
       attr_reader :path
-      
+
       def initialize(path)
         @path = path
       end
-      
+
       def files
         Dir.glob("#{File.expand_path(path)}/*").map do |filename|
           begin
@@ -21,7 +21,7 @@ class Kicker
         end.compact.sort.reverse.map { |_, filename| filename }
       end
     end
-    
+
     def self.start_watching(paths, options={}, &block)
       listener = Listen.to(*(paths.dup << options))
       listener.change do |modified, added, removed|

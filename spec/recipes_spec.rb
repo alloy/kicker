@@ -6,7 +6,7 @@ describe "Kicker::Recipes" do
   before do
     Kicker::Recipes.reset!
   end
-  
+
   it "returns a list of recipes" do
     recipe_files = Kicker::Recipes.recipe_files
     if File.exist?(File.expand_path('~/.kick'))
@@ -17,7 +17,7 @@ describe "Kicker::Recipes" do
       end
     end
   end
-  
+
   it "returns a list of recipe names" do
     expected = Set.new(%w(could_not_handle_file dot_kick execute_cli_command ignore jstest rails ruby).map { |n| n.to_sym })
     actual = Set.new(Kicker::Recipes.recipe_names)
@@ -29,7 +29,7 @@ describe "Kicker::Recipes" do
       end
     end
   end
-  
+
   # TODO ~/.kick is no longer added to the load path, but files are looked up
   # in lib/kicker/recipes.rb recipe_filename
   #
@@ -40,18 +40,18 @@ describe "Kicker::Recipes" do
   #else
     #puts "[!] ~/.kick does not exist, not testing the Kicker directory support."
   #end
-  
+
   it "should load a recipe" do
     should.not.raise { recipe :ruby }
   end
-  
+
   it "does not break when a recipe is loaded twice" do
     should.not.raise do
       recipe :ruby
       recipe :ruby
     end
   end
-  
+
   it "should define a recipe load callback" do
     called = false
     recipe('new_recipe') { called = true }
@@ -59,7 +59,7 @@ describe "Kicker::Recipes" do
     recipe(:new_recipe)
     called.should == true
   end
-  
+
   it "should raise if a recipe does not exist" do
     begin
       recipe :foobar
