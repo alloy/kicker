@@ -5,10 +5,6 @@
 /coverage
 /rdoc
 /pkg
-/html/*.html
-/html/*.rid
-/html/*.css
-/html/classes
-/html/files
+/html
 /Gemfile.lock
 /tmp/
