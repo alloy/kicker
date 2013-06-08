@@ -36,6 +36,10 @@ class Kicker #:nodoc:
     self
   end
 
+  def loop!
+    (Thread.list - [Thread.current]).each(&:join)
+  end
+
   private
 
   def validate_options!
@@ -69,10 +73,6 @@ class Kicker #:nodoc:
       watch_dog.stop
       exit
     end
-  end
-
-  def loop!
-    (Thread.list - [Thread.current]).each(&:join)
   end
 
   def run_startup_chain
