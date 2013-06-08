@@ -22,14 +22,12 @@ describe "Kicker::Options.parse" do
     Kicker.paths.should == %w{ /some/file.rb /a/dir /and/some/other/file.rb }
   end
 
-  if Kicker::Notification.usable?
-    it "parses wether or not user notifications should be used" do
-      Kicker::Options.parse([])
-      Kicker::Notification.should.use
+  it "parses wether or not user notifications should be used" do
+    Kicker::Options.parse([])
+    Kicker::Notification.should.use
 
-      Kicker::Options.parse(%w{ --no-notification })
-      Kicker::Notification.should.not.use
-    end
+    Kicker::Options.parse(%w{ --no-notification })
+    Kicker::Notification.should.not.use
   end
 
   it "should parse if we should keep output to a minimum" do
@@ -58,7 +56,7 @@ describe "Kicker::Options.parse" do
     Kicker.should.clear_console
   end
 
-  if Kicker::Notification.usable?
+  if Kicker.osx?
     it "parses the application to activate when a user notification is clicked" do
       Kicker::Options.parse(%w{ --activate-app com.apple.Safari })
       Kicker::Notification.app_bundle_identifier.should == 'com.apple.Safari'
