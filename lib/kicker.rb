@@ -37,7 +37,7 @@ class Kicker #:nodoc:
   end
 
   def loop!
-    (Thread.list - [Thread.current]).each(&:join)
+    (Thread.list - [Thread.current, Thread.main]).each(&:join)
   end
 
   private
