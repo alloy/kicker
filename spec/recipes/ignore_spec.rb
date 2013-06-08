@@ -1,8 +1,8 @@
 require File.expand_path('../../spec_helper', __FILE__)
 
-before = Kicker.pre_process_chain.dup
 recipe :ignore
-IGNORE = (Kicker.pre_process_chain - before).first
+
+IGNORE = Kicker.pre_process_chain.find{|callback| callback == Ignore }
 
 describe "The Ignore handler" do
   it "should remove files that match the given regexp" do
