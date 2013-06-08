@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.date     = Time.new
 
   s.summary  = "A lean, agnostic, flexible file-change watcher."
+  s.description = "Allows you to fire specific command on file-system change."
   s.authors  = ["Eloy Duran", "Manfred Stienstra"]
   s.homepage = "http://github.com/alloy/kicker"
   s.email    = %w{ eloy.de.enige@gmail.com manfred@fngtps.com }

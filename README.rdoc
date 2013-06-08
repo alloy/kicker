@@ -18,9 +18,9 @@ feel offended; live with it.</i>
 == The short version
 
   Usage: ./bin/kicker [options] [paths to watch]
- 
+
     Available recipes: ignore, jstest, rails, ruby.
- 
+
       -s, --silent                     Keep output to a minimum.
       -q, --quiet                      Quiet output. Don't print timestamps when logging.
       -c, --clear                      Clear console before each run.
@@ -64,7 +64,8 @@ A few recipes come shipped with Kicker:
   HeadlessSquirrel[http://github.com/Fingertips/Headless-squirrel].
 * Ignore, ignores logs, tmp, and svn and git files.
 
-Add your own shared recipes to <tt>~/.kick</tt>.
+Add your own shared recipes to <tt>~/.kick</tt> folder or
+current working directory <tt>.kick</tt>.
 
 === Project specific handlers
 
@@ -110,7 +111,7 @@ be added:
     test_files = files.take_and_map do |file|
       if path =~ %r{^app/views/mailer/\w+\.erb$}
         'test/unit/mailer_test.rb'
-      
+
       # elsif ... handle more app specific stuff
       end
     end
