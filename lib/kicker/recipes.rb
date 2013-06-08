@@ -1,6 +1,3 @@
-RECIPES_DIR      = File.expand_path('../recipes', __FILE__)
-USER_RECIPES_DIR = File.expand_path('~/.kick')
-
 module Kernel
   # If only given a <tt>name</tt>, the specified recipe will be loaded. For
   # instance, the following, in a <tt>.kick</tt> file, will load the Rails
@@ -25,6 +22,12 @@ end
 
 class Kicker
   module Recipes #:nodoc:
+    RECIPES_DIR      = Pathname.new('../recipes').expand_path(__FILE__)
+    USER_RECIPES_DIR = Pathname.new('~/.kick').expand_path
+    CURRENT_RECIPES_DIR = Pathname.pwd.join('.kick').expand_path
+
+    RECIPES_DIRS = [RECIPES_DIR, USER_RECIPES_DIR, CURRENT_RECIPES_DIR]
+
     class << self
       def reset!
         @recipes = nil
@@ -43,17 +46,17 @@ class Kicker
           USER_RECIPES_DIR,
           RECIPES_DIR
         ].each do |directory|
-          filename = File.join(directory, "#{name}.rb")
-          return filename if File.exist?(filename)
+          filename = directory.join("#{name}.rb")
+          return filename if filename.exist?
         end
       end
 
       def recipe_names
-        recipe_files.map { |filename| File.basename(filename, '.rb').to_sym }
+        recipe_files.map { |filename| filename.basename('.rb').to_s.to_sym }
       end
 
       def recipe_files
-        Dir.glob(File.join(RECIPES_DIR, '*.rb')) + Dir.glob(File.join(USER_RECIPES_DIR, '*.rb'))
+        RECIPES_DIRS.map{|dir| Pathname.glob(dir.join('*.rb')) }.flatten.uniq.map(&:expand_path)
       end
 
       def define_recipe(name, &block)
