@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   }
 
   s.add_runtime_dependency("listen", '~> 1.1.0')
-  s.add_runtime_dependency("notify", '~> 0.5.1')
+  s.add_runtime_dependency("notify", '~> 0.5.2')
 
   s.add_development_dependency("bacon")
   s.add_development_dependency("mocha-on-bacon")
