@@ -43,7 +43,7 @@ class Kicker
         opt.separator " "
 
         opt.on('-v', 'Print the Kicker version') do
-          puts VERSION
+          puts Kicker::VERSION
           exit
         end
 
