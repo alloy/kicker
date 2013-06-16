@@ -78,7 +78,7 @@ class Kicker
         IO.popen("#{command} 2>&1", &block)
       end
     end
-    
+
     def will_execute_command(job)
       puts(CLEAR) if Kicker.clear_console? && should_clear_screen?
       @should_clear_screen = false
@@ -91,7 +91,7 @@ class Kicker
         Notification.notify(notification)
       end
     end
-    
+
     def did_execute_command(job)
       if message = job.print_after
         puts(message)
@@ -111,14 +111,14 @@ module Kernel
   def log(message)
     Kicker::Utils.log(message)
   end
-  
+
   # When you perform some work (like shelling out a command to run without
   # using +execute+) you need to call this method, with a block in which you
   # perform your work, which will take care of logging the work appropriately.
   def perform_work(command, &block)
     Kicker::Utils.perform_work(command, &block)
   end
-  
+
   # Executes the +command+, logs the output, and optionally sends user
   # notifications on Mac OS X (10.8 or higher).
   def execute(command, &block)

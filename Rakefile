@@ -1,8 +1,4 @@
-begin
-  require 'rdoc/task'
-rescue LoadError
-  require 'rake/rdoctask'
-end
+require 'rdoc/task'
 
 desc "Run specs"
 task :spec do
@@ -12,11 +8,15 @@ task :spec do
 end
 
 namespace :docs do
-  Rake::RDocTask.new('generate') do |t|
+  RDoc::Task.new('generate') do |t|
     t.main = "README.rdoc"
     t.rdoc_files.include("README.rdoc", "lib/**/*.rb")
     t.options << '--charset=utf8'
   end
+end
+
+task :docs => 'docs:generate' do
+  FileUtils.cp_r('images', 'html')
 end
 
 task :default => :spec
