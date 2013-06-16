@@ -11,6 +11,11 @@ Meet king kikker, kicking stuff in your computers is his dream come true!
 <i>Drawing by Manfred Stienstra. The character is purely fictional, so if you
 feel offended; live with it.</i>
 
+== Ruby Version support
+Beginning with 3.0.0 we are dropping Ruby 1.8 support.
+We are not running tests automatically so nothing is guaranteed.
+But it still might work. If it does not work for you. Use latest 2.x release.
+
 == Installation
 
   $ gem install kicker -s http://gemcutter.org
