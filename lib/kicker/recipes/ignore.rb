@@ -7,11 +7,11 @@ module Ignore
   def self.call(files) #:nodoc:
     files.reject! { |file| ignores.any? { |ignore| file =~ ignore } }
   end
-  
+
   def self.ignores #:nodoc:
     @ignores ||= []
   end
-  
+
   def self.ignore(regexp_or_string) #:nodoc:
     ignores << (regexp_or_string.is_a?(Regexp) ? regexp_or_string : /^#{regexp_or_string}$/)
   end
@@ -33,7 +33,7 @@ end
 
 recipe :ignore do
   pre_process Ignore
-  
+
   ignore("tmp")
   ignore(/\w+\.log/)
   ignore(/\.(svn|git)\//)

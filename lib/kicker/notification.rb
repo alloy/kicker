@@ -1,26 +1,26 @@
-require 'terminal-notifier'
+require 'notify'
 
 class Kicker
   module Notification #:nodoc:
+    TITLE = 'Kicker'
+
     class << self
       attr_accessor :use, :app_bundle_identifier
       alias_method :use?, :use
 
-      def usable?
-        TerminalNotifier.available?
-      end
-
       def notify(options)
-        if usable? && use?
-          unless message = options.delete(:message)
-            raise "A notification requires a `:message'"
-          end
-          options = {
-            :group    => Dir.pwd,
-            :activate => app_bundle_identifier
-          }.merge(options)
-          TerminalNotifier.notify(message, options)
+        return unless use?
+
+        unless message = options.delete(:message)
+          raise "A notification requires a `:message'"
         end
+
+        options = {
+          :group    => Dir.pwd,
+          :activate => app_bundle_identifier
+        }.merge(options)
+
+        Notify.notify(TITLE, message, options)
       end
     end
   end
