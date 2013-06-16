@@ -1,6 +1,14 @@
 require File.expand_path('../spec_helper', __FILE__)
 
+require 'stringio'
 describe "Kicker, when a change occurs" do
+  def silent(&block)
+    stdout = $stdout
+    $stdout = StringIO.new
+    yield
+  ensure
+    $stdout = stdout
+  end
   def touch(file)
     file = "/tmp/kicker_test_tmp_#{file}"
     `touch #{file}`
@@ -118,9 +126,13 @@ describe "Kicker, when a change occurs" do
 
     files = %w{ /file/1 /file/2 }
     @kicker.stubs(:changed_files).returns(files)
+
     @kicker.process_chain.append_callback lambda { |files| Kicker::Utils.perform_work('ls -l') {} }
     @kicker.process_chain.append_callback lambda { |files| Kicker::Utils.perform_work('ls -l') {} }
-    @kicker.send(:process, files.map { |f| event(f) })
+
+    silent do
+      @kicker.send(:process, files.map { |f| event(f) })
+    end
   end
 
   it "does not clear the console if no work is ever performed" do
