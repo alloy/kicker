@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
+
 $:.unshift File.expand_path('../lib', __FILE__)
 require 'kicker/version'
+require 'date'
 
 Gem::Specification.new do |s|
   s.name     = "kicker"
