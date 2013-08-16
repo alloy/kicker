@@ -26,8 +26,7 @@ Gem::Specification.new do |s|
     For multi platform notifications install notification gem for your platform.
     For the list of supported gems see https://github.com/jugyo/notify#feature
   }
-
-  s.add_runtime_dependency("listen", '~> 1.1.0')
+  s.add_runtime_dependency("listen", '~> 1.3.0')
   s.add_runtime_dependency("notify", '~> 0.5.2')
 
   s.add_development_dependency("bacon")
