@@ -28,7 +28,7 @@ describe "Kicker::FSEvents" do
     FileUtils.touch(tmp.join('file'))
 
     watch_dog = Kicker::FSEvents.start_watching([tmp.to_s]) { |e| events = e }
-    Kicker::FSEvents::FSEvent.expects(:new).with('what')
+    Kicker::FSEvents::FSEvent.expects(:new).with(File.expand_path(test.to_s))
 
     FileUtils.touch(test.join('file'))
 
