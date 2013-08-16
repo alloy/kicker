@@ -24,10 +24,6 @@ Gem::Specification.new do |s|
                            'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
-  s.post_install_message = %{
-    For multi platform notifications install notification gem for your platform.
-    For the list of supported gems see https://github.com/jugyo/notify#feature
-  }
   s.add_runtime_dependency("listen", '~> 1.3.0')
   s.add_runtime_dependency("notify", '~> 0.5.2')
 

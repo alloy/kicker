@@ -132,6 +132,16 @@ To load recipes from your <tt>~/.kick</tt> file:
 That’s basically it, just remember that the order of specifying handlers _can_
 be important in your decision on where to specify handlers.
 
+== Notifiers
+
+For platform specific notifications we use the notify gem. For supported
+backends see: https://github.com/jugyo/notify#feature.
+
+You select the notify backend by setting the NOTIFY environment variable.
+
+  gem install terminal-notifier
+  env NOTIFY=terminal-notifier kicker
+
 == Contributors
 
 * Manfred Stienstra (@manfred)
