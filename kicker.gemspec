@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.name     = "kicker"
   s.version  = Kicker::VERSION
   s.date     = Time.new
+  s.license  = 'MIT'
 
   s.summary  = "A lean, agnostic, flexible file-change watcher."
   s.description = "Allows you to fire specific command on file-system change."
