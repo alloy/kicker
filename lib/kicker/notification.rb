@@ -25,7 +25,7 @@ class Kicker
     end
   end
 
-  Notification.use = true
+  Notification.use = ENV['NOTIFY'].to_s != ''
   Notification.app_bundle_identifier = 'com.apple.Terminal'
 end
 
