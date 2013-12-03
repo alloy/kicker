@@ -23,7 +23,7 @@ end
 
 desc "Install gem"
 task :install => :build do
-  sh "sudo gem install #{gem_file}"
+  sh "gem install #{gem_file}"
 end
 
 desc "Clean, build, install, and push gem to rubygems.org"
