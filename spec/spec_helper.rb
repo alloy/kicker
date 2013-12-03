@@ -1,10 +1,8 @@
-require 'rubygems'
+require 'bacon'
+require 'mocha-on-bacon'
 
-gem 'test-unit'
-require 'test/unit'
-require 'test/spec'
+Bacon.summary_at_exit
 
-require 'mocha'
 require 'set'
 
 $:.unshift File.expand_path('../../lib', __FILE__)
@@ -14,7 +12,7 @@ class File
   class << self
     attr_accessor :existing_files
     attr_accessor :use_original_exist
-    
+
     alias exist_without_stubbing? exist?
     def exist?(file)
       if use_original_exist

@@ -1,22 +1,22 @@
-begin
-  require 'rdoc/task'
-rescue LoadError
-  require 'rake/rdoctask'
-end
+require 'rdoc/task'
 
-desc "Run tests"
-task :test do
+desc "Run specs"
+task :spec do
   # shuffle to ensure that tests are run in different order
-  files = FileList['test/**/*_test.rb'].map { |f| f[0,f.size-3] }.shuffle
-  sh "ruby -Ilib -I. -r '#{files.join("' -r '")}' -e ''"
+  files = FileList['spec/**/*_spec.rb'].shuffle
+  sh "bundle exec bacon #{files.map { |file| "'#{file}'" }.join(' ')}"
 end
 
 namespace :docs do
-  Rake::RDocTask.new('generate') do |t|
+  RDoc::Task.new('generate') do |t|
     t.main = "README.rdoc"
     t.rdoc_files.include("README.rdoc", "lib/**/*.rb")
     t.options << '--charset=utf8'
   end
 end
 
-task :default => :test
+task :docs => 'docs:generate' do
+  FileUtils.cp_r('images', 'html')
+end
+
+task :default => :spec

@@ -6,7 +6,7 @@ class Kicker::Recipes::Rails < Kicker::Recipes::Ruby
     %w{ test_type runner_bin test_cases_root test_options }.each do |delegate|
       define_method(delegate) { Kicker::Recipes::Ruby.send(delegate) }
     end
-    
+
     # Maps +type+, for instance `models', to a test directory.
     def type_to_test_dir(type)
       if test_type == 'test'
@@ -43,7 +43,7 @@ class Kicker::Recipes::Rails < Kicker::Recipes::Ruby
       end
     end
   end
-  
+
   # Returns an array of all tests related to the given model.
   def tests_for_model(model)
     if test_type == 'test'
@@ -60,37 +60,37 @@ class Kicker::Recipes::Rails < Kicker::Recipes::Ruby
       }
     end.map { |f| test_file f }
   end
-  
+
   def handle!
     @tests.concat(@files.take_and_map do |file|
       case file
       # Run all functional tests when routes.rb is saved
       when 'config/routes.rb'
         Kicker::Recipes::Rails.all_controller_tests
-      
+
       # Match lib/*
       when /^(lib\/.+)\.rb$/
         test_file($1)
-      
+
       # Map fixtures to their related tests
       when %r{^#{test_cases_root}/fixtures/(\w+)\.yml$}
         tests_for_model($1)
-      
+
       # Match any file in app/ and map it to a test file
       when %r{^app/(\w+)([\w/]*)/([\w\.]+)\.\w+$}
         type, namespace, file = $1, $2, $3
-        
+
         if dir = Kicker::Recipes::Rails.type_to_test_dir(type)
           if type == "views"
             namespace = namespace.split('/')[1..-1]
             file = "#{namespace.pop}_controller"
           end
-          
+
           test_file File.join(dir, namespace, file)
         end
       end
     end)
-    
+
     # And let the Ruby handler match other stuff.
     super
   end
@@ -99,9 +99,9 @@ end
 recipe :rails do
   require 'rubygems' rescue LoadError
   require 'active_support/inflector'
-  
+
   process Kicker::Recipes::Rails
-  
+
   # When changing the schema, prepare the test database.
   process do |files|
     execute 'rake db:test:prepare' if files.delete('db/schema.rb')

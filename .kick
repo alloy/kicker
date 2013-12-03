@@ -1,13 +1,15 @@
 recipe :ignore
 recipe :ruby
 
+Kicker::Recipes::Ruby.runner_bin = 'bacon'
+
 process do |files|
   test_files = files.take_and_map do |file|
     case file
     when %r{^lib/kicker(\.rb|/validate\.rb|/growl\.rb)$}
-      ["test/initialization_test.rb", ("test/filesystem_change_test.rb" if $1 == '.rb')]
+      ["spec/initialization_spec.rb", ("spec/filesystem_change_spec.rb" if $1 == '.rb')]
     when %r{^lib/kicker/(.+)\.rb$}
-      "test/#{$1}_test.rb"
+      "spec/#{$1}_spec.rb"
     end
   end
   

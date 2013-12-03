@@ -1,36 +1,32 @@
 require 'shellwords' if RUBY_VERSION >= "1.9"
 
 class Kicker
-  Status = Struct.new(:command, :exit_code, :output) do
-    def success?
-      exit_code == 0
-    end
-  end
-
   module Utils #:nodoc:
     extend self
 
     attr_accessor :should_clear_screen
     alias_method :should_clear_screen?, :should_clear_screen
 
-    def perform_work(command)
-      @last_command = command
-      status = Status.new(command, 0, '')
-      will_execute_command(status)
-      yield status
-      did_execute_command(status)
-      status
-    end
-
-    def execute(command)
-      perform_work(command) do |status|
-        _execute(status)
-        yield status if block_given?
+    def perform_work(command_or_options)
+      if command_or_options.is_a?(Hash)
+        options = command_or_options
+      elsif command_or_options.is_a?(String)
+        options = { :command => command_or_options }
+      else
+        raise ArgumentError, "Should be a string or a hash."
       end
+      job = Job.new(options)
+      will_execute_command(job)
+      yield job
+      did_execute_command(job)
+      job
     end
 
-    def last_command
-      @last_command
+    def execute(command_or_options)
+      perform_work(command_or_options) do |job|
+        _execute(job)
+        yield job if block_given?
+      end
     end
 
     def log(message)
@@ -41,14 +37,6 @@ class Kicker
         puts "#{now.strftime('%H:%M:%S')}.#{now.usec.to_s[0,2]} | #{message}"
       end
     end
-    
-    def last_command_succeeded?
-      $?.success?
-    end
-    
-    def last_command_status
-      $?.exitstatus
-    end
 
     def clear_console!
       puts(CLEAR) if Kicker.clear_console?
@@ -58,22 +46,22 @@ class Kicker
 
     CLEAR = "\e[H\e[2J"
 
-    def _execute(status)
+    def _execute(job)
       silent = Kicker.silent?
       unless silent
         puts
         sync_before, $stdout.sync = $stdout.sync, true
       end
       output = ""
-      popen(status.command) do |io|
+      popen(job.command) do |io|
         while str = io.read(1)
           output << str
           $stdout.print str unless silent
         end
       end
-      status.output = output.strip
-      status.exit_code = last_command_status
-      status
+      job.output = output.strip
+      job.exit_code = $?.exitstatus
+      job
     ensure
       unless silent
         $stdout.sync = sync_before
@@ -90,19 +78,30 @@ class Kicker
         IO.popen("#{command} 2>&1", &block)
       end
     end
-    
-    def will_execute_command(status)
+
+    def will_execute_command(job)
       puts(CLEAR) if Kicker.clear_console? && should_clear_screen?
       @should_clear_screen = false
 
-      log "Executing: #{status.command}"
-      Kicker::Growl.change_occured(status) if Kicker::Growl.use? && !Kicker.silent?
+      if message = job.print_before
+        log(message)
+      end
+
+      if notification = job.notify_before
+        Notification.notify(notification)
+      end
     end
-    
-    def did_execute_command(status)
-      puts("\n#{status.output}\n\n") if Kicker.silent? && !status.success?
-      log(status.success? ? "Success" : "Failed (#{status.exit_code})")
-      Kicker::Growl.result(status) if Kicker::Growl.use?
+
+    def did_execute_command(job)
+      if message = job.print_after
+        puts(message)
+      end
+
+      log(job.success? ? "Success" : "Failed (#{job.exit_code})")
+
+      if notification = job.notify_after
+        Notification.notify(notification)
+      end
     end
   end
 end
@@ -112,21 +111,17 @@ module Kernel
   def log(message)
     Kicker::Utils.log(message)
   end
-  
+
   # When you perform some work (like shelling out a command to run without
   # using +execute+) you need to call this method, with a block in which you
   # perform your work, which will take care of logging the work appropriately.
   def perform_work(command, &block)
     Kicker::Utils.perform_work(command, &block)
   end
-  
-  # Executes the +command+, logs the output, and optionally growls.
+
+  # Executes the +command+, logs the output, and optionally sends user
+  # notifications on Mac OS X (10.8 or higher).
   def execute(command, &block)
     Kicker::Utils.execute(command, &block)
-  end
-  
-  # Returns the last executed command.
-  def last_command
-    Kicker::Utils.last_command
   end
 end

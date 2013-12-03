@@ -1,3 +1,3 @@
 class Kicker
-  VERSION = "2.6.1"
+  VERSION = "3.0.0pre3"
 end
