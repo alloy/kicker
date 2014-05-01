@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
                            'html/images/kikker.jpg']
   s.extra_rdoc_files = %w{ LICENSE README.rdoc }
 
-  s.add_runtime_dependency("listen", '~> 2.7.3')
+  s.add_runtime_dependency("listen", '~> 2.7.1')
   s.add_runtime_dependency("notify", '~> 0.5.2')
 
   s.add_development_dependency("bacon")
