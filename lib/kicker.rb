@@ -12,6 +12,9 @@ class Kicker #:nodoc:
   def self.run(argv = ARGV)
     Kicker::Options.parse(argv)
     new.start.loop!
+  rescue Interrupt
+    log 'Exiting...'
+    exit
   end
 
   attr_reader :last_event_processed_at
