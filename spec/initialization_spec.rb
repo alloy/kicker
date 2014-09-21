@@ -100,11 +100,9 @@ describe "Kicker, when starting" do
   it "should setup a signal handler for `INT' which stops the FSEvents stream and exits" do
     @kicker.stubs(:validate_options!)
 
-    watch_dog = stub('Kicker::FSEvents')
-    Kicker::FSEvents.stubs(:start_watching).returns(watch_dog)
+    Kicker::FSEvents.stubs(:start_watching).returns(stub)
 
     @kicker.expects(:trap).with('INT').yields
-    watch_dog.expects(:stop)
     @kicker.expects(:exit)
 
     @kicker.start

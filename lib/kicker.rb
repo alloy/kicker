@@ -12,9 +12,6 @@ class Kicker #:nodoc:
   def self.run(argv = ARGV)
     Kicker::Options.parse(argv)
     new.start.loop!
-  rescue Interrupt
-    log 'Exiting...'
-    exit
   end
 
   attr_reader :last_event_processed_at
@@ -68,12 +65,11 @@ class Kicker #:nodoc:
 
   def run_watch_dog!
     dirs = @paths.map { |path| File.directory?(path) ? path : File.dirname(path) }
-    watch_dog = Kicker::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
+    Kicker::FSEvents.start_watching(dirs, :latency => self.class.latency) do |events|
       process events
     end
     trap('INT') do
-      log "Exiting ..."
-      watch_dog.stop
+      log 'Exiting ...'
       exit
     end
   end
