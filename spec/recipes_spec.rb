@@ -17,6 +17,7 @@ describe "Kicker::Recipes" do
   before do
     FakeFS.activate!
     FakeFS::FileSystem.clone(RECIPES_PATH)
+    Dir.chdir(File.absolute_path('../../', __FILE__))
   end
 
   after do
@@ -31,7 +32,7 @@ describe "Kicker::Recipes" do
   end
 
   it "loads local recipes" do
-    local = Pathname.new('~/.kick')
+    local = Pathname.new('~/.kick').expand_path
     local.mkpath
     recipe = local.join('some-random-recipe.rb')
     FileUtils.touch(recipe)
