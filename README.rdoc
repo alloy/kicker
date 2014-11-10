@@ -1,6 +1,6 @@
 = Kicker
 
-{<img src="https://secure.travis-ci.org/alloy/kicker.png" />}[http://travis-ci.org/alloy/kicker]
+{<img src="https://travis-ci.org/alloy/kicker.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/alloy/kicker]
 
 A lean, agnostic, flexible file-change watcher.
 

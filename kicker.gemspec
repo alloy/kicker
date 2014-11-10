@@ -31,6 +31,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency("bacon")
   s.add_development_dependency("mocha-on-bacon")
   s.add_development_dependency("activesupport")
-  s.add_development_dependency("fakefs")
+  s.add_development_dependency("fakefs", '>= 0.5')
 end
 
